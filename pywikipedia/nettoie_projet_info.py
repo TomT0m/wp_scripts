@@ -76,6 +76,8 @@ def extract_date(text):
 		if match:
 			return Date(match.group(1), match.group(2), match.group(3))
 	return None
+
+#pylint: disable=W0611
 import os
 
 def msg_line_eating():
@@ -219,7 +221,7 @@ def create_options():
 	""" Script option parsing """
 	options = ArgumentParser()
 
-	options.add_argument('-s', '--simulate', action='store_false', 
+	options.add_argument('-s', '--simulate', action='store_true', 
 		    help = "don't save changes", dest = "simulate")
 	options.add_argument('-t', '--test', action='store_true', 
 		    help = "run tests", dest = "test")
