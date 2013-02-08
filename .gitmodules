@@ -1,0 +1,3 @@
+[submodule "mwparserfromhell"]
+	path = mwparserfromhell
+	url = " git://github.com/earwig/mwparserfromhell.git"

@@ -9,7 +9,7 @@ import re, logging
 from functools import total_ordering
 
 import wikipedia
-
+import mwparserfromhell
 
 
 @total_ordering
@@ -39,8 +39,11 @@ class Date(object):
 		return self.annee < other.annee or (
 			self.annee == other.annee and self.mois < other.mois or (
 				self.mois == other.mois and self.jour < other.jour))
-	def __repr__(self):
-		return u"{:2d} {} {:4d}".format(self.jour, self.MOIS[self.mois], self.annee)
+	def __str__(self):
+		res = u"{:2d} {} {:4d}".format(self.jour, self.MOIS[self.mois], self.annee)
+		print(res)
+		print(repr(res))
+		return res
 
 	@property
 	def mois(self):
@@ -104,9 +107,11 @@ def msg_line_eating():
 
 	return '(?:' + '^$\n?' +'|'+ not_eq_eq + ".*$\n?" + ')'
 
-def extract_announces(text):
+def extract_full_del_props(text):
 	""" Takes wikicode, returns a pair 
 	([(title(str), Date)*], newtext)
+
+	Searches deletion proposition generated with the standard ''full template'' form
 	"""
 	pattern = u"""== L'article {} est proposé à la suppression ==$\n""" + '((?:' + msg_line_eating() +')*'+ ')'
 	articles = []
@@ -134,8 +139,9 @@ def extract_announces(text):
 def format_del_announce(date, article_name):
 	""" returns a mediawiki template text for a deletion announce"""
 	return u"{{Annonce proposition suppression|nom=" +\
-		article_name+u"|"+\
-		repr(date)+ u"}}"
+		article_name + u"|" +\
+		date.__str__() + u"}}"
+		#TODO: gni ?
 
 def insert_new_announces(old_text, to_del_list):
 	""" Creates a text with to_del_list announces inserted at timely sorted"""
@@ -144,17 +150,17 @@ def insert_new_announces(old_text, to_del_list):
 	# découpage en utilisant les marqueurs de la section annonces dans la page
 	
 
-	sep_preamble = "------->"
-	sep_end = "<noinclude>"
+	sep_preamble = u"------->"
+	sep_end = u"<noinclude>"
 	
 	(preamble, following ) = old_text.split( sep_preamble, 1)
 	(section_annonces, rest) = following.split( sep_end, 1 )
 
 	# prétraitement des annonces : création d'une liste de couple (template, Date)
-	announces_lines = section_annonces.split("\n")
+	announces_lines = section_annonces.split(u"\n")
 	
 	dated_old_announces = [ (text, extract_date(text)) 
-			for text in announces_lines if text != ""]
+			for text in announces_lines if text != u""]
 	dated_new_announces = [ (format_del_announce(date, name), date) 
 			for name, date in to_del_list]
 	
@@ -164,9 +170,47 @@ def insert_new_announces(old_text, to_del_list):
 
 	# création de la section finale
 
-	new_section = "\n".join([ text for text, _ in sorted_announces])
+	new_section = u"\n".join([ text for text, _ in sorted_announces])
 
-	return preamble + sep_preamble + new_section + sep_end + rest
+	return preamble + sep_preamble + u"\n" + new_section + u"\n" + sep_end + rest
+
+class PageStatus:
+	""" Status object """
+	def __init__(self, page):
+		self.page = page
+
+	def is_proposed_to_deletion(self):
+		""" try to guess if there is a fusion proposition related to this page"""
+		if self.page.exists():
+			return "{{suppression}}" in self.page.get()
+
+		return False
+
+def get_page_status(pagename):
+	""" Returns a page status object """
+	site = wikipedia.getSite("fr")
+	page = wikipedia.Page(site, pagename)
+
+	return PageStatus(page)
+
+class Template(object):
+	""" Mediawiki template encapsulation class """
+	def __init__(self, name, *args, **kwargs):
+		self.name = name
+		self.args = args
+		self.kwargs = kwargs
+	
+
+	
+def parse_template(tmpl_text):
+	""" Creates a Template object from a template string """
+	# regex = '{{'+ +'|[^|]*' +'}}'
+	return
+
+def deletion_prop_status_update(del_prop_list):
+	""" returns an updated prop list"""
+	for article, date in del_prop_list:
+		print(article, date)
 
 def deletion_prop_maintenance(base_name, simulate = False):
 	""" Real Action """
@@ -189,7 +233,7 @@ def deletion_prop_maintenance(base_name, simulate = False):
 
 	# récupération des annonces noyées dans la PDD
 	#
-	(articles, new_discussion_text) = extract_announces(discussion_text)
+	(articles, new_discussion_text) = extract_full_del_props(discussion_text)
 
 	# stats sur le diff entre page générée et page originale
 	logging.info("Before : {} ; After {} ; expected around {}".format(len(discussion_text),
@@ -244,7 +288,7 @@ class Test(unittest.TestCase):
 	def test_extraction(self):
 		""" Simple test """
 		text = SAMPLE_TEXT
-		(articles, new_text) = extract_announces(text)
+		(articles, new_text) = extract_full_del_props(text)
 		self.assertTrue("Feteke" not in new_text)
 		(nom, date) = articles[0]
 		self.assertEqual(nom, "Jean-Daniel Fekete")
@@ -258,7 +302,7 @@ class Test(unittest.TestCase):
 		""" Real World extraction """
 		text = FULL_TEST
 		num_titles = self.count_titles(text)
-		(articles, new_text) = extract_announces(text)
+		(articles, new_text) = extract_full_del_props(text)
 		new_num_titles = self.count_titles(new_text)
 		self.assertEqual(num_titles , len(articles)+new_num_titles)
 
