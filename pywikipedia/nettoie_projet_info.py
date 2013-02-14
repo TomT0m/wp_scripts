@@ -4,11 +4,11 @@
 #Description: Déplace les annonces de proposition de suppression de la page Projet:Informatique vers la page d'annonces
 """
 
-from __future__ import unicode_literals
+# from __future__ import unicode_literals
 import re, logging
 from functools import total_ordering
 
-import wikipedia
+import wikipedia as pywikibot
 import mwparserfromhell
 
 
@@ -41,8 +41,10 @@ class Date(object):
 				self.mois == other.mois and self.jour < other.jour))
 	def __str__(self):
 		res = u"{:2d} {} {:4d}".format(self.jour, self.MOIS[self.mois], self.annee)
-		print(res)
-		print(repr(res))
+		return res
+	
+	def __repr__(self):
+		res = "{:2d} {} {:4d}".format(self.jour, self.MOIS[self.mois], self.annee)
 		return res
 
 	@property
@@ -181,36 +183,89 @@ class PageStatus:
 
 	def is_proposed_to_deletion(self):
 		""" try to guess if there is a fusion proposition related to this page"""
-		if self.page.exists():
-			return "{{suppression}}" in self.page.get()
+		
+		re_bandeau = re.compile(u"{{(suppression|à supprimer)}}", re.IGNORECASE)
+		re_pas_closed = re.compile(u"{{Article (supprimé|conservé)", re.IGNORECASE)
 
+		if self.page.exists():
+			
+			nom_discussion_suppression = "Discussion:" + self.page.title() + "/Suppression"
+			
+			content = self.page.get()
+			# import pdb ; pdb.set_trace()
+			has_status = re_bandeau.search(content)
+
+			if not has_status:
+				discussion_suppression = get_page(nom_discussion_suppression)
+				res = re_pas_closed.search(discussion_suppression.get())
+				
+				if not res: 
+					# inconsistent state :
+					# TODO: treat
+					pywikibot.output("État incohérent entre la page et la page de suppression")
+					return True
+				else: 
+					return False
+			return True
 		return False
 
 def get_page_status(pagename):
-	""" Returns a page status object """
-	site = wikipedia.getSite("fr")
-	page = wikipedia.Page(site, pagename)
+	""" Returns a page status object 
+	>>> get_page("Plop", "Discussion")
+	"""
+	site = pywikibot.getSite("fr")
+	page = pywikibot.Page(site, pagename)
 
 	return PageStatus(page)
 
-class Template(object):
-	""" Mediawiki template encapsulation class """
-	def __init__(self, name, *args, **kwargs):
-		self.name = name
-		self.args = args
-		self.kwargs = kwargs
-	
+ANNOUNCE_DEL_TMPL = "Annonce proposition suppression"
 
-	
-def parse_template(tmpl_text):
-	""" Creates a Template object from a template string """
-	# regex = '{{'+ +'|[^|]*' +'}}'
-	return
+def del_prop_iteration(page):
+	""" iterator on deletion proposition announces in announce page
+	>>> liste = list(del_prop_iteration(ANNOUNCES_SAMPLE))
+	>>> liste[0].get("nom").value
+	u'PagePlus'
+	>>> len(liste)
+	13
+	>>> liste[0].name ==  ANNOUNCE_DEL_TMPL
+	True
+	"""
 
-def deletion_prop_status_update(del_prop_list):
-	""" returns an updated prop list"""
-	for article, date in del_prop_list:
-		print(article, date)
+	#TODO: tests if needs parsing
+	
+	# parsed = mwparserfromhell.parse(page)
+
+	for tmpl in page.filter_templates():
+		if tmpl.name == ANNOUNCE_DEL_TMPL:
+			yield tmpl
+
+def deletion_prop_status_update(announce_page):
+	""" returns an updated announce page
+	where deletion proposition annouce have been
+	modified to reflect their real status (closed ?)
+	"""
+	
+	parsed = mwparserfromhell.parse(announce_page)
+	
+	for announce in del_prop_iteration(parsed):
+		article_title = announce.get("nom").value
+		pywikibot.output("-> {}".format(article_title))
+		status = get_page_status(article_title)
+		if status.is_proposed_to_deletion():
+			pywikibot.output("* still opened")
+		else:
+			if "fait" not in announce:
+				announce.add(2, u"fait")
+	return unicode(parsed)
+
+def get_page(name, namespace = None):
+	""" get a Page in frwiki """
+	site = pywikibot.getSite("fr")
+
+	if namespace:
+		return pywikibot.Page(site, name, defaultNamespace = namespace)
+	
+	return pywikibot.Page(site, name)
 
 def deletion_prop_maintenance(base_name, simulate = False):
 	""" Real Action """
@@ -218,15 +273,15 @@ def deletion_prop_maintenance(base_name, simulate = False):
 	# Récupération des données #
 	
 	pagename = u"Discussion {}".format(base_name)
-	announces_pagename = "{}/Annonces".format(base_name)
+	announces_pagename = u"{}/Annonces".format(base_name)
 
-	site = wikipedia.getSite("fr")
+	site = pywikibot.getSite("fr")
 	
 	
-	discussion_page = wikipedia.Page(site, pagename, defaultNamespace = "Discussion")
+	discussion_page = pywikibot.Page(site, pagename, defaultNamespace = "Discussion")
 	discussion_text = discussion_page.get(get_redirect = True)
 
-	announces_page = wikipedia.Page(site, announces_pagename)
+	announces_page = pywikibot.Page(site, announces_pagename)
 	announces_text = announces_page.get(get_redirect = True )
 	
 	# Traitements #
@@ -236,28 +291,41 @@ def deletion_prop_maintenance(base_name, simulate = False):
 	(articles, new_discussion_text) = extract_full_del_props(discussion_text)
 
 	# stats sur le diff entre page générée et page originale
-	logging.info("Before : {} ; After {} ; expected around {}".format(len(discussion_text),
+	logging.info(u"Before : {} ; After {} ; expected around {}".format(len(discussion_text),
 							    len(new_discussion_text),
 							    len(discussion_text) - len(articles) * 1200))
-	logging.info("Articles extraits")
+	logging.info(u"Articles extraits")
 	for elem  in articles :
 		(nom, date) = elem
 		logging.info(u"Date d'annonce : {} ; Article à supprimer : {}".format(date, nom))
 	
 	# insertions des annonces extraites dans la page d'annonce
 	new_announces_text = insert_new_announces(announces_text, articles)
-	print("> Diff des Annonces <\n")
-	wikipedia.showDiff(announces_text, new_announces_text)
+	# mise à jour de l'état des annonces #
+	new_announces_text = deletion_prop_status_update(new_announces_text)
 	
-	print("> Diff PDD <\n")
-	wikipedia.showDiff(discussion_text, new_discussion_text)
 	
+	print(u"> Diff des Annonces <\n")
+	pywikibot.showDiff(announces_text, new_announces_text)
+	
+	print(u"> Diff PDD <\n")
+	pywikibot.showDiff(discussion_text, new_discussion_text)
+
+	
+	
+		
 	# Sauvegarde éventuelle #
 	if not simulate:
-		discussion_page.put(new_discussion_text, 
-		    comment = "Déplacement vers [[{}]]".format(announces_pagename))
-		announces_page.put(new_announces_text, 
-		    comment = "Déplacement proposition suppression depuis la [[{}|Page de discussion]]".format(pagename))
+		if len(articles) > 0 :
+			discussion_page.put(new_discussion_text, 
+		          comment = u"Déplacement vers [[{}]]".format(announces_pagename))
+		if new_announces_text != announces_text:
+			comment = ""
+			if len(articles) > 0:
+				comment = u"Déplacement proposition suppression depuis la [[{}|Page de discussion]]; ".format(pagename)
+			comment = comment + u"Mise à jour des proposition de suppression traitées"
+			announces_page.put(new_announces_text, 
+			  comment = comment)
 
 from argparse import ArgumentParser
 
@@ -311,6 +379,7 @@ def test():
 		* TestCases from unittest module, 
 		* docstring tests
 	"""
+	# deletion_prop_maintenance(ANNOUNCES_SAMPLE)	
 	import doctest
 	doctest.testmod()
 	unittest.main(argv=[sys.argv[0]])
@@ -831,6 +900,124 @@ Le meilleur moyen d’obtenir un consensus pour la conservation de l’article e
 [[Utilisateur:Linan|Linan]] ([[Discussion utilisateur:Linan|d]]) 14 janvier 2013 à 22:25 (CET)
 """
 
+
+ANNOUNCES_SAMPLE = u"""<noinclude>[[Catégorie:Projet:Informatique|Annonces]]</noinclude>
+<center>[{{fullurl:Projet:Informatique/Annonces|action=edit}} Annoncer quelque chose] — [{{fullurl:Projet:Informatique/Annonces|action=watch}} Suivre les modifications]</center>
+<center>{{article détaillé|contenu=Archives Annonces: [[Discussion Projet:Informatique/2012/Annonces|2012]] - [[Discussion Projet:Informatique/2013/Annonces|2013]]}}</center>
+<noinclude>== Annonces ==</noinclude>
+<!------------------------------- Rajouter ci-dessous la dernière annonce ----------->
+{{Annonce proposition suppression|nom=PagePlus|12 février 2013}}
+{{Annonce proposition suppression|nom=First Assistant| 8 février 2013}}
+{{Annonce proposition suppression|nom=GrayMatter Recruitment| 7 février 2013}}
+{{Annonce proposition suppression|nom=Doorgets|5 février 2013}}
+{{Annonce proposition suppression|nom=Java et logiciel libre|4 février 2013}}
+{{annonce fusion d'article|28 janvier 2013|[[Visualisation de données]] et [[Représentation graphique]] et [[Représentation graphique de données statistiques]] sur [[Wikipédia:Pages_à_fusionner#Visualisation_de_donn.C3.A9es_et_Repr.C3.A9sentation_graphique_et_Repr.C3.A9sentation_graphique_de_donn.C3.A9es_statistiques|cette page]]}}
+{{Annonce proposition suppression|nom=Decostock|26 janvier 2013}}
+{{Annonce proposition suppression|nom=Turaz|26 janvier 2013}}
+{{Annonce proposition suppression|nom=Medias Sociaux Academy|25 janvier 2013}}
+{{Annonce proposition suppression|nom=DigDash|25 janvier 2013}}
+{{Annonce proposition suppression|nom=Prodware Innovation & Design|25 janvier 2013}}
+{{Annonce proposition suppression|nom=Gironde Logiciels Libres|21 janvier 2013}}
+{{Annonce proposition suppression|nom=Twago|20 janvier 2013}}
+{{annonce fusion d'article|12 janvier 2013|[[Linguistique informatique]] et [[Traitement automatique du langage naturel]] [[Wikipédia:Pages_à_fusionner#Linguistique_informatique_et_Traitement_automatique_du_langage_naturel|ici]]}} 
+{{annonce fusion d'article|12 janvier 2013|proposition fusion [[Agent logiciel]] et [[Agent (informatique)]] [[Wikipédia:Pages_à_fusionner#Agent_logiciel_et_Agent_.28informatique.29|ici]] }}
+{{Annonce proposition suppression|nom=Jean-Daniel Fekete| 3 janvier 2013}}
+<noinclude>
+<!------------------------------- Ci-dessous les modèles d'annonces ------------>
+
+== Modèles d'annonce ==
+
+<div style="width:97%; padding:5px">
+{| border="0" style="background-color:inherit; font-size:smaller;"
+! scope="col"| <u>type d'annonce</u>
+! scope="col"| <u>apparence</u>
+! scope="col"| <u>code à insérer</u>
+! scope="col"| <u>modèle</u>
+|
+{{!}}-----
+{{!}} ''actualités''
+{{!}} {{Annonce actualités|31|texte}}
+{{!}} <tt><nowiki>{{Annonce actualités|</nowiki>''jour du mois''<nowiki>|</nowiki>''texte''<nowiki>}}</nowiki></tt>
+{{!}}-----
+{{!}} ''discussion ''
+{{!}} {{Annonce discussion|30|texte}}
+{{!}} <tt><nowiki>{{Annonce discussion|</nowiki>''jour du mois''<nowiki>|</nowiki>''texte''<nowiki>}}</nowiki></tt>
+{{!}}-----
+{{!}} ''à vérifier''
+{{!}} {{Annonce à vérifier|29|texte}}
+{{!}} <tt><nowiki>{{Annonce à vérifier|</nowiki>''jour du mois''<nowiki>|</nowiki>''texte''<nowiki>}}</nowiki></tt>
+{{!}}-----
+{{!}} ''à surveiller''
+{{!}} {{Annonce à surveiller|28|texte}}
+{{!}} <tt><nowiki>{{Annonce à surveiller|</nowiki>''jour du mois''<nowiki>|</nowiki>''texte''<nowiki>}}</nowiki></tt>
+{{!}}-----
+{{!}} '''débats''' ou '''sondages'''
+{{!}} {{Annonce vote|27|texte&nbsp;&nbsp;}}
+{{!}} <tt><nowiki>{{Annonce vote|</nowiki>''jour du mois''<nowiki>|</nowiki>''texte''<nowiki>}}</nowiki></tt>
+{{!}}-----
+{{!}} '''prises de décision'''
+{{!}} {{Annonce prise de décision|26|texte}}
+{{!}} <tt><nowiki>{{Annonce prise de décision|</nowiki>''jour du mois''<nowiki>|</nowiki>''texte''<nowiki>}}</nowiki></tt>
+{{!}}-----
+{{!}} '''demandes de suppression d'articles'''
+{{!}}<div> 
+* {{Annonce proposition suppression |25 |nom=Plog }}
+ou
+* {{Annonce proposition suppression |25 |nom=Plog|traité }}</div>
+{{!}}
+* <tt><nowiki>{{Annonce proposition suppression |</nowiki>''date''<nowiki> |</nowiki>nom=''article'' <nowiki> }}</nowiki></tt>
+ou
+* <tt><nowiki>{{Annonce proposition suppression |</nowiki>''date''<nowiki> |</nowiki>nom=''article'' <nowiki>|traité }}</nowiki></tt>
+{{!}} {{m|Annonce proposition suppression}}
+{{!}}-----
+{{!}} '''annonce de fusion d’articles'''
+{{!}} {{Annonce fusion d'article|date|[[Lien annonces sur wp:fusion]] entre [[article 1]] et [[article 2]]}}
+{{!}} <tt><nowiki>{{Annonce fusion d'article|date|[[Lien annonces sur wp:fusion]] entre [[article1]] et [[article2]]}}</nowiki>
+{{!}} {{m|Annonce fusion d'article}}
+{{!}}-----
+{{!}} '''nouveaux participants''' au portail
+{{!}} {{Annonce utilisateur|24|texte}}
+{{!}} <tt><nowiki>{{Annonce utilisateur|</nowiki>''jour du mois''<nowiki>|</nowiki>''texte''<nowiki>}}</nowiki></tt>
+{{!}}-----
+{{!}} '''[[Wikipédia:Articles de qualité|articles de qualité]]'''
+{{!}} {{Annonce article de qualité|23|texte}}
+{{!}} <tt><nowiki>{{Annonce article de qualité|</nowiki>''jour du mois''<nowiki>|</nowiki>''texte''<nowiki>}}</nowiki></tt>
+{{!}}-----
+{{!}} '''[[Wikipédia:bon article|bon article]]'''
+{{!}} {{Annonce bon article|22|texte}}
+{{!}} <tt><nowiki>{{Annonce bon article|</nowiki>''jour du mois''<nowiki>|</nowiki>''texte''<nowiki>}}</nowiki></tt>
+{{!}}-----
+{{!}} '''modèles''' spécialisés
+{{!}} {{Annonce modèle|21|texte}}
+{{!}} <tt><nowiki>{{Annonce modèle|</nowiki>''jour du mois''<nowiki>|</nowiki>''texte''<nowiki>}}</nowiki></tt>
+{{!}}-----
+{{!}} '''images''' pour le projet
+{{!}} {{Annonce image|20|texte}}
+{{!}} <tt><nowiki>{{Annonce image|</nowiki>''jour du mois''<nowiki>|</nowiki>''texte''<nowiki>}}</nowiki></tt>
+{{!}}-----
+{{!}} '''champagne'''
+{{!}} {{Annonce champagne|38|texte}}
+{{!}} <tt><nowiki>{{Annonce champagne|</nowiki>''jour du mois''<nowiki>|</nowiki>''texte''<nowiki>}}</nowiki></tt>
+{{!}}-----
+{!}} '''travail''' ou '''chantier'''
+{{!}} {{Annonce travail|19|texte}}
+{{!}} <tt><nowiki>{{Annonce travail|</nowiki>''jour du mois''<nowiki>|</nowiki>''texte''<nowiki>}}</nowiki></tt>
+{{!}}-----
+{{!}} '''atelier'''
+{{!}} {{Annonce atelier|18|texte}}
+{{!}} <tt><nowiki>{{Annonce atelier|</nowiki>''jour du mois''<nowiki>|</nowiki>''texte''<nowiki>}}</nowiki></tt>
+{{!}}-----
+{{!}} '''traduction'''
+{{!}} {{Annonce traduction|17|texte}}
+{{!}} <tt><nowiki>{{Annonce traduction|</nowiki>''jour du mois''<nowiki>|</nowiki>''texte''<nowiki>}}</nowiki></tt>
+{{!}}-----
+{{!}} ''autres ...''
+{{!}} {{Annonce divers|16|texte}}
+{{!}} <tt><nowiki>{{Annonce divers|</nowiki>''jour du mois''<nowiki>|</nowiki>''texte''<nowiki>}}</nowiki></tt>
+{{!}}-----
+{{!}}}
+<center><u>Remarque :</u> Voir aussi les [[:Catégorie:Modèle d'annonce|autres modèles d'annonce spécifiques]].</center></div></noinclude>
+"""
 
 
 if __name__ == "__main__":
