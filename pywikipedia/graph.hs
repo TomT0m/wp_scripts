@@ -29,8 +29,8 @@ edges graph =
 		map (\x ->  nodeID x ) $ plop2
 
 
-toDotNodes :: (Ord n) => NodeLookup n -> [DotNode n]
-toDotNodes = map (\(n,(_,as)) -> DotNode n as) . Map.assocs
+-- toDotNodes :: (Ord n) => NodeLookup n -> [DotNode n]
+-- toDotNodes = map (\(n,(_,as)) -> DotNode n as) . Map.assocs
 
 
 main = do 
@@ -44,9 +44,9 @@ main = do
 	S.putStrLn "plop"
 	-- Pario.putDot dotGraph
 	mapM S.putStrLn $ edges xDotGraph
-	let inf = nodeInformation True dotGraph
+	-- let inf = nodeInformation True dotGraph
 	-- let nodeInf = inf Map.! "TeX" -- Map.! "TeX"
-	let nodes = toDotNodes inf
+	let nodes = Par.graphNodes dotGraph 
 	S.putStr(nodes)
 	-- mapM S.putStr $ fst nodeInf
 
