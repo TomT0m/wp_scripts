@@ -4,7 +4,6 @@
 #Description: Déplace les annonces de proposition de suppression de la page Projet:Informatique vers la page d'annonces
 """
 
-# from __future__ import unicode_literals
 import re, logging
 from functools import total_ordering
 
@@ -124,8 +123,8 @@ def extract_full_del_props(text):
 		articles.append((article.group(1), date))
 		del_sum += len(article.group(0))
 	
-		logging.info(" Article : {} (annoncé le {})".format(article.group(1), date))
-		logging.info(" Annonce : \n'''{}'''".format(len(article.group(2))))
+		logging.info(u" Article : {} (annoncé le {})".format(article.group(1), date))
+		logging.info(u" Annonce : \n'''{}'''".format(len(article.group(2))))
 	
 	del_pattern = pattern.format('.*')
 	newpage = re.sub(del_pattern, '', text, flags = re.MULTILINE)
