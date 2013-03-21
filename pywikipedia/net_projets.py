@@ -124,14 +124,14 @@ def extract_full_del_props(text):
 		articles.append((article.group(1), date))
 		del_sum += len(article.group(0))
 	
-		logging.info(" Article : {} (annoncé le {})".format(article.group(1), date))
-		logging.info(" Annonce : \n'''{}'''".format(len(article.group(2))))
+		logging.info(u" Article : {} (annoncé le {})".format(article.group(1), date))
+		logging.info(u" Annonce : \n'''{}'''".format(len(article.group(2))))
 	
-	del_pattern = pattern.format('.*')
+	del_pattern = pattern.format(u'.*')
 	newpage = re.sub(del_pattern, '', text, flags = re.MULTILINE)
 
 
-	logging.debug("(taille en octets) : Supprimé {} - nouvelle : {}, ancienne {}, différence {}: ".format(del_sum, 
+	logging.debug(u"(taille en octets) : Supprimé {} - nouvelle : {}, ancienne {}, différence {}: ".format(del_sum, 
 						     len(newpage), 
 						     len(text), 
 						     del_sum-(len(text) - len(newpage))))
@@ -347,6 +347,26 @@ def create_options():
 
 #############################################################
 # testing
+
+class ProjetParameters(object):
+	def __init__(self, 
+	      project_name, 
+	      wiki_basename, 
+	      announce_pagename=None, 
+	      discussion_pagename=None
+	     ):
+		self.wiki_basename = wiki_basename
+		self.project_name = project_name
+		self._announce_pagename = announce_pagename
+		self._discussion_pagename = discussion_pagename
+	@property
+	def announce_pagename(self):
+		if
+	
+PROJETS=[
+	ProjectParameters("Informatique", "Projet:Informatique"),
+]
+
 
 import unittest
 import sys
