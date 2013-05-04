@@ -180,7 +180,13 @@ class PageStatus:
 	""" Status object """
 	def __init__(self, page):
 		self.page = page
+		self._cached_content = None
 
+	def get_content(self):
+		if not self._cached_content:
+			self._cached_content = content = self.page.get()
+		return self._cached_content
+	
 	def is_proposed_to_deletion(self):
 		""" try to guess if there is a fusion proposition related to this page"""
 		
@@ -191,7 +197,7 @@ class PageStatus:
 			
 			nom_discussion_suppression = "Discussion:" + self.page.title() + "/Suppression"
 			
-			content = self.page.get()
+			content = self.get_content()
 			# import pdb ; pdb.set_trace()
 			has_status = re_bandeau.search(content)
 
@@ -208,6 +214,8 @@ class PageStatus:
 					return False
 			return True
 		return False
+	def is_proposed_to_fusion(self):
+		""" TODO: implement"""
 
 def get_page_status(pagename):
 	""" Returns a page status object 
@@ -267,13 +275,19 @@ def get_page(name, namespace = None):
 	
 	return pywikibot.Page(site, name)
 
-def deletion_prop_maintenance(base_name, simulate = False):
+def projects_maintenance(projects, options):
+	""" Function launching maintenance for all projects """
+	for project in projects:
+		# TODO: log
+		deletion_prop_maintenance(project, options.simulate)
+
+def deletion_prop_maintenance(project, simulate = False):
 	""" Real Action """
 
 	# Récupération des données #
 	
-	pagename = u"Discussion {}".format(base_name)
-	announces_pagename = u"{}/Annonces".format(base_name)
+	pagename = project.discussion_pagename # u"Discussion {}".format(base_name)
+	announces_pagename = project.announce_pagename  # u"{}/Annonces".format(base_name)
 
 	site = pywikibot.getSite("fr")
 	
@@ -327,6 +341,8 @@ def deletion_prop_maintenance(base_name, simulate = False):
 			announces_page.put(new_announces_text, 
 			  comment = comment)
 
+
+
 from argparse import ArgumentParser
 
 def create_options():
@@ -345,10 +361,12 @@ def create_options():
 	return options
 
 
-#############################################################
-# testing
 
-class ProjetParameters(object):
+class ProjectParameters(object):
+	""" Project parameters storage class, stores :
+		* project name
+		* parameters pages names : Announces, discussion pagename.
+	"""
 	def __init__(self, 
 	      project_name, 
 	      wiki_basename, 
@@ -359,14 +377,29 @@ class ProjetParameters(object):
 		self.project_name = project_name
 		self._announce_pagename = announce_pagename
 		self._discussion_pagename = discussion_pagename
+
 	@property
 	def announce_pagename(self):
-		if
-	
-PROJETS=[
+		""" Getter for announce pagename property """
+		if self._announce_pagename:
+			return self._announce_pagename
+		else:
+			return self.wiki_basename + "/Annonces"
+
+	@property
+	def discussion_pagename(self):
+		if self._discussion_pagename:
+			return self._discussion_pagename
+		else:
+			return "Discussion {}".format(self.wiki_basename)
+
+PROJETS = [
 	ProjectParameters("Informatique", "Projet:Informatique"),
 ]
 
+
+#############################################################
+# testing
 
 import unittest
 import sys
@@ -416,7 +449,7 @@ def main():
 		test()
 	else:
 		# paramètres par defaut : "Projet:Informatique", False
-		deletion_prop_maintenance(opts.page, opts.simulate)
+		projects_maintenance(PROJETS, opts) # deletion_prop_maintenance(opts.page, opts.simulate)
 
 
 ####
