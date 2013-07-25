@@ -4,7 +4,6 @@
 #Description: Déplace les annonces de proposition de suppression de la page Projet:Informatique vers la page d'annonces
 """
 
-# from __future__ import unicode_literals
 import re, logging
 from functools import total_ordering
 
@@ -198,7 +197,6 @@ class PageStatus:
 			nom_discussion_suppression = "Discussion:" + self.page.title() + "/Suppression"
 			
 			content = self.get_content()
-			# import pdb ; pdb.set_trace()
 			has_status = re_bandeau.search(content)
 
 			if not has_status:
@@ -266,6 +264,50 @@ def deletion_prop_status_update(announce_page):
 				announce.add(2, u"fait")
 	return unicode(parsed)
 
+def projects_maintenance(projects, options):
+	""" Function launching maintenance for all projects """
+	for project in projects:
+		# TODO: log
+		deletion_prop_maintenance(project, options.simulate)
+
+def del_prop_iteration(page):
+	""" iterator on deletion proposition announces in announce page
+	>>> liste = list(del_prop_iteration(ANNOUNCES_SAMPLE))
+	>>> liste[0].get("nom").value
+	u'PagePlus'
+	>>> len(liste)
+	13
+	>>> liste[0].name ==  ANNOUNCE_DEL_TMPL
+	True
+	"""
+
+	#TODO: tests if needs parsing
+	
+	# parsed = mwparserfromhell.parse(page)
+
+	for tmpl in page.filter_templates():
+		if tmpl.name == ANNOUNCE_DEL_TMPL:
+			yield tmpl
+
+def deletion_prop_status_update(announce_page):
+	""" returns an updated announce page
+	where deletion proposition annouce have been
+	modified to reflect their real status (closed ?)
+	"""
+	
+	parsed = mwparserfromhell.parse(announce_page)
+	
+	for announce in del_prop_iteration(parsed):
+		article_title = announce.get("nom").value
+		pywikibot.output("-> {}".format(article_title))
+		status = get_page_status(article_title)
+		if status.is_proposed_to_deletion():
+			pywikibot.output("* still opened")
+		else:
+			if "fait" not in announce:
+				announce.add(2, u"fait")
+	return unicode(parsed)
+
 def get_page(name, namespace = None):
 	""" get a Page in frwiki """
 	site = pywikibot.getSite("fr")
@@ -274,12 +316,6 @@ def get_page(name, namespace = None):
 		return pywikibot.Page(site, name, defaultNamespace = namespace)
 	
 	return pywikibot.Page(site, name)
-
-def projects_maintenance(projects, options):
-	""" Function launching maintenance for all projects """
-	for project in projects:
-		# TODO: log
-		deletion_prop_maintenance(project, options.simulate)
 
 def deletion_prop_maintenance(project, simulate = False):
 	""" Real Action """
@@ -340,8 +376,6 @@ def deletion_prop_maintenance(project, simulate = False):
 			comment = comment + u"Mise à jour des proposition de suppression traitées"
 			announces_page.put(new_announces_text, 
 			  comment = comment)
-
-
 
 from argparse import ArgumentParser
 
