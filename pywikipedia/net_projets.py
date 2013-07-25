@@ -182,12 +182,13 @@ class PageStatus:
 		self._cached_content = None
 
 	def get_content(self):
+		""" cached access to page content """
 		if not self._cached_content:
-			self._cached_content = content = self.page.get()
+			self._cached_content = self.page.get(get_redirect = True)
 		return self._cached_content
 	
 	def is_proposed_to_deletion(self):
-		""" try to guess if there is a fusion proposition related to this page"""
+		""" try to guess if there is a deletion proposition related to this page"""
 		
 		re_bandeau = re.compile(u"{{(suppression|à supprimer)}}", re.IGNORECASE)
 		re_pas_closed = re.compile(u"{{Article (supprimé|conservé)", re.IGNORECASE)
@@ -201,7 +202,7 @@ class PageStatus:
 
 			if not has_status:
 				discussion_suppression = get_page(nom_discussion_suppression)
-				res = re_pas_closed.search(discussion_suppression.get())
+				res = re_pas_closed.search(discussion_suppression.get(get_redirect = True))
 				
 				if not res: 
 					# inconsistent state :
@@ -212,8 +213,18 @@ class PageStatus:
 					return False
 			return True
 		return False
+
 	def is_proposed_to_fusion(self):
-		""" TODO: implement"""
+		""" try to guess if there is a deletion proposition related to this page"""
+
+		return u'{{à fusionner|' in self.get_content()
+
+	def fusion_with(self):
+		"""get the list of article titles which are supposed to be fusioned with this one"""
+		parsed = mwparserfromhell.parse(self.get_content())
+		for tmpl in parsed.filter_template():
+			if tmpl.name == u"à fusionner":
+				print(tmpl)
 
 def get_page_status(pagename):
 	""" Returns a page status object 
@@ -239,8 +250,6 @@ def del_prop_iteration(page):
 
 	#TODO: tests if needs parsing
 	
-	# parsed = mwparserfromhell.parse(page)
-
 	for tmpl in page.filter_templates():
 		if tmpl.name == ANNOUNCE_DEL_TMPL:
 			yield tmpl
@@ -269,6 +278,7 @@ def projects_maintenance(projects, options):
 	for project in projects:
 		# TODO: log
 		deletion_prop_maintenance(project, options.simulate)
+		fusion_prop_maintenance(project, options.simulate)
 
 def del_prop_iteration(page):
 	""" iterator on deletion proposition announces in announce page
@@ -322,8 +332,8 @@ def deletion_prop_maintenance(project, simulate = False):
 
 	# Récupération des données #
 	
-	pagename = project.discussion_pagename # u"Discussion {}".format(base_name)
-	announces_pagename = project.announce_pagename  # u"{}/Annonces".format(base_name)
+	pagename = project.discussion_pagename 
+	announces_pagename = project.announce_pagename
 
 	site = pywikibot.getSite("fr")
 	
@@ -361,8 +371,6 @@ def deletion_prop_maintenance(project, simulate = False):
 	print(u"> Diff PDD <\n")
 	pywikibot.showDiff(discussion_text, new_discussion_text)
 
-	
-	
 		
 	# Sauvegarde éventuelle #
 	if not simulate:
@@ -376,6 +384,11 @@ def deletion_prop_maintenance(project, simulate = False):
 			comment = comment + u"Mise à jour des proposition de suppression traitées"
 			announces_page.put(new_announces_text, 
 			  comment = comment)
+
+def fusion_prop_maintenance(project, simulate = True):
+	""" Testing """
+	logging.info("gestion des propositions de fusion ...")
+
 
 from argparse import ArgumentParser
 
@@ -466,7 +479,6 @@ def test():
 		* TestCases from unittest module, 
 		* docstring tests
 	"""
-	# deletion_prop_maintenance(ANNOUNCES_SAMPLE)	
 	import doctest
 	doctest.testmod()
 	unittest.main(argv=[sys.argv[0]])
@@ -483,7 +495,7 @@ def main():
 		test()
 	else:
 		# paramètres par defaut : "Projet:Informatique", False
-		projects_maintenance(PROJETS, opts) # deletion_prop_maintenance(opts.page, opts.simulate)
+		projects_maintenance(PROJETS, opts) 
 
 
 ####
