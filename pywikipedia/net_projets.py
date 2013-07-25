@@ -180,6 +180,7 @@ class PageStatus:
 	def __init__(self, page):
 		self.page = page
 		self._cached_content = None
+		self.edit_comment = ""
 
 	def get_content(self):
 		""" cached access to page content """
@@ -187,6 +188,14 @@ class PageStatus:
 			self._cached_content = self.page.get(get_redirect = True)
 		return self._cached_content
 	
+	def set_content(self, new_text, comment):
+		""" setter for content, without writing"""
+		self._cached_content = new_text
+		self.edit_comment += "; " + comment
+
+	def save(self):
+		self.page.put(self._cached_content, comment = self.edit_comment)
+
 	def is_proposed_to_deletion(self):
 		""" try to guess if there is a deletion proposition related to this page"""
 		
@@ -237,48 +246,34 @@ def get_page_status(pagename):
 
 ANNOUNCE_DEL_TMPL = "Annonce proposition suppression"
 
-def del_prop_iteration(page):
-	""" iterator on deletion proposition announces in announce page
-	>>> liste = list(del_prop_iteration(ANNOUNCES_SAMPLE))
-	>>> liste[0].get("nom").value
-	u'PagePlus'
-	>>> len(liste)
-	13
-	>>> liste[0].name ==  ANNOUNCE_DEL_TMPL
-	True
-	"""
 
-	#TODO: tests if needs parsing
-	
-	for tmpl in page.filter_templates():
-		if tmpl.name == ANNOUNCE_DEL_TMPL:
-			yield tmpl
-
-def deletion_prop_status_update(announce_page):
-	""" returns an updated announce page
-	where deletion proposition annouce have been
-	modified to reflect their real status (closed ?)
-	"""
-	
-	parsed = mwparserfromhell.parse(announce_page)
-	
-	for announce in del_prop_iteration(parsed):
-		article_title = announce.get("nom").value
-		pywikibot.output("-> {}".format(article_title))
-		status = get_page_status(article_title)
-		if status.is_proposed_to_deletion():
-			pywikibot.output("* still opened")
-		else:
-			if "fait" not in announce:
-				announce.add(2, u"fait")
-	return unicode(parsed)
 
 def projects_maintenance(projects, options):
 	""" Function launching maintenance for all projects """
 	for project in projects:
 		# TODO: log
-		deletion_prop_maintenance(project, options.simulate)
-		fusion_prop_maintenance(project, options.simulate)
+		
+		pywikibot.log("Project : " + project)
+		
+		deletion_prop_maintenance(project)
+		fusion_prop_maintenance(project)
+		
+
+		print(u"> Diff des Annonces <\n")
+		pywikibot.showDiff(announces_text, new_announces_text)
+	
+		print(u"> Diff PDD <\n")
+		pywikibot.showDiff(discussion_text, new_discussion_text)
+
+		# Sauvegarde éventuelle #
+		if not simulate:
+			if project.discussion_page.modified:
+				project.discussion_page.save() 
+			
+			if project.announce_page.modified:
+				project.announce_page.save()
+				#announces_page.put(new_announces_text, 
+				#	comment = comment)
 
 def del_prop_iteration(page):
 	""" iterator on deletion proposition announces in announce page
@@ -293,8 +288,6 @@ def del_prop_iteration(page):
 
 	#TODO: tests if needs parsing
 	
-	# parsed = mwparserfromhell.parse(page)
-
 	for tmpl in page.filter_templates():
 		if tmpl.name == ANNOUNCE_DEL_TMPL:
 			yield tmpl
@@ -317,6 +310,7 @@ def deletion_prop_status_update(announce_page):
 			if "fait" not in announce:
 				announce.add(2, u"fait")
 	return unicode(parsed)
+
 
 def get_page(name, namespace = None):
 	""" get a Page in frwiki """
@@ -327,7 +321,7 @@ def get_page(name, namespace = None):
 	
 	return pywikibot.Page(site, name)
 
-def deletion_prop_maintenance(project, simulate = False):
+def deletion_prop_maintenance(project):
 	""" Real Action """
 
 	# Récupération des données #
@@ -365,30 +359,29 @@ def deletion_prop_maintenance(project, simulate = False):
 	new_announces_text = deletion_prop_status_update(new_announces_text)
 	
 	
-	print(u"> Diff des Annonces <\n")
-	pywikibot.showDiff(announces_text, new_announces_text)
-	
-	print(u"> Diff PDD <\n")
-	pywikibot.showDiff(discussion_text, new_discussion_text)
+	comment = u"Déplacements vers [[{}]]".format(announces_pagename))
+	project.discussion_page.put(new_discussion_text, comment)
+
+
 
 		
-	# Sauvegarde éventuelle #
-	if not simulate:
-		if len(articles) > 0 :
-			discussion_page.put(new_discussion_text, 
-		          comment = u"Déplacement vers [[{}]]".format(announces_pagename))
-		if new_announces_text != announces_text:
-			comment = ""
-			if len(articles) > 0:
-				comment = u"Déplacement proposition suppression depuis la [[{}|Page de discussion]]; ".format(pagename)
-			comment = comment + u"Mise à jour des proposition de suppression traitées"
-			announces_page.put(new_announces_text, 
-			  comment = comment)
+	opt_parse = create_options()
+	opts = opt_parse.parse_args()
 
-def fusion_prop_maintenance(project, simulate = True):
+	if opts.debug:
+		logging.basicConfig(level = logging.DEBUG)
+
+	if opts.test:
+		test()
+	else:
+		# paramètres par defaut : "Projet:Informatique", False
+		projects_maintenance(PROJETS, opts) 
+
+
+def fusion_prop_maintenance(project):
 	""" Testing """
 	logging.info("gestion des propositions de fusion ...")
-
+	(article_lists, new_text) = extract_fusions_props()
 
 from argparse import ArgumentParser
 
@@ -439,6 +432,19 @@ class ProjectParameters(object):
 			return self._discussion_pagename
 		else:
 			return "Discussion {}".format(self.wiki_basename)
+	
+	@property
+	def discussion_page(self):
+		if not self._discussion:
+			self._discussion = get_page(self.discussion_pagename)
+		return self._discussion
+
+	@property
+	def announce_page(self):
+		if not self._announce:
+			self._announce = get_page(self.announce_pagename)
+		return self._announce
+
 
 PROJETS = [
 	ProjectParameters("Informatique", "Projet:Informatique"),
@@ -485,17 +491,15 @@ def test():
 
 def main():
 	""" Main function"""
-	opt_parse = create_options()
+	opt_parse = create_options
 	opts = opt_parse.parse_args()
-
 	if opts.debug:
 		logging.basicConfig(level = logging.DEBUG)
-
 	if opts.test:
 		test()
 	else:
 		# paramètres par defaut : "Projet:Informatique", False
-		projects_maintenance(PROJETS, opts) 
+		projects_maintenance(PROJETS, opts)
 
 
 ####
