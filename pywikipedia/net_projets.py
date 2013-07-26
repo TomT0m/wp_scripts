@@ -11,6 +11,13 @@ import wikipedia as pywikibot
 import mwparserfromhell
 
 
+# Constants
+
+ANNOUNCE_DEL_TMPL = "Annonce proposition suppression"
+ANNOUNCE_FUSION_TMPL = "Annonce fusion d'articles"
+
+# utilitary classes
+
 @total_ordering
 class Date(object):
 	""" A french (very) simple date object, comparable and that's it, 
@@ -69,8 +76,8 @@ def extract_date(text):
 	
 	>>> extract_date("10 janvier 2042")
 	10 janvier 2042
-	
-	"""
+
+"""
 	for line in text.split("\n"):
 		mois = Date.MOIS
 		re_mois = u"{}".format(u"|".join(mois))
@@ -81,6 +88,9 @@ def extract_date(text):
 			return Date(match.group(1), match.group(2), match.group(3))
 	return None
 
+
+# Parsing functions
+
 #pylint: disable=W0611
 import os
 
@@ -89,19 +99,19 @@ def msg_line_eating():
 	generates a pattern matching a complete line not beginning with '=='
 	>>> opts = re.MULTILINE # | re.DEBUG	
 	>>> re.match(msg_line_eating(), "plop").group(0)
-	u'plop'
+	'plop'
 	>>> re.match(msg_line_eating(), "p").group(0)
-	u'p'
+	'p'
 	>>> re.match(msg_line_eating(), "== plop ==")
 	
 	>>> re.match(u"([^=]|=?!=).*$", u"aa").group(0)
 	u'aa'
 	>>> msg = "ab" + os.linesep + "b" + os.linesep + "==plop=="
 	>>> re.match('(' +msg_line_eating() + ')*', msg, opts).group(0).split(os.linesep)
-	[u'ab', u'b', u'']
+	['ab', 'b', '']
 	>>> msg = msg + os.linesep + os.linesep + "==plop==" + os.linesep
 	>>> re.match('(' +msg_line_eating() + ')*', msg, opts).group(0).split(os.linesep)
-	[u'ab', u'b', u'']
+	['ab', 'b', '']
 	"""
 	# newline_pattern = "(?:$\n)?^"
 	not_eq_eq = "^(?:[^=]|=?!=)"
@@ -142,9 +152,66 @@ def format_del_announce(date, article_name):
 	return u"{{Annonce proposition suppression|nom=" +\
 		article_name + u"|" +\
 		date.__str__() + u"}}"
-		#TODO: gni ?
+		#TODO: gni str/unicode ?
 
-def insert_new_announces(old_text, to_del_list):
+
+
+def extract_fusion_articles(title):
+	""" Extracts article titles from section title 
+	>>> title = '== Les articles [[Jasper]] et [[Jasper (informatique)]] sont proposés à la fusion =='
+	>>> extract_fusion_articles(title)
+	['Jasper', 'Jasper (informatique)']
+	
+	""" 
+	match = re.findall("\[\[(.*?)\]\]", title)
+	return match
+
+SAMPLE_FUSION_ANNOUNCE = u"""== Les articles [[Jasper]] et [[Jasper (informatique)]] sont proposés à la fusion ==
+[[Image:Merge-arrows.svg|60px|left|Proposition de fusion en cours.]]
+
+La discussion a lieu sur la page [[Wikipédia:Pages à fusionner#Jasper et Jasper (informatique)]]. La procédure de fusion est consultable sur [[Wikipédia:Pages à fusionner]].
+
+[[Utilisateur:Silex6|Silex6]] ([[Discussion utilisateur:Silex6|d]]) 25 juillet 2013 à 12:23 (CEST)
+"""
+
+def extract_link_to_fusionprops(section):
+	""" Extracts the section in fusion prop global page from a (parsed) fusion prop section in Project Chat
+	>>> parsed = mwparserfromhell.parse(SAMPLE_FUSION_ANNOUNCE)
+	>>> extract_link_to_fusionprops(parsed)
+	u'Wikipédia:Pages à fusionner#Jasper et Jasper (informatique)'
+	"""
+	expected = unicode(section.filter_wikilinks(matches = u"Wikipédia:Pages à fusionner#")[0])
+	return expected[2:-2]
+
+def extract_fusion_props(text):
+	""" returns a couple:
+		
+		(props, new_text)
+		with props a triple:
+			* article list
+			* fusion section title in fusion page
+			* date
+		
+	"""
+
+	parsed = mwparserfromhell.parse(text) 
+	
+	sections = parsed.get_sections([2], matches = u"Les articles .*? sont proposés à la fusion")
+	
+	fusions = []
+
+	for sect in sections:
+		
+		articles = extract_fusion_articles(sect.split("==")[1])
+		date = extract_date(sect)
+		link_to_discussion = extract_link_to_fusionprops(sect)
+		
+		fusions.append((articles, link_to_discussion, date))
+		text = text.replace(unicode(sect), "")
+	
+	return (fusions, text)
+
+def insert_new_announces(old_text, dated_new_announces):
 	""" Creates a text with to_del_list announces inserted at timely sorted"""
 	
 	
@@ -162,8 +229,6 @@ def insert_new_announces(old_text, to_del_list):
 	
 	dated_old_announces = [ (text, extract_date(text)) 
 			for text in announces_lines if text != u""]
-	dated_new_announces = [ (format_del_announce(date, name), date) 
-			for name, date in to_del_list]
 	
 	# tri par date
 	sorted_announces = sorted( dated_old_announces + dated_new_announces, 
@@ -175,25 +240,36 @@ def insert_new_announces(old_text, to_del_list):
 
 	return preamble + sep_preamble + u"\n" + new_section + u"\n" + sep_end + rest
 
+
 class PageStatus:
 	""" Status object """
 	def __init__(self, page):
 		self.page = page
 		self._cached_content = None
-		self.edit_comment = ""
+		self.edit_comment = u""
+		self._original_content = None
+		self.modified = False
 
 	def get_content(self):
 		""" cached access to page content """
 		if not self._cached_content:
 			self._cached_content = self.page.get(get_redirect = True)
+			self._original_content = self._cached_content
+
 		return self._cached_content
 	
 	def set_content(self, new_text, comment):
 		""" setter for content, without writing"""
 		self._cached_content = new_text
-		self.edit_comment += "; " + comment
+		if self.edit_comment != "":
+			self.edit_comment += u"; " + comment
+		else:
+			self.edit_comment = comment
+
+		self.modified = new_text != self._original_content
 
 	def save(self):
+		""" saves the current content on server """
 		self.page.put(self._cached_content, comment = self.edit_comment)
 
 	def is_proposed_to_deletion(self):
@@ -235,49 +311,52 @@ class PageStatus:
 			if tmpl.name == u"à fusionner":
 				print(tmpl)
 
+	def show_diff(self):
+		""" show our changes """
+		if self._cached_content:
+			pywikibot.showDiff(self._original_content, self._cached_content)
+
 def get_page_status(pagename):
 	""" Returns a page status object 
-	>>> get_page("Plop", "Discussion")
+	>>> get_page_status("Plop").page
+	Page{[[fr:Plop]]}
 	"""
 	site = pywikibot.getSite("fr")
 	page = pywikibot.Page(site, pagename)
 
 	return PageStatus(page)
 
-ANNOUNCE_DEL_TMPL = "Annonce proposition suppression"
 
-
+# writing functions
 
 def projects_maintenance(projects, options):
 	""" Function launching maintenance for all projects """
 	for project in projects:
 		# TODO: log
 		
-		pywikibot.log("Project : " + project)
+		pywikibot.log("Project : " + project.project_name)
 		
 		deletion_prop_maintenance(project)
 		fusion_prop_maintenance(project)
 		
 
 		print(u"> Diff des Annonces <\n")
-		pywikibot.showDiff(announces_text, new_announces_text)
+		project.announce_page.show_diff()
 	
 		print(u"> Diff PDD <\n")
-		pywikibot.showDiff(discussion_text, new_discussion_text)
+		project.discussion_page.show_diff()
 
 		# Sauvegarde éventuelle #
-		if not simulate:
+		if not options.simulate:
 			if project.discussion_page.modified:
 				project.discussion_page.save() 
 			
 			if project.announce_page.modified:
 				project.announce_page.save()
-				#announces_page.put(new_announces_text, 
-				#	comment = comment)
 
 def del_prop_iteration(page):
 	""" iterator on deletion proposition announces in announce page
-	>>> liste = list(del_prop_iteration(ANNOUNCES_SAMPLE))
+	>>> liste = list(del_prop_iteration(mwparserfromhell.parse(ANNOUNCES_SAMPLE)))
 	>>> liste[0].get("nom").value
 	u'PagePlus'
 	>>> len(liste)
@@ -286,8 +365,6 @@ def del_prop_iteration(page):
 	True
 	"""
 
-	#TODO: tests if needs parsing
-	
 	for tmpl in page.filter_templates():
 		if tmpl.name == ANNOUNCE_DEL_TMPL:
 			yield tmpl
@@ -326,17 +403,10 @@ def deletion_prop_maintenance(project):
 
 	# Récupération des données #
 	
-	pagename = project.discussion_pagename 
 	announces_pagename = project.announce_pagename
 
-	site = pywikibot.getSite("fr")
-	
-	
-	discussion_page = pywikibot.Page(site, pagename, defaultNamespace = "Discussion")
-	discussion_text = discussion_page.get(get_redirect = True)
-
-	announces_page = pywikibot.Page(site, announces_pagename)
-	announces_text = announces_page.get(get_redirect = True )
+	discussion_text = project.discussion_page.get_content()
+	announces_text = project.announce_page.get_content()
 	
 	# Traitements #
 
@@ -354,34 +424,49 @@ def deletion_prop_maintenance(project):
 		logging.info(u"Date d'annonce : {} ; Article à supprimer : {}".format(date, nom))
 	
 	# insertions des annonces extraites dans la page d'annonce
-	new_announces_text = insert_new_announces(announces_text, articles)
+	
+	dated_new_announces = [ (format_del_announce(date, name), date) 
+			for name, date in articles]
+	new_announces_text = insert_new_announces(announces_text, dated_new_announces)
+
 	# mise à jour de l'état des annonces #
 	new_announces_text = deletion_prop_status_update(new_announces_text)
 	
 	
-	comment = u"Déplacements vers [[{}]]".format(announces_pagename))
-	project.discussion_page.put(new_discussion_text, comment)
+	comment = u"Déplacements vers [[{}]]".format(announces_pagename)
+	project.discussion_page.set_content(new_discussion_text, comment)
 
 
+def format_fusion_props(articles, section, date):
+	""" format a fusion proposition """
+	debut = u"{{Annonce fusion d'article|" + unicode(date) + u'|[[{}|Proposition de fusion]] entre '.format(section)
+	suite = ""
+	if len(articles) > 2:
+		suite = u", ".join(u'[[{}]]'.format(articles[3:]))
+	msg = debut + suite + u'[[' + articles[1] + u']]' + u" et [["+ articles[0] + ']]'
 
-		
-	opt_parse = create_options()
-	opts = opt_parse.parse_args()
-
-	if opts.debug:
-		logging.basicConfig(level = logging.DEBUG)
-
-	if opts.test:
-		test()
-	else:
-		# paramètres par defaut : "Projet:Informatique", False
-		projects_maintenance(PROJETS, opts) 
-
+	return msg
 
 def fusion_prop_maintenance(project):
 	""" Testing """
 	logging.info("gestion des propositions de fusion ...")
-	(article_lists, new_text) = extract_fusions_props()
+	(fusion_prop_list, new_d_text) = extract_fusion_props(project.discussion_page.get_content())
+	
+	if len(fusion_prop_list) > 0:
+		dated_new_announces = [ (format_fusion_props(*elem), elem[2] ) for elem in fusion_prop_list ]
+		new_a_text = insert_new_announces(project.announce_page.get_content(), dated_new_announces)
+		project.announce_page.set_content(new_a_text, 
+			      		u"Déplacement d'annonces de proposition de fusion depuis la [[{}|La PDD]]"
+			      			.format(project.discussion_pagename)
+				   )
+
+		project.discussion_page.set_content(new_d_text, 
+			      		u"Déplacement des annonces de proposition fusion vers [[{}|La page d'annonce]] "
+			      			.format(project.announce_pagename)
+				     )
+
+
+# CLI management, UI
 
 from argparse import ArgumentParser
 
@@ -417,6 +502,9 @@ class ProjectParameters(object):
 		self.project_name = project_name
 		self._announce_pagename = announce_pagename
 		self._discussion_pagename = discussion_pagename
+		
+		self._discussion = None
+		self._announce = None
 
 	@property
 	def announce_pagename(self):
@@ -428,6 +516,7 @@ class ProjectParameters(object):
 
 	@property
 	def discussion_pagename(self):
+		""" get discussion pagename """
 		if self._discussion_pagename:
 			return self._discussion_pagename
 		else:
@@ -435,14 +524,17 @@ class ProjectParameters(object):
 	
 	@property
 	def discussion_page(self):
+		""" get discussion page object (last version if we modified on the program) """
 		if not self._discussion:
-			self._discussion = get_page(self.discussion_pagename)
+			self._discussion = get_page_status(self.discussion_pagename)
 		return self._discussion
 
 	@property
 	def announce_page(self):
+		""" get our announce_page object """
+
 		if not self._announce:
-			self._announce = get_page(self.announce_pagename)
+			self._announce = get_page_status(self.announce_pagename)
 		return self._announce
 
 
@@ -491,7 +583,7 @@ def test():
 
 def main():
 	""" Main function"""
-	opt_parse = create_options
+	opt_parse = create_options()
 	opts = opt_parse.parse_args()
 	if opts.debug:
 		logging.basicConfig(level = logging.DEBUG)
@@ -1001,6 +1093,14 @@ Le meilleur moyen d’obtenir un consensus pour la conservation de l’article e
 |}
 
 [[Utilisateur:Linan|Linan]] ([[Discussion utilisateur:Linan|d]]) 14 janvier 2013 à 22:25 (CET)
+
+== Les articles [[Jasper]] et [[Jasper (informatique)]] sont proposés à la fusion ==
+[[Image:Merge-arrows.svg|60px|left|Proposition de fusion en cours.]]
+
+La discussion a lieu sur la page [[Wikipédia:Pages à fusionner#Jasper et Jasper (informatique)]]. La procédure de fusion est consultable sur [[Wikipédia:Pages à fusionner]].
+
+[[Utilisateur:Silex6|Silex6]] ([[Discussion utilisateur:Silex6|d]]) 25 juillet 2013 à 12:23 (CEST)
+
 """
 
 
