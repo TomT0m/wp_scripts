@@ -404,6 +404,7 @@ def deletion_prop_maintenance(project):
 	# Récupération des données #
 	
 	announces_pagename = project.announce_pagename
+	discussion_pagename = project.discussion_pagename
 
 	discussion_text = project.discussion_page.get_content()
 	announces_text = project.announce_page.get_content()
@@ -433,8 +434,12 @@ def deletion_prop_maintenance(project):
 	new_announces_text = deletion_prop_status_update(new_announces_text)
 	
 	
-	comment = u"Déplacements vers [[{}]]".format(announces_pagename)
+	comment = u"Déplacements vers [[{}|la page d'annonces]]".format(announces_pagename)
+	announce_comment = u"proposition(s) de suppression déplacée(s) depuis [[{}|La page de discussion]]"\
+				.format(discussion_pagename)
+	
 	project.discussion_page.set_content(new_discussion_text, comment)
+	project.announce_page.set_content(new_announces_text, announce_comment) 
 
 
 def format_fusion_props(articles, section, date):
