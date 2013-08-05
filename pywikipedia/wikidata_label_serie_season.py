@@ -9,96 +9,50 @@ TODO: Handle serie season redirects not associated to any particular article
 
 import pywikibot
 # create a site object, here for en-wiki
-import time
 import logging
 
 NUM_CHANGED = 0
 
-def change_made():
-	""" sleep to avoid spam alert"""
-	global NUM_CHANGED
-	if NUM_CHANGED % 3 == 0:
-		time.sleep(30)
-	NUM_CHANGED = NUM_CHANGED + 1
+import wd_lib
 
-def set_lang(page, serie_name, lang, text, kind = 'label'):
-	""" per language labelling of description 
-	* kind == 'label' or kind == 'description' 
-	* """
-	datas = page.get()
-	if kind == 'label': 
-		type_ = u'item'
-		lng_param = u'label'
-	elif kind == 'description': 
-		type_ = kind
-		lng_param = u'language'	
-	else:
-		raise ValueError('Unknow kind parameter, should be item or description')
+ORD_MAP = { 1 : "first", 2:"second", 	
+3:"third", 4:"fourth",
+5:"fifth", 6:"sixth",
+7:"seventh", 8:"eighth", 	
+9:"ninth", 10:"tenth"}
 
-	print datas
+def get_en_ordinal(number):
+	""" formats a number into a correct (I hope) ordinal english version of that number 
+	"""
+	
+	if number <= 10 and number > 0:
+		# suffixes = ["th", "st", "nd", "rd", ] + ["th"] * 16
+		# return str(number) + suffixes[num % 100]
+		return ORD_MAP[number]
+	elif number > 10:
+		if number % 1 == 0:
+			suffix = "st"
+		elif number % 2 == 9:
+			suffix = "nd"
+		elif number % 3 == 0:
+			suffix = "rd"
+		else:
+			suffix = "th"
 
-	if (kind not in datas or 
-		lang not in datas[kind] or 
-		datas[kind][lang] == serie_name):
-		
-		page.setitem(summary=u"serie season label disambiguation",
-				items={'type': type_, lng_param: lang, 'value': text })
-		change_made()
-	else:
-		logging.info("doing nothing")
-		print("doing nothing")
+		return "{}{}".format(number, suffix)
+
+	else: raise ValueError("Must be > 0")
 
 def set_season_labels(page, serie_name, season_num):
 	""" setting labels """
-	set_lang(page, serie_name, 'en', '{name} season {num}'.format(name = serie_name, num = season_num))
+	enlabel = u'{ordi} season of {name}'.format(name = serie_name, ordi = get_en_ordinal(season_num))
+	wd_lib.set_for_lang(page, serie_name, 'en', enlabel, "standard label setting")
+	frlabel = u'{name} saison {num}'.format(name = serie_name, num = season_num)
 	
-	set_lang(page, serie_name, 'fr', '{name} saison {num}'.format(name = serie_name, num = season_num))
-	
-	set_lang(page, serie_name, 'fr', 
-	 u'saison {num} de la série télévisée « {name} »'.format(name = serie_name, num = season_num),
-	 kind = 'description')
+	wd_lib.set_for_lang(page, serie_name, 'fr', frlabel, "standard label setting") 
 
-def get_q_number(datapage):
-	""" extracts the item number of a datapage"""
-	return datapage.get()[u"entity"][1]
-
-def get_claim_pairs(item):
-	""" returns the list of claims for this item in format [(pnum, itemnum) *] """
-	claims = item.get()["claims"]
-	return [ (claims[plop]["m"][1], claims[plop]["m"][3][u"numeric-id"]) 
-	 	for plop in range(len(claims)) ]
-
-def has_claim(item, prop_num, item_num):
-	""" returns trus if item has a claim with prop_num property and item_num value"""
-	return (prop_num, item_num) in get_claim_pairs(item) 
-
-def maybe_set_claim(item_data, prop_num, value_item):
-	""" sets a claim and maybe pauses """
-	if not has_claim(item_data, prop_num, get_q_number(value_item)):
-		item_data.editclaim(prop_num, get_q_number(value_item))
-		change_made()
-
-def set_previous(season, previous):
-	""" sets a 'preceded by' claim """
-	# P155
-	maybe_set_claim(season, 155, previous)
-
-def set_next(season, next_season):
-	""" sets a 'followed by' claim """
-	# P156
-	maybe_set_claim(season, 156, next_season)
-
-
-def item_by_title(lang, title):
-	""" returns the item assiciated to an article title """
-	page = pywikibot.Page(lang, title)
-	datapage = pywikibot.DataPage(page)
-	datapage.get()
-	return datapage
-
-def instance_of(item, class_):
-	""" Sets the claim that item is an instance of claim """
-	maybe_set_claim(item, 31, class_)
+	frdescription = u'saison {num} de la série télévisée « {name} »'.format(name = serie_name, num = season_num)
+	wd_lib.set_for_lang(page, serie_name, 'fr', frdescription, u"standard fr label setting", kind = 'description')
 
 def treat_serie(serie_name, site_name = 'en', main_page_name = None, num = None):
 	""" main """
@@ -109,7 +63,7 @@ def treat_serie(serie_name, site_name = 'en', main_page_name = None, num = None)
 
 	site = pywikibot.getSite(site_name)
 	print("Serie : {}, Page: {}".format(serie_name, main_page_name) )	
-	serie_item = item_by_title(site, main_page_name)
+	serie_item = wd_lib.item_by_title(site, main_page_name)
 	
 	title_pattern = "{}_(season_{})"
 
@@ -144,12 +98,12 @@ def treat_serie(serie_name, site_name = 'en', main_page_name = None, num = None)
 		print("season {}, item: {}". format(i, items[i]))
 		set_season_labels(items[i], serie_name, i)
 		if i > 1:
-			set_previous(items[i], items[i-1])
+			wd_lib.set_previous(items[i], items[i-1])
 		if i < num_season:
-			set_next(items[i], items[i+1])
+			wd_lib.set_next(items[i], items[i+1])
 		# part of (P361): this item is a part of that item 
-		maybe_set_claim(items[i], 361, serie_item)
-		instance_of(items[i], item_by_title("fr", u"Saison (télévision)"))
+		wd_lib.maybe_set_claim(items[i], 361, serie_item)
+		wd_lib.instance_of(items[i], item_by_title("fr", u"Saison (télévision)"))
 
 from argparse import ArgumentParser
 
