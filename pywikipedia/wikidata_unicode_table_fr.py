@@ -149,6 +149,9 @@ def main():
 		set_for_lang( item, u"Table des caractères Unicode", "fr", label(min_, max_), "ambiguity and label correction")
 		set_for_lang( item, u"", "en", enlabel(min_, max_), "ambiguity and label correction")
 
+		# correction of previous bug as it seems
+		set_for_lang( item, u"Unicode characters from 100000 to 10FFFF codepoints", "en", enlabel(min_, max_), "ambiguity and label correction")
+
 if __name__ == "__main__": 
 	main()
 
