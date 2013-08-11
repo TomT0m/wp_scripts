@@ -13,8 +13,6 @@ import logging
 
 from wd_lib import set_for_lang, make_sequence, item_by_title
 
-
-
 SOURCE = """<strong class="selflink">10000 – 10FFF</strong></li>
 <li><a href="/wiki/Table_des_caract%C3%A8res_Unicode_(11000-11FFF)" title="Table des caractères Unicode (11000-11FFF)">11000 – 11FFF</a></li>
 <li><a href="/wiki/Table_des_caract%C3%A8res_Unicode_(12000-12FFF)" title="">12000 – 12FFF</a></li>
@@ -120,9 +118,10 @@ def main():
 	items  = [ item_by_title("fr", title)  for title in MAINS ]
 	ranges = [ extr_mini_maxi(title) for title in MAINS ]
 
+	# items : the main articles, 7 main ranges, separated into subranges each
+
 	all_items = items
-	for item in items:
-		print(item)
+	all_ranges = ranges
 
 	make_sequence(items)
 
@@ -144,16 +143,16 @@ def main():
 		make_sequence(items)
 		# suboptimal
 		all_items = all_items + items
+		all_ranges = all_ranges + ranges
 
-	for item in all_items:
+	for (item, (min_, max_)) in zip(all_items, all_ranges):
 		set_for_lang( item, u"Table des caractères Unicode", "fr", label(min_, max_), "ambiguity and label correction")
 		set_for_lang( item, u"", "en", enlabel(min_, max_), "ambiguity and label correction")
 
 		# correction of previous bug as it seems
-		set_for_lang( item, u"Unicode characters from 100000 to 10FFFF codepoints", "en", enlabel(min_, max_), "ambiguity and label correction")
+		set_for_lang( item, u"Unicode characters from 100000 to 10FFFF codepoints",\
+	       			"en", enlabel(min_, max_), "ambiguity and label correction")
 
 if __name__ == "__main__": 
 	main()
-
-
 

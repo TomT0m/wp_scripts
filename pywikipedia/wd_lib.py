@@ -1,3 +1,7 @@
+#coding: utf-8
+
+import time
+import pywikibot
 
 NUM_CHANGED = 0
 
@@ -23,24 +27,26 @@ def set_for_lang(page, label_to_overload, lang, text, summary, kind = 'label'):
 		raise ValueError('Unknow kind parameter, should be item or description')
 	
 	try:
-		print(datas)
-		print(u"Current item label {} :".format(datas["label"][lang]))
-		print(u"Current interwiki in {} {}:".format(lang, datas["links"]["{}wiki".format(lang)]))
+		# print(datas)
+		print(u"Label: Current item label {} :".format(datas["label"][lang]))
+		print(u"Label: Current interwiki in {} {}:".format(lang, datas["links"]["{}wiki".format(lang)]))
 	except KeyError:
-		print("nothing in language {}".format(lang))
+		print("Label : !! * nothing in language {}".format(lang))
 	finally:
 		pass
+	pywikibot.output(u"Label: to overload: {}".format(label_to_overload)) 
 
 	if (kind not in datas or 
 		lang not in datas[kind] or 
 		datas[kind][lang] == label_to_overload):
 		
-		page.setitem(summary=u"serie season label disambiguation",
+		page.setitem(summary = summary,
 				items={'type': type_, lng_param: lang, 'value': text })
+		pywikibot.output(u"Set label of {} in {} : {}".format(get_q_number(page), lang, text) )
+		
 		change_made()
 	else:
-		logging.info("doing nothing")
-		print("doing nothing")
+		pywikibot.output(u"Label of {} in {} doing nothing".format(get_q_number(page), lang) )
 
 def get_q_number(datapage):
 	""" extracts the item number of a datapage"""
@@ -58,8 +64,10 @@ def has_claim(item, prop_num, item_num):
 
 def maybe_set_claim(item_data, prop_num, value_item):
 	""" sets a claim and maybe pauses """
-	if not has_claim(item_data, prop_num, get_q_number(value_item)):
-		item_data.editclaim(prop_num, get_q_number(value_item))
+	value_item_num = get_q_number(value_item)
+	if not has_claim(item_data, prop_num, value_item_num):
+		pywikibot.output("Setting claim <Q{}> P{} <Q{}>".format(get_q_number(item_data), prop_num, value_item_num))
+		item_data.editclaim(prop_num, value_item_num)
 		change_made()
 
 def set_previous(season, previous):
