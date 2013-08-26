@@ -44,7 +44,7 @@ def set_for_lang(page, label_to_overload, lang, text, summary, kind = 'label'):
 				items={'type': type_, lng_param: lang, 'value': text })
 		pywikibot.output(u"Set label of {} in {} : {}".format(get_q_number(page), lang, text) )
 		
-		change_made()
+		# change_made()
 	else:
 		pywikibot.output(u"Label of {} in {} doing nothing".format(get_q_number(page), lang) )
 
