@@ -1,4 +1,6 @@
 
+#encoding:utf-8
+
 SAMPLE_TEXT = """
 ==Plop==
 Bidou
