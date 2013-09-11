@@ -7,7 +7,7 @@
 import re, logging
 from functools import total_ordering
 
-import wikipedia as pywikibot
+import pywikibot
 import mwparserfromhell
 
 
