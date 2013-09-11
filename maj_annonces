@@ -3,5 +3,5 @@
 #Description: Lancer la maintenance de la PDD du projet Info.
 
 
-"$(dirname "$0")"/pywikipedia/net_projets.py $@
+"$(dirname "$0")"/scripts/net_projets.py $@
 
