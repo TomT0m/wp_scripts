@@ -1,4 +1,7 @@
 #coding: utf-8
+"""
+Library for script to manipulate Wikidata Data
+"""
 
 import time
 import pywikibot
@@ -90,16 +93,21 @@ def item_by_title(lang, title):
 
 def instance_of(item, class_):
 	""" Sets the claim that item is an instance of claim """
+	print(type(class_))
+	print(type(item))
 	maybe_set_claim(item, 31, class_)
 
 
-def make_sequence(iterable):
+def make_sequence(iterable, items_type = None):
 	""" Makes a 'preceded / succeeded by claims from a sequence of items"""
-	i = 0
 	previous = None
 	for item in iterable:
+		print(type(item))
 		if previous != None:
 			set_previous(item, previous)
 			set_next(previous, item)
 		previous = item
+		print(type(item))
+		if items_type != None:
+			instance_of(item, items_type)
 
