@@ -1,0 +1,5 @@
+#! /bin/bash
+
+#Description: updates statements in Wikidata after item merging
+
+"$(dirname "$0")/scripts/wikidata_substitute_items.py" "$@"

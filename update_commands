@@ -1,0 +1,20 @@
+#! /usr/bin/python3
+"""
+Annex program.
+"""
+import globbing
+
+command_pattern
+import re
+
+import commands
+
+cur_commands = commands.analyse_directory(".")
+scripts = commands.analyse_directory("pywikipedia/")
+
+for res in glob.glob("pywikipedia/*.py")
+	content = file(res).read()
+	res = re.search("# *Description *:(.*)$", content)
+	if res:
+		command_name = None 
+

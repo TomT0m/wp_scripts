@@ -2,7 +2,11 @@
 # -*- coding: UTF-8 -*-
 """
 #Description: Déplace les annonces de proposition de suppression de la page Projet:Informatique vers la page d'annonces
+
 """
+
+#TODO: Fix duplicates announces bug.
+#TODO: Fix fusion status.
 
 import re, logging
 from functools import total_ordering
@@ -17,6 +21,7 @@ ANNOUNCE_DEL_TMPL = "Annonce proposition suppression"
 ANNOUNCE_FUSION_TMPL = "Annonce fusion d'articles"
 
 # utilitary classes
+
 
 @total_ordering
 class Date(object):

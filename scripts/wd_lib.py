@@ -58,8 +58,11 @@ def get_q_number(datapage):
 def get_claim_pairs(item):
 	""" returns the list of claims for this item in format [(pnum, itemnum) *] """
 	claims = item.get()["claims"]
-	return [ (claims[plop]["m"][1], claims[plop]["m"][3][u"numeric-id"]) 
-	 	for plop in range(len(claims)) ]
+	print(claims)
+	pairs = [ (claims[prop][n].getID(), claims[prop][n].target) 
+	 	for prop in claims for n in range(len(claims[prop]))]
+	print(pairs)
+	return pairs
 
 def has_claim(item, prop_num, item_num):
 	""" returns trus if item has a claim with prop_num property and item_num value"""
@@ -87,7 +90,7 @@ def set_next(season, next_season):
 def item_by_title(lang, title):
 	""" returns the item assiciated to an article title """
 	page = pywikibot.Page(lang, title)
-	datapage = pywikibot.DataPage(page)
+	datapage = pywikibot.ItemPage(page)
 	datapage.get()
 	return datapage
 
