@@ -266,7 +266,7 @@ class PageStatus:
 	def set_content(self, new_text, comment):
 		""" setter for content, without writing"""
 		self._cached_content = new_text
-		if self.edit_comment != "":
+		if len(self.edit_comment) > 0:
 			self.edit_comment += u"; " + comment
 		else:
 			self.edit_comment = comment
@@ -438,8 +438,12 @@ def deletion_prop_maintenance(project):
 	announce_comment = u"proposition(s) de suppression déplacée(s) depuis [[{}|La page de discussion]]"\
 			.format(discussion_pagename)
 	project.discussion_page.set_content(new_announces_text, announce_comment)
+	project.announce_page.set_content(new_announces_text, announce_comment) 
+	
+	
 	
 	# mise à jour de l'état des annonces #
+	
 	new_announces_text = deletion_prop_status_update(new_announces_text)
 	
 	
@@ -606,7 +610,7 @@ def main():
 		# paramètres par defaut : "Projet:Informatique", False
 		projects_maintenance(PROJETS, opts)
 
-import test_data
+from datas import test_data
 
 SAMPLE_TEXT = test_data.SAMPLE_TEXT
 
