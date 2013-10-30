@@ -24,7 +24,6 @@ def set_for_lang(page, label_to_overload, lang, text, summary, kind = u'labels')
         raise ValueError('Unknow "kind" parameter, is "{}", should be labels or descriptions'.format(kind))
     
     try:
-        # print(datas)
         print(u"Label: Current item label {} :".format(datas["label"][lang]))
         print(u"Label: Current interwiki in {} {}:".format(lang, datas["links"]["{}wiki".format(lang)]))
     except KeyError:
@@ -44,7 +43,6 @@ def set_for_lang(page, label_to_overload, lang, text, summary, kind = u'labels')
         
         pywikibot.output(u"Set label of {} in {} : {}".format(get_q_number(page), lang, text) )
         
-        # change_made()
     else:
         pywikibot.output(u"Label of {} in {} doing nothing".format(get_q_number(page), lang) )
 
@@ -54,11 +52,11 @@ def get_q_number(datapage):
 
 def get_claim_pairs(item):
     """ returns the list of claims for this item in format [(pnum, itemnum) *] """
-    claims = item.get()["claims"]
-    print(claims)
+    datas = item.get()
+    claims = datas['claims']
     pairs = [ (claims[prop][n].getID(), claims[prop][n].target) 
         for prop in claims for n in range(len(claims[prop]))]
-    print(pairs)
+    
     return pairs
 
 def has_claim(item, prop_num, item_num):
@@ -69,7 +67,7 @@ def maybe_set_claim(item_data, prop_num, value_item):
     """ sets a claim and maybe pauses """
     value_item_num = get_q_number(value_item)
     
-    if not has_claim(item_data, prop_num, value_item_num):
+    if not has_claim(item_data, "P{}".format(prop_num), value_item):
         pywikibot.output("Setting claim <Q{}> P{} <Q{}>".format(get_q_number(item_data), prop_num, value_item_num))
         
         
@@ -106,8 +104,6 @@ def item_by_title(lang, title):
 
 def instance_of(item, class_):
     """ Sets the claim that item is an instance of claim """
-    print(type(class_))
-    print(type(item))
     maybe_set_claim(item, 31, class_)
 
 
@@ -115,12 +111,10 @@ def make_sequence(iterable, items_type = None):
     """ Makes a 'preceded / succeeded by claims from a sequence of items"""
     previous = None
     for item in iterable:
-        print(type(item))
         if previous != None:
             set_previous(item, previous)
             set_next(previous, item)
         previous = item
-        print(type(item))
         if items_type != None:
             instance_of(item, items_type)
 

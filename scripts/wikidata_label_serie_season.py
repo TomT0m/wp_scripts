@@ -74,7 +74,7 @@ def treat_serie(serie_name, site_name = 'en', main_page_name = None, num = None)
     if not num:
         num = 1000
 
-    while has_previous and current < num:
+    while has_previous and current <= num:
         title = title_pattern.format(serie_name, current)
         page = pywikibot.Page(site, title)
         print(title)
