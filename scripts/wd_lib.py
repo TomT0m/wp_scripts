@@ -4,7 +4,7 @@
 Library for script to manipulate Wikidata Data
 """
 
-import time
+# import time
 import pywikibot
 
 from pywikibot import output as output
@@ -28,7 +28,7 @@ def set_for_lang_aux(page, label_to_overload, lang, text, summary, kind = u'labe
         raise ValueError('Unknow "kind" parameter, is "{}", should be labels or descriptions'.format(kind))
    
     try:
-        to_output = u"> Label: Current item label {} :".format(datas[u"labels"][lang])
+        to_output = u"> {}: Current item label {} :".format(kind, datas[kind][lang])
         output(to_output)
     except KeyError:
         output(u"> Label: Nothing in language {}".format(lang))
@@ -38,7 +38,8 @@ def set_for_lang_aux(page, label_to_overload, lang, text, summary, kind = u'labe
 
     if (kind not in datas or 
         lang not in datas[kind] or 
-        datas[kind][lang] == label_to_overload):
+        (datas[kind][lang] == label_to_overload)
+            and datas[kind][lang] != text):
         
         if kind == 'labels':
             page.editLabels({ lang : text }, summary=summary)
@@ -51,19 +52,23 @@ def set_for_lang_aux(page, label_to_overload, lang, text, summary, kind = u'labe
         pywikibot.output(u"|>>>! Set label of {} in {} : {}".format(get_q_number(page), lang, text) )
         
     else:
-        pywikibot.output(u"|>>> Label of {} in {} doing nothing".format(get_q_number(page), lang) )
+        pywikibot.output(u"|>>> Label of {} in {}, nothing done.".format(get_q_number(page), lang) )
 
     output("End of season processing\n")
 
-def set_for_lang(page, label_to_overload, lang, text, summary, kind = u'labels'):
+def set_for_lang(page, label_to_overload, lang, text, summary, kind = u'labels', depth=0):
     """ wrapper """
     try:
         set_for_lang_aux(page, label_to_overload, lang, text, summary, kind=kind)
     except APIError as err:
         if u"editconf" in str(err):
             output("|>>>>!!!!!!!!!!!!!!!!!! Editconflict, retrying ......")
-            set_for_lang(page, label_to_overload, lang, text, summary, kind=kind)
-        raise err
+            print("Nombre d'essais: {}, err : {}".format(depth, err))
+            # reloading page 
+            page = item_by_title("wikidata", unicode(page)[2:-2])
+            set_for_lang(page, label_to_overload, lang, text, summary, kind=kind, depth=depth+1 )
+        else:
+            raise err
 
 def get_q_number(datapage):
     """ extracts the item number of a datapage"""
@@ -97,9 +102,10 @@ def maybe_set_claim(item_data, prop_num, value_item):
             item_data.addClaim(claim)
         
             change_made()
-    except APIError as e:
-        if "ediconflict" in str(e):
+    except APIError as err:
+        if "ediconflict" in str(err):
             output("editconflict ????, retrying")
+            output("=====>".format(err))
             maybe_set_claim(item_data, prop_num, value_item)
         else:
             raise
@@ -118,12 +124,18 @@ def set_next(season, next_season):
 def item_by_title(lang, title):
     """ returns the item assiciated to an article title """
     if type(lang) == str:
-        site = pywikibot.Site(lang, "wikipedia")
+        if lang != "wikidata":
+            site = pywikibot.Site(lang, "wikipedia")
+        else:
+            site = pywikibot.site.DataSite("wikidata", "wikidata")
     else:
         site = lang
     page = pywikibot.Page(site, title)
-    # repo = 
-    datapage = pywikibot.ItemPage.fromPage(page)
+    
+    if lang != "wikidata":
+        datapage = pywikibot.ItemPage.fromPage(page)
+    else:
+        datapage = page
     datapage.get()
     
     return datapage
