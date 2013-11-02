@@ -18,6 +18,7 @@ import pywikibot
 import wd_lib
 
 from pywikibot import output as output
+from pywikibot import NoPage as NoPage
 
 ORD_MAP = { 1 : "first", 2:"second",     
 3:"third", 4:"fourth",
@@ -110,21 +111,24 @@ def treat_serie(serie_name, site_name = 'en', main_page_name = None, num = None)
     if not num:
         num = 1000
 
-    while has_previous and current <= num:
-        title = title_pattern.format(serie_name, current)
-        page = pywikibot.Page(site, title)
-        output(title)
-        if page.exists():
-            datapage = pywikibot.ItemPage.fromPage(page)
-            if datapage.exists():
-                datapage.get()
-                items[current] = datapage
+    try:
+        while has_previous and current <= num:
+            title = title_pattern.format(serie_name, current)
+            page = pywikibot.Page(site, title)
+            output(title)
+            if page.exists():
+                datapage = pywikibot.ItemPage.fromPage(page)
+                if datapage.exists():
+                    datapage.get()
+                    items[current] = datapage
+                else:
+                    raise NoPage("page do not exists")
+                
+                current += 1
             else:
-                raise Exception("page do not exists")
-            
-            current += 1
-        else:
-            has_previous = False
+                has_previous = False
+    except NoPage:
+        pass # doing nothing, TODO: mark and log
 
     num_season = current - 1
 

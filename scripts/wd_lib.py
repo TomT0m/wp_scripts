@@ -56,6 +56,12 @@ def set_for_lang_aux(page, label_to_overload, lang, text, summary, kind = u'labe
 
     output("End of season processing\n")
 
+def reloaditempage(itempage):
+    """ reload the datas of a page if needed"""
+    page = item_by_title("wikidata", unicode(itempage)[2:-2].split(":")[1])
+    page.get()
+    return page
+
 def set_for_lang(page, label_to_overload, lang, text, summary, kind = u'labels', depth=0):
     """ wrapper """
     try:
@@ -65,7 +71,7 @@ def set_for_lang(page, label_to_overload, lang, text, summary, kind = u'labels',
             output("|>>>>!!!!!!!!!!!!!!!!!! Editconflict, retrying ......")
             print("Nombre d'essais: {}, err : {}".format(depth, err))
             # reloading page 
-            page = item_by_title("wikidata", unicode(page)[2:-2])
+            page = reloaditempage(page) 
             set_for_lang(page, label_to_overload, lang, text, summary, kind=kind, depth=depth+1 )
         else:
             raise err
@@ -104,9 +110,11 @@ def maybe_set_claim(item_data, prop_num, value_item):
             change_made()
     except APIError as err:
         if "ediconflict" in str(err):
+            
             output("editconflict ????, retrying")
             output("=====>".format(err))
-            maybe_set_claim(item_data, prop_num, value_item)
+
+            maybe_set_claim(reloaditempage(item_data), prop_num, value_item)
         else:
             raise
 
@@ -130,12 +138,13 @@ def item_by_title(lang, title):
             site = pywikibot.site.DataSite("wikidata", "wikidata")
     else:
         site = lang
-    page = pywikibot.Page(site, title)
-    
-    if lang != "wikidata":
-        datapage = pywikibot.ItemPage.fromPage(page)
+    datapage = None 
+    if lang == "wikidata":
+        print(title)
+        datapage = pywikibot.ItemPage(site, title)
     else:
-        datapage = page
+        page = pywikibot.Page(site, title)
+        datapage = pywikibot.ItemPage.fromPage(page)
     datapage.get()
     
     return datapage
