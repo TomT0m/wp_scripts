@@ -1,19 +1,23 @@
-#! /usr/bin/python
+#! /usr/bin/ipython --
 #encoding: utf-8
 """ 
 Serie formatting in wikidata
 
-TODO: Handle serie season redirects not associated to any particular article
+TODO: * Handle serie season redirects not associated to any particular article
+* Handle series with no items
+* Use pywikibot infrastructure logging
 """
 
 
 import pywikibot
 # create a site object, here for en-wiki
-import logging
+# import logging
 
-NUM_CHANGED = 0
+# NUM_CHANGED = 0
 
 import wd_lib
+
+from pywikibot import output as output
 
 ORD_MAP = { 1 : "first", 2:"second",     
 3:"third", 4:"fourth",
@@ -39,20 +43,52 @@ def get_en_ordinal(number):
         else:
             suffix = "th"
 
-        return "{}{}".format(number, suffix)
+        return u"{}{}".format(number, suffix)
 
     else: raise ValueError("Must be > 0")
 
-def set_season_labels(page, serie_name, season_num):
-    """ setting labels """
-    enlabel = u'{ordi} season of {name}'.format(name = serie_name, ordi = get_en_ordinal(season_num))
-    wd_lib.set_for_lang(page, serie_name, 'en', enlabel, "standard label setting")
-    frlabel = u'{name} saison {num}'.format(name = serie_name, num = season_num)
-    
-    wd_lib.set_for_lang(page, serie_name, 'fr', frlabel, "standard label setting") 
+__lang_patterns__ = {
+    u"fr": {
+        u"label": u'{name} saison {num}',
+        u"description": u'saison {num} de la série télévisée « {name} »'
+        
+    },
+    u"en": {
+        u"label": u'{ordi} season of {name}',
+        u"description": None
+    }
+} 
 
-    frdescription = u'saison {num} de la série télévisée « {name} »'.format(name = serie_name, num = season_num)
-    wd_lib.set_for_lang(page, serie_name, 'fr', frdescription, u"standard fr label setting", kind = 'descriptions')
+
+def set_season_labels(serie_page, season_page, serie_name, season_num):
+    """ setting labels """
+
+    datas = serie_page.get()
+
+    #en
+    enlabel = __lang_patterns__[u"en"][u"label"].format(name = serie_name, ordi = get_en_ordinal(season_num))
+    wd_lib.set_for_lang(season_page, serie_name, u'en', enlabel, u"standard label setting")
+    
+    #fr
+    if "fr" in datas["labels"]:
+        frseriename = datas["labels"]["fr"]
+    else:
+        frseriename = serie_name
+
+    frlabel = u'{name} saison {num}'.format(name = frseriename, num = season_num)
+    wd_lib.set_for_lang(season_page, serie_name, u'fr', frlabel, u"standard label setting") 
+
+    frdescription = u'saison {num} de la série télévisée « {name} »'.format(name = frseriename, num = season_num)
+    if frseriename != serie_name:
+        wrongdescription = u'saison {num} de la série télévisée « {name} »'.format(name = serie_name, num = season_num)
+    
+        wd_lib.set_for_lang(season_page, wrongdescription, 
+                           'fr', frdescription, u"standard fr label setting",
+                            kind = 'descriptions')
+    wd_lib.set_for_lang(season_page, serie_name, 
+                        'fr', frdescription, u"standard fr label setting", 
+                        kind = 'descriptions')
+
 
 def treat_serie(serie_name, site_name = 'en', main_page_name = None, num = None):
     """ main """
@@ -62,10 +98,10 @@ def treat_serie(serie_name, site_name = 'en', main_page_name = None, num = None)
     
 
     site = pywikibot.Site(site_name, "wikipedia")
-    print("Serie : {}, Page: {}".format(serie_name, main_page_name) )    
+    output(u"Serie : {}, Page: {}".format(serie_name, main_page_name) )    
     serie_item = wd_lib.item_by_title(site, main_page_name)
     
-    title_pattern = "{}_(season_{})"
+    title_pattern = u"{}_(season_{})"
 
     has_previous = True
     current = 1
@@ -77,7 +113,7 @@ def treat_serie(serie_name, site_name = 'en', main_page_name = None, num = None)
     while has_previous and current <= num:
         title = title_pattern.format(serie_name, current)
         page = pywikibot.Page(site, title)
-        print(title)
+        output(title)
         if page.exists():
             datapage = pywikibot.ItemPage.fromPage(page)
             if datapage.exists():
@@ -92,11 +128,11 @@ def treat_serie(serie_name, site_name = 'en', main_page_name = None, num = None)
 
     num_season = current - 1
 
-    print("Number of seasons : {}".format(num_season))
+    output(u"Number of seasons : {}".format(num_season))
     
     for i in range(1, len(items) + 1):
-        print("season {}, item: {}". format(i, items[i]))
-        set_season_labels(items[i], serie_name, i)
+        output(u"season {}, item: {}". format(i, items[i]))
+        set_season_labels(serie_item, items[i], serie_name, i)
         if i > 1:
             wd_lib.set_previous(items[i], items[i-1])
         if i < num_season:
@@ -134,16 +170,23 @@ import sys
 
 def main():
     """ main script function """
+    if not sys.stdin.encoding:
+        import codecs
+        sys.stdin = codecs.getreader('utf-8')(sys.stdin)
+    
+    if not sys.stdout.encoding:
+        sys.stdout = codecs.getwriter('utf-8')(sys.stdin)
+    
     opt_parse = create_options()
     opt = opt_parse.parse_args()
 
     if not opt.serie_name:
         opt_parse.print_help()
         exit(0)
-    serie_name = " ".join(opt.serie_name)
     
-    print(sys.argv)
-
+    serie_name = u" ".join([ name.decode('utf-8')
+                            for name in opt.serie_name])
+    
     num = None
     if opt.max_num:
         num = opt.max_num
@@ -153,9 +196,10 @@ def main():
     else:
         treat_serie(serie_name, "en", num = num)
 
-    print ("Nombre de changements : {}".format(NUM_CHANGED) ) 
+    output (u"Nombre de changements : {}".format(wd_lib.NUM_CHANGED) ) 
     return True
 
-exit(main())
+
+main()
 
 
