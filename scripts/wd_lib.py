@@ -23,7 +23,13 @@ def set_for_lang_aux(page, label_to_overload, lang, text, summary, kind = u'labe
     """ per language labelling of description 
     * kind == 'label' or kind == 'description' 
     * """
+    
+    output("===>>>> new label ===")
+    
+    # reload because of concurrency access problems
+    page = reloaditempage(page)
     datas = page.get()
+    
     if kind != u'labels' and kind != u'descriptions': 
         raise ValueError('Unknow "kind" parameter, is "{}", should be labels or descriptions'.format(kind))
    
@@ -54,7 +60,7 @@ def set_for_lang_aux(page, label_to_overload, lang, text, summary, kind = u'labe
     else:
         pywikibot.output(u"|>>> Label of {} in {}, nothing done.".format(get_q_number(page), lang) )
 
-    output("End of season processing\n")
+    output("===> End of label processing ===")
 
 def reloaditempage(itempage):
     """ reload the datas of a page if needed"""

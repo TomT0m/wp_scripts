@@ -35,11 +35,11 @@ def get_en_ordinal(number):
         # return str(number) + suffixes[num % 100]
         return ORD_MAP[number]
     elif number > 10:
-        if number % 1 == 0:
+        if number % 10 == 1 and number > 11:
             suffix = "st"
-        elif number % 2 == 9:
+        elif number % 10 == 2 and number > 12:
             suffix = "nd"
-        elif number % 3 == 0:
+        elif number % 10 == 3 and number > 13:
             suffix = "rd"
         else:
             suffix = "th"
@@ -81,11 +81,14 @@ def set_season_labels(serie_page, season_page, serie_name, season_num):
 
     frdescription = u'saison {num} de la série télévisée « {name} »'.format(name = frseriename, num = season_num)
     if frseriename != serie_name:
+        # correct a label set in english name when we got a french one
         wrongdescription = u'saison {num} de la série télévisée « {name} »'.format(name = serie_name, num = season_num)
     
         wd_lib.set_for_lang(season_page, wrongdescription, 
                            'fr', frdescription, u"standard fr label setting",
                             kind = 'descriptions')
+        # end correction block
+    
     wd_lib.set_for_lang(season_page, serie_name, 
                         'fr', frdescription, u"standard fr label setting", 
                         kind = 'descriptions')
@@ -99,7 +102,7 @@ def treat_serie(serie_name, site_name = 'en', main_page_name = None, num = None)
     
 
     site = pywikibot.Site(site_name, "wikipedia")
-    output(u"Serie : {}, Page: {}".format(serie_name, main_page_name) )    
+    output(u"======> Serie : {}, Page: {}".format(serie_name, main_page_name) )    
     serie_item = wd_lib.item_by_title(site, main_page_name)
     
     title_pattern = u"{}_(season_{})"
@@ -132,9 +135,11 @@ def treat_serie(serie_name, site_name = 'en', main_page_name = None, num = None)
 
     num_season = current - 1
 
-    output(u"Number of seasons : {}".format(num_season))
+    output(u"=>Number of seasons : {}".format(num_season))
     
     for i in range(1, len(items) + 1):
+        output("===> Saison {}\n".format(i))
+        
         output(u"season {}, item: {}". format(i, items[i]))
         set_season_labels(serie_item, items[i], serie_name, i)
         if i > 1:
@@ -144,6 +149,10 @@ def treat_serie(serie_name, site_name = 'en', main_page_name = None, num = None)
         # part of (P361): this item is a part of that item 
         wd_lib.maybe_set_claim(items[i], 361, serie_item)
         wd_lib.instance_of(items[i], wd_lib.item_by_title("fr", u"Saison (télévision)"))
+        
+        output("===> End of aison {} processing\n".format(i))
+    
+    output("======> End of serie (maybe) processing\n")
 
 from argparse import ArgumentParser
 
@@ -196,7 +205,7 @@ def main():
         num = opt.max_num
 
     if opt.main_page_name:
-        treat_serie(serie_name, "en", opt.main_page_name, num = num)
+        treat_serie(serie_name, "en", opt.main_page_name.decode('utf-8'), num = num)
     else:
         treat_serie(serie_name, "en", num = num)
 
