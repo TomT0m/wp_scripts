@@ -26,7 +26,7 @@ def set_for_lang_aux(page, label_to_overload, lang, text, summary, kind = u'labe
     
     output("===>>>> new label ===")
     
-    # reload because of concurrency access problems
+    # TODO: reload because of concurrency access problems
     page = reloaditempage(page)
     datas = page.get()
     
@@ -64,9 +64,11 @@ def set_for_lang_aux(page, label_to_overload, lang, text, summary, kind = u'labe
 
 def reloaditempage(itempage):
     """ reload the datas of a page if needed"""
-    page = item_by_title("wikidata", unicode(itempage)[2:-2].split(":")[1])
-    page.get()
-    return page
+
+    #page = pywikibot.ItemPage(itempage, itempage.data_repository)
+    
+    itempage.get(force=True)
+    return itempage
 
 def set_for_lang(page, label_to_overload, lang, text, summary, kind = u'labels', depth=0):
     """ wrapper """
@@ -119,8 +121,9 @@ def maybe_set_claim(item_data, prop_num, value_item):
             
             output("editconflict ????, retrying")
             output("=====>".format(err))
-
-            maybe_set_claim(reloaditempage(item_data), prop_num, value_item)
+            # TODO : FIX reload
+            item_data = reloaditempage(item_data),
+            maybe_set_claim( item_data, prop_num, value_item)
         else:
             raise
 
@@ -135,18 +138,23 @@ def set_next(season, next_season):
     maybe_set_claim(season, 156, next_season)
 
 
-def item_by_title(lang, title):
+def item_by_title(lang, title, datasite = None):
     """ returns the item assiciated to an article title """
+    
     if type(lang) == str:
         if lang != "wikidata":
             site = pywikibot.Site(lang, "wikipedia")
         else:
             site = pywikibot.site.DataSite("wikidata", "wikidata")
+    elif datasite != None:
+        site = datasite
     else:
         site = lang
+    
     datapage = None 
     if lang == "wikidata":
-        print(title)
+        #print(title)
+        print(site)
         datapage = pywikibot.ItemPage(site, title)
     else:
         page = pywikibot.Page(site, title)

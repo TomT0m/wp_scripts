@@ -1,4 +1,4 @@
-#! /usr/bin/ipython --
+#! /usr/bin/python --
 #encoding: utf-8
 """ 
 Serie formatting in wikidata
@@ -20,11 +20,17 @@ import wd_lib
 from pywikibot import output as output
 from pywikibot import NoPage as NoPage
 
+
+from systemd import journal
+
 ORD_MAP = { 1 : "first", 2:"second",     
 3:"third", 4:"fourth",
 5:"fifth", 6:"sixth",
 7:"seventh", 8:"eighth",     
 9:"ninth", 10:"tenth"}
+
+
+ARTICLE = None
 
 def get_en_ordinal(number):
     """ formats a number into a correct (I hope) ordinal english version of that number 
@@ -181,8 +187,9 @@ def create_options():
 
 import sys
 
-def main():
+def logmain():
     """ main script function """
+    
     if not sys.stdin.encoding:
         import codecs
         sys.stdin = codecs.getreader('utf-8')(sys.stdin)
@@ -199,11 +206,13 @@ def main():
     
     serie_name = u" ".join([ name.decode('utf-8')
                             for name in opt.serie_name])
+    global ARTICLE
+    ARTICLE = serie_name # remember for logging all errors    
     
     num = None
     if opt.max_num:
         num = opt.max_num
-
+    
     if opt.main_page_name:
         treat_serie(serie_name, "en", opt.main_page_name.decode('utf-8'), num = num)
     else:
@@ -212,6 +221,13 @@ def main():
     output (u"Nombre de changements : {}".format(wd_lib.NUM_CHANGED) ) 
     return True
 
+def main():
+    """ plop """
+    # journal.send("New serie name treatment")
+    try:
+        logmain()
+    except Exception as err:
+        journal.send("something went wrong for article {}".format(ARTICLE), ERROR=str(err))
 
 main()
 

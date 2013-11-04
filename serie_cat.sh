@@ -38,9 +38,12 @@ wp listpages  -- "-catr:$category" -lang:en -family:wikipedia 	| awk -F':' '{ pr
 		
 			title "$serie (${label})"
 	    	
+			journal_log "Doing article $page" "cmd=$0 $*" "article=$serie" --codefile "$0" 
+			
 			echo -e "\n\n>>>>>>>>>>>>>>>>>>> ============================ <$serie> , <$page>, <$meta> =============================" 
 				wp set_serie_labels -p "$page" "$serie";
 		else
 			echo -e "\n>>>>>Skipping $page (<$meta> did not pass)\n"
+			journal_log "Skipping, do not match: <$page>" "cmd=$0 $*" "article=$serie"  --codefile "$0"
 		fi
 	done
