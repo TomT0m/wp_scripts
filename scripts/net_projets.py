@@ -322,14 +322,22 @@ class PageStatus:
 			pywikibot.showDiff(self._original_content, self._cached_content)
 
 def get_page_status(pagename):
-	""" Returns a page status object 
-	>>> get_page_status("Plop").page
-	Page{[[fr:Plop]]}
-	"""
-	site = pywikibot.getSite("fr")
-	page = pywikibot.Page(site, pagename)
+    """ Returns a page status object 
+    >>> get_page_status("Plop").page
+    Page{[[fr:Plop]]}
 
-	return PageStatus(page)
+    may thow InvalidPage
+
+    """
+    site = pywikibot.getSite("fr")
+    regtitle = re.compile("\[\[.*\]\]")
+    
+    if regtitle.match(pagename):
+        pagename = pagename[2:-2]
+    
+    page = pywikibot.Page(site, pagename)
+
+    return PageStatus(page)
 
 
 # writing functions
@@ -384,13 +392,17 @@ def deletion_prop_status_update(announce_page):
 	
 	for announce in del_prop_iteration(parsed):
 		article_title = announce.get("nom").value
-		pywikibot.output("-> {}".format(article_title))
-		status = get_page_status(article_title)
-		if status.is_proposed_to_deletion():
-			pywikibot.output("* still opened")
-		else:
-			if "fait" not in announce:
-				announce.add(2, u"fait")
+                pywikibot.output("-> {}".format(article_title))
+                try:
+		    status = get_page_status(unicode(article_title))
+		    if status.is_proposed_to_deletion():
+		    	pywikibot.output("* still opened")
+		    else:
+		    	if "fait" not in announce:
+		    		announce.add(2, u"fait")
+                except pywikibot.exceptions.InvalidTitle:
+                    logging.warn("Annonce malformée !! {}".format(article_title))
+
 	return unicode(parsed)
 
 
