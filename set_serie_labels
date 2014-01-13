@@ -2,5 +2,5 @@
 
 #Description: Résoud les homonymies associées à la suppression des parenthèses dans les labels des saisons de séries
 
-"$(dirname "$0")/pywikipedia/wikidata_label_serie_season.py" "$@"
+"$(dirname "$0")/scripts/wikidata_label_serie_season.py" "$@"
 

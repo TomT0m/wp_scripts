@@ -245,6 +245,21 @@ def insert_new_announces(old_text, dated_new_announces):
 
     return preamble + sep_preamble + u"\n" + new_section + u"\n" + sep_end + rest
 
+def gen_archives_page(old_archive_text, new_archived_announces):
+    """ génère une page d'archive à partir de l'ancienne page et des nouvelles archives """
+    
+    announces_lines = page.split(u"\n")
+    
+    dated_old_announces = [ (text, extract_date(text)) 
+            for text in announces_lines if text != u""]
+    
+    # tri par date
+    sorted_announces = sorted( dated_old_announces + new_archived_announces, 
+               key = lambda (_, date): date, reverse = True)
+
+    #new_text = reduce(, string.concat)
+
+    return new_text
 
 class PageStatus:
     """ Status object """
@@ -266,7 +281,7 @@ class PageStatus:
     def set_content(self, new_text, comment):
         """ setter for content, without writing"""
         self._cached_content = new_text
-        if self.edit_comment != "":
+        if len(self.edit_comment) > 0:
             self.edit_comment += u"; " + comment
         else:
             self.edit_comment = comment
@@ -325,8 +340,16 @@ def get_page_status(pagename):
     """ Returns a page status object 
     >>> get_page_status("Plop").page
     Page{[[fr:Plop]]}
+
+    may thow InvalidPage
+
     """
     site = pywikibot.getSite("fr")
+    regtitle = re.compile("\[\[.*\]\]")
+    
+    if regtitle.match(pagename):
+        pagename = pagename[2:-2]
+    
     page = pywikibot.Page(site, pagename)
 
     return PageStatus(page)
@@ -385,12 +408,16 @@ def deletion_prop_status_update(announce_page):
     for announce in del_prop_iteration(parsed):
         article_title = announce.get("nom").value
         pywikibot.output("-> {}".format(article_title))
-        status = get_page_status(article_title)
-        if status.is_proposed_to_deletion():
-            pywikibot.output("* still opened")
-        else:
-            if "fait" not in announce:
-                announce.add(2, u"fait")
+        try:
+            status = get_page_status(unicode(article_title))
+            if status.is_proposed_to_deletion():
+                pywikibot.output("* still opened")
+            else:
+                if "fait" not in announce:
+                    announce.add(2, u"fait")
+        except pywikibot.exceptions.InvalidTitle:
+            logging.warn("Annonce malformée !! {}".format(article_title))
+
     return unicode(parsed)
 
 
@@ -438,8 +465,12 @@ def deletion_prop_maintenance(project):
     announce_comment = u"proposition(s) de suppression déplacée(s) depuis [[{}|La page de discussion]]"\
             .format(discussion_pagename)
     project.discussion_page.set_content(new_announces_text, announce_comment)
+    project.announce_page.set_content(new_announces_text, announce_comment) 
+    
+    
     
     # mise à jour de l'état des annonces #
+    
     new_announces_text = deletion_prop_status_update(new_announces_text)
     
     
@@ -607,7 +638,7 @@ def main():
         # paramètres par defaut : "Projet:Informatique", False
         projects_maintenance(PROJETS, opts)
 
-import test_data
+from datas import test_data
 
 SAMPLE_TEXT = test_data.SAMPLE_TEXT
 
