@@ -4,7 +4,14 @@ Annex program.
 """
 import globbing
 
-command_pattern
+bashscript_pattern="""
+#!/bin/bash
+
+#Description: Résoud les homonymies associées à la suppression des parenthèses dans les labels des saisons de séries
+
+"$(dirname "$0")/{filename} "$@"
+"""
+
 import re
 
 import commands
@@ -12,9 +19,13 @@ import commands
 cur_commands = commands.analyse_directory(".")
 scripts = commands.analyse_directory("pywikipedia/")
 
-for res in glob.glob("pywikipedia/*.py")
+for filename in glob.glob("pywikipedia/*.py"):
 	content = file(res).read()
 	res = re.search("# *Description *:(.*)$", content)
 	if res:
-		command_name = None 
+		command_name = filename
+                if filename[-3:] ==".py":
+                    command_name= filename[:-3]
+
+                
 

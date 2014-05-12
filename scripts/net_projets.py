@@ -123,6 +123,11 @@ def msg_line_eating():
 
     return '(?:' + '^$\n?' +'|'+ not_eq_eq + ".*$\n?" + ')'
 
+    # newline_pattern = "(?:$\n)?^"
+    not_eq_eq = "^(?:[^=]|=?!=)"
+
+    return '(?:' + '^$\n?' +'|'+ not_eq_eq + ".*$\n?" + ')'
+
 def extract_full_del_props(text):
     """ Takes wikicode, returns a pair 
     ([(title(str), Date)*], newtext)
@@ -245,19 +250,28 @@ def insert_new_announces(old_text, dated_new_announces):
 
     return preamble + sep_preamble + u"\n" + new_section + u"\n" + sep_end + rest
 
+
+
 def gen_archives_page(old_archive_text, new_archived_announces):
     """ génère une page d'archive à partir de l'ancienne page et des nouvelles archives """
     
-    announces_lines = page.split(u"\n")
+    announces_lines = old_archive_text.split(u"\n")
     
     dated_old_announces = [ (text, extract_date(text)) 
-            for text in announces_lines if text != u""]
+                           for text in announces_lines if text != u"" and text.strip()[:2] == "{{" ]
     
-    # tri par date
     sorted_announces = sorted( dated_old_announces + new_archived_announces, 
-               key = lambda (_, date): date, reverse = True)
-
+                              key = lambda (_, date): date, reverse = False)
+    
+    by_month = { month: [value for (date, value) in sorted_announces + dated_old_announces 
+                          if date.mois == month] for month in Date.MOIS 
+                }
     #new_text = reduce(, string.concat)
+    
+    new_text = "\n".join([
+        "== {} ==\n{}\n".format(date.MOIS[mois], by_month[annonce])
+        for mois in by_month
+    ])
 
     return new_text
 
@@ -280,13 +294,17 @@ class PageStatus:
     
     def set_content(self, new_text, comment):
         """ setter for content, without writing"""
-        self._cached_content = new_text
-        if len(self.edit_comment) > 0:
-            self.edit_comment += u"; " + comment
-        else:
-            self.edit_comment = comment
+        
+        self.modified = unicode(new_text) != unicode(self._original_content)
+        modif = unicode(new_text) != unicode(self._cached_content)
 
-        self.modified = new_text != self._original_content
+        if self.modified:
+            if len(self.edit_comment) > 0:
+                self.edit_comment += u"; " + comment
+            else:
+                self.edit_comment = comment
+
+        self._cached_content = new_text
 
     def save(self):
         """ saves the current content on server """
