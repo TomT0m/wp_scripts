@@ -8,13 +8,22 @@ code importé de https://fr.wikipedia.org/w/index.php?title=Utilisateur:HyuBoT/S
 """
 """
 Scripts for HyuBoT
+
+Features : 
+    * monitors the articles recently created or added in a Category
+    * reports its finding on a Wikipage
+    * maintains a list of articles to be watched by the member of the project 
+      using the "linked pages changes" Mediawiki features
+    * ?
 """
+
  
 import string, re
 
 import pywikibot as wikipedia
 import pywikibot.catlib as catlib
 
+# TODO: check the API to know if it is still needed (quick and dirty fix)
 def unique(l):
      """Given a list of hashable object, return an alphabetized unique list."""
      l = dict.fromkeys(l).keys()
@@ -23,12 +32,11 @@ def unique(l):
 
 catlib.unique = unique
 
-# , catlib
- 
 """
 Toolkit
 """
- 
+
+# store for the warnings to report on some userpage
 warnings_list = []
  
 def output(text):
@@ -36,7 +44,7 @@ def output(text):
     warnings_list.append(text)
  
 class TranslationTable:
-    def __init__(self, dicOfRelatives = {}, #uppercase = False,
+    def __init__(self, dicOfRelatives = {}, 
                  defaultValue = None):
         self.unknownCharList = []
         self.dict = {}
@@ -45,9 +53,7 @@ class TranslationTable:
         for s in dicOfRelatives.keys():
             for c in dicOfRelatives[s]:
                 self.dict[c] = s
-        #if uppercase:
-        #    for key, value in self.dict.items():
-        #        self.dict[key] = value.upper()
+        
         if defaultValue is not None:
            self.dict[None] = defaultValue
  
@@ -63,39 +69,50 @@ class TranslationTable:
  
 utf2ascii = TranslationTable(
     dicOfRelatives = {
-        'a': u'áàâäåāảãăạąặắǎа', 'e': u'éêèëěėễệęềếē', 'i': u'íîïīıìị',
-        'o': u'óôöōőøõòơồόŏờốṓởǫ', # les deux accents aigus sont différents
-        'u': u'ùûüūúưứŭũửůű', 'y':u'ÿý',
-        'A': u'ÀÂÄÅÁĀ', 'E': u'ÉÊÈË', 'I': u'ÎÏİÍ', 'O': u'ÔØÖŌÓÕ',
-        'U': u'ÙÛÜÚŪ',
-        'ae': u'æ', 'AE': u'Æ', 'oe': u'œ', 'OE': u'Œ',
-        'c': u'çćč', 'C': u'ÇČĈĆ',  'd': u'đð', 'D':u'ĐD̠',
-        'g': u'ğġǧ', 'G': u'Ğ', 'h':u'ĥ', 'H':u'Ḥ', 'l': u'ḷłľℓļ', 'L': u'ŁĽ',
-        'n': u'ńñňṇ', 'r':u'řṛ', 's': u'śšşs̩ṣș', 'S': u'ŠŞŚŜȘ',
-        't':u'ţťt̠țṭ', 'T':u'T̩ŢȚ', 'z':u'žż', 'Z':u'ŻŽ',
-        'ss': u'ß', 'th':u'þ', 'Th': u'Þ', 'TM': u'™',
-        'alpha': u'α', 'beta': u'β', 'gamma': u'γ', 'Gamma': u'Γ',
-        'delta': u'δ', 'Delta': u'Δ', 'epsilon': u'ε', 'zeta': u'ζ',
-        'eta': u'η', 'theta': u'θ', 'iota': u'ι', 'kappa': u'κ',
-        'lambda': u'λ', 'Lambda': u'Λ', 'mu': u'μµ', 'nu': u'ν',
-        'xi': u'ξ', 'omicron': u'ο', 'pi': u'π', 'rho': u'ρ',
-        'sigma': u'σ', 'Sigma': u'Σ', 'tau': u'τ', 'upsilon': u'υ',
-        'phi': u'φϕ', 'Phi': u'Φ', 'chi': u'χ', 'psi': u'ψ',
-        'omega': u'ω', 'Omega': u'Ω',
-        '2': u'²', '3': u'³',
-        ' ': u'’–−∞×÷≡«»°人…—ʿ‘®´⊥‐' + string.whitespace + string.punctuation,
-        '':u'­' #caractère pour la coupure d'un mot
+                    'a': u'áàâäåāảãăạąặắǎấầ', # 'а' dans l'alphabet cyrillique
+                    'e': u'éêèëěėễệęềếē', 'i': u'íîïīıìịǐĩ', 
+                    'o': u'óôöōőøõòơồόŏờốṓởǫỗớ', # les deux accents aigus sont différents
+                    'u': u'ùûüūúưứŭũửůűụ', 'y':u'ÿýỳ',
+                    'A': u'ÀÂÄÅÁĀ', 'E': u'ÉÊÈËĖ', 'I': u'ÎÏİÍ', 'O': u'ÔØÖŌÓÕ', 
+                    'U': u'ÙÛÜÚŪ',
+                    'ae': u'æ', 'AE': u'Æ', 'oe': u'œ', 'OE': u'Œ',
+                    'c': u'çćč', 'C': u'ÇČĈĆ',  'd': u'đð', 'D':u'ĐD̠',
+                    'g': u'ğġǧ', 'G': u'Ğ', 'h':u'ĥħ', 'H':u'ḤĦ', 'l': u'ḷłľℓļ', 'L': u'ŁĽ', 
+                    'm': u'ṃ', 'n': u'ńñňṇņ', 'r':u'řṛṟ', 's': u'śšşs̩ṣș', 'S': u'ŠŞŚŜȘ', 
+                    't':u'ţťt̠țṭ', 'T':u'T̩ŢȚ', 'z':u'žżź', 'Z':u'ŻŽ', 
+                    'ss': u'ß', 'th':u'þ', 'Th': u'Þ', 'TM': u'™',
+                    'alpha': u'α', 'beta': u'β', 'gamma': u'γ', 'Gamma': u'Γ',
+                    'delta': u'δ', 'Delta': u'Δ', 'epsilon': u'ε', 'zeta': u'ζ',
+                    'eta': u'η', 'theta': u'θ', 'iota': u'ι', 'kappa': u'κ',
+                    'lambda': u'λ', 'Lambda': u'Λ', 'mu': u'μ', 'nu': u'ν',
+                    'xi': u'ξ', 'omicron': u'ο', 'pi': u'π', 'rho': u'ρ',
+                    'sigma': u'σ', 'Sigma': u'Σ', 'tau': u'τ', 'upsilon': u'υ',
+                    'phi': u'φϕ', 'Phi': u'Φ', 'chi': u'χ', 'psi': u'ψ', 'Psi': u'Ψ',
+                    'omega': u'ω', 'Omega': u'Ω', 
+                    '1 2': u'½', '2': u'²', '3': u'³', 'micro': u'µ', # symbole différent de la lettre mu
+                    ' ': u'’–−∞×÷≡«»°…—®⊥‐√ʼ§' + string.whitespace + string.punctuation, 
+                    # à traiter : '‘´'
+                    # supprimé : 人
+                    '':u'·ʿ‘' #diacritiques ou lettres négligées et caractère pour la coupure d'un mot
         },
-    #uppercase = True,
-    defaultValue = ' ')
- 
+    defaultValue = ' '
+)
+                
 def uppercase_first(text):
     if text:
         return (text[0].upper() +  text[1:])
     else:
         return ''
- 
+
+# 
+# functions on the List (of Pages) article
+#
+
 def compareSortedLists(newList, oldList):
+    """ calculates the differences between a list and a newer one
+    
+    returns a couple of lists (insertions, deletions)
+    """
     gain = []
     loss = []
     index = 0
@@ -113,6 +130,7 @@ def compareSortedLists(newList, oldList):
     return (gain + newList[index:], loss)
  
 def interSortedLists(list1, list2):
+    """ computes the commons elements of two sorted list """
     index = 0
     intersection = []
     for el in list2:
@@ -134,12 +152,22 @@ def oddIndexList(longList):
 class Tag:
     """
     Specifies start tag and end tag.
+
+    class 
     """
     def __init__(self, startTag = '', endTag = None):
+        """ 
+        intialisation of the begin and end delimeter 
+        used to extract a substring in a text
+        """
         self.start = startTag
         self.end = endTag
  
     def indices(self, txt, textFrom = 0):
+        """ computes the indexes of the substring delimited by the start and end delimiters
+        
+        (or (StartIndex, None) if there is no end delimiters
+        """
         startIndex = txt.index(self.start, textFrom)
         if self.end:
             try:
@@ -166,7 +194,7 @@ class Tag:
                 output(u"Balise de fin %s manquante." % self.end)
         return result
  
-    def rebuild(self,stringList):
+    def rebuild(self, stringList):
         outside = True
         try:
             result = [stringList[0]]
@@ -203,10 +231,9 @@ class HtmlTag(Tag):
         self.start = '<%s>' % s
         self.end = '</%s>' % s
  
-bot_tag = Tag(u'', u'<!-- FIN BOT -->')
+bot_tag = Tag('', '<!-- FIN BOT -->')
 link_tag = Tag(u'[[', u']]')
-#empty_if_tag = Tag('{{#if:|','}}')
-#lbranch_tag = Tag('{{#if:','|')
+
 arg_tag = Tag(u'{{{', u'}}}')
  
 comment_tag = Tag('<!--', '-->')
@@ -248,37 +275,29 @@ class BotEditPage(wikipedia.Page):
             except wikipedia.NoPage:
                 output(u"\nLa page %s n'existe pas." % self.title())
                 if self.create:
-                    #output(u"Création de la page %s." % self.title())
                     self.splitting = ['', '']
                 else:
-                    #output(u"Abandon de la mise à jour.")
                     raise wikipedia.NoPage
             finally:
                 self.recovered = True
  
-    #def prepare(self):
-    #    if not self.recovered:
-    #    self.recovered = True
- 
     def sectionString(self, sectionNumber = 0):
         return self.splitting[2*sectionNumber+1]
  
-    def sectionUpdate(self, newSection, sectionNumber = 0, #create = False,
+    def sectionUpdate(self, newSection, sectionNumber = 0, 
                       changeWarning = None, noChangeWarning = False,
                       comment = None):
         if not self.recovered:
-            #try:
-            self.recover()#create = create)
-            #except wikipedia.NoPage:
-            #    return
+            self.recover()
+        
         index = 2*sectionNumber+1
         try:
             oldSection = self.splitting[index]
         except IndexError:
-            output(u"Balise de début %s manquante"
-                   + u" ou numéro de section %s trop élevé"
-                   + u" dans la page %s."
-                   % (self.botTag.start, str(sectionNumber), self.title()))
+            output(u"Balise de début {} manquante".format(self.botTag.start)
+                   + u" ou numéro de section {} trop élevé".format(str(sectionNumber))
+                   + u" dans la page {}.".format(self.title()))
+            
             if self.create:
                 output(u"Création de la section à la suite du texte.")
                 oldSection = ''
@@ -287,7 +306,7 @@ class BotEditPage(wikipedia.Page):
                 return
         if oldSection == newSection:
             if noChangeWarning:
-                output(u"Pas de changement sur la page %s." % self.title())
+                output(u"Pas de changement sur la page {}.".format(self.title()))
             return
         if not comment:
             comment = self.editSummary
@@ -336,7 +355,6 @@ class BotEditPage(wikipedia.Page):
             self.edit = agreement(u'Page %s does not exist. Create?'
                                   % self.title(), default = self.edit)
         if newString == body:
-            #output(u"Pas de changement pour la page [[%s]]." % self.title())
             self.edit = False
         elif self.edit and edit:
             if not comment:
@@ -442,10 +460,10 @@ class ListUpdateRobot:
         return catlib.unique(titlesList)
  
     def formatWithoutTalkpages(self, title):
-        return (u'* [[%s]]' % title)
+        return u'* [[{}]]'.format(title)
  
     def formatWithTalkpages(self, title):
-        return (u'* [[%s]] ([[Discussion:%s|d]])' % (title, title))
+        return u'* [[{}]] ([[Discussion:{}|d]])'.format(title, title)
  
     def listString(self, titlesList = []):
         """
