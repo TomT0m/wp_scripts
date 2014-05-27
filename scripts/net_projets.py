@@ -425,7 +425,7 @@ def deletion_prop_status_update(announce_page):
     
     for announce in del_prop_iteration(parsed):
         article_title = announce.get("nom").value
-        pywikibot.output("-> {}".format(article_title))
+        pywikibot.output(u"-> {}".format(article_title))
         try:
             status = get_page_status(unicode(article_title))
             if status.is_proposed_to_deletion():
