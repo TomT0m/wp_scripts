@@ -598,8 +598,7 @@ class Portal(wikipedia.Page):
  
 class Project(wikipedia.Page):
     """
-    Subclass of Page that has some special tricks that only work for
-    project: pages
+    Specialisation of class Page for "Project:" pages
     """
     def __init__(self, site, name, insite = None, portalNamesList = [],
                  portalEdit = True, option = {}):
