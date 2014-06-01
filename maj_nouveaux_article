@@ -3,5 +3,5 @@
 #Description: Lancer la maintenance des nouveaux articles sur les projets
 
 
-"$(dirname "$0")"/scripts/HyuBot.py $@
+"$(dirname "$0")"/pwbscripts/HyuBot.py $@
 

@@ -1,11 +1,9 @@
 
-
-
 # Informatique
 
 Informatique:
-        page: "Projet:Informatique"
-        tasks: ["announces"]
+        page:  Projet:Informatique
+        tasks: [announces]
 
 # Philosophie
 
@@ -13,12 +11,18 @@ Philosophie:
         page: Projet:Philosophie
         tasks: [announces]
 
-#Tunisie
+# Tunisie
 
 Tunisie: 
-        page: "Projet:Tunisie"
-        portal_names: ["Tunisie"]
+        page: Projet:Tunisie
+        portal_names: [Tunisie]
         tasks: ["HyuBot"]
+
+# Sciences
+Sciences:
+        page: Projet:Sciences
+        tasks: [announces]
+
 
 # Mathématiques
 
@@ -71,7 +75,7 @@ Littérature:
                        'Poésie',
                        'Polar',
                        'Science-fiction']
-        option: {u'Littérature':['nolink']},
+        option: {'Littérature':['nolink']}
         tasks:  ["HyuBot"]
 
 # Nord-Pas-de-Calais
@@ -83,4 +87,5 @@ Nord-Pas-de-Calais:
                         'Flandres',
                         'Lille Métropole']
         tasks: ["HyuBot"]
+
 

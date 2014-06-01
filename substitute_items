@@ -2,4 +2,4 @@
 
 #Description: updates statements in Wikidata after item merging
 
-"$(dirname "$0")/scripts/wikidata_substitute_items.py" "$@"
+"$(dirname "$0")/pwbscripts/wikidata_substitute_items.py" "$@"

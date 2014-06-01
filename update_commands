@@ -17,7 +17,7 @@ import re
 import commands
 
 cur_commands = commands.analyse_directory(".")
-scripts = commands.analyse_directory("pywikipedia/")
+pwbscripts = commands.analyse_directory("pywikipedia/")
 
 for filename in glob.glob("pywikipedia/*.py"):
 	content = file(res).read()

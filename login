@@ -5,5 +5,5 @@
 cd "$(dirname "$0")"
 dirname "$0"
 
-./pywiki/core/scripts/login.py
+./pywiki/core/pwbscripts/login.py
 

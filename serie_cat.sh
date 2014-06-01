@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# pywikidir="$(dirname $0)/pywiki/core/scripts/"
+# pywikidir="$(dirname $0)/pywiki/core/pwbscripts/"
 
 if [ "$1" == '-c' ] ; then
 	category="$2"
