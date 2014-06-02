@@ -10,6 +10,7 @@ tests_dir="tests/"
 args=("$@")
 
 export PYTHONPATH="${PYTHONPATH}:${PACK_PATH}"
+export PWBSCRIPTS_CONFFILE="${PATH_PACK}/pwbscripts/projects.yaml"
 
 echo $PYTHONPATH
 

@@ -28,13 +28,11 @@ def read_conffile(conffilepath):
     """
     returns the parsed yaml conffile
     """
-
-    content = yaml.load(conffilepath)
-
-    projects = [
-        load_parameters(name, content[name])
-        for name in content
-    ]
-
-    return projects
+    with open(conffilepath, 'r') as stream:
+        content = yaml.load(stream)
+        projects = [
+            load_parameters(name, content[name])
+            for name in content
+        ]
+        return projects
 

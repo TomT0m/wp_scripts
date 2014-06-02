@@ -1,7 +1,7 @@
 
 #encoding:utf-8
 
-SAMPLE_TEXT = """
+SAMPLE_TEXT = u"""
 ==Plop==
 Bidou
 

@@ -9,6 +9,17 @@ import pywikibot
 
 import re
 
+def get_page(name, namespace=None):
+    """ get a Page in frwiki """
+    site = pywikibot.getSite("fr")
+
+    if namespace:
+        return pywikibot.Page(site, name, defaultNamespace=namespace)
+
+    return pywikibot.Page(site, name)
+
+
+
 class PageStatus(object):
     """ Status object """
     def __init__(self, page):

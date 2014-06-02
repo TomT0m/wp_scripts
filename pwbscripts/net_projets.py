@@ -15,7 +15,7 @@ import mwparserfromhell
 
 from date import Date, extract_date
 from project_parameters import ProjectParameters
-from projects import get_projects
+from projects import read_conffile
 from page_status import get_page_status
 
 # Constants
@@ -75,19 +75,23 @@ def extract_full_del_props(text):
     newpage = re.sub(del_pattern, '', text, flags=re.MULTILINE)
 
 
-    logging.debug(u"(taille en octets) : Supprimé {} - nouvelle : {}, ancienne {}, différence {}: ".format(del_sum,
-                             len(newpage),
-                             len(text),
-                             del_sum-(len(text) - len(newpage))))
+    logging.debug(u"(taille en octets) : Supprimé {} - nouvelle : {}, ancienne {}, différence {}: "
+                  .format(
+                      del_sum,
+                      len(newpage),
+                      len(text),
+                      del_sum-(len(text) - len(newpage))
+                  )
+                 )
 
     return (articles, newpage)
 
 def format_del_announce(date, article_name):
     """ returns a mediawiki template text for a deletion announce"""
     return u"{{Annonce proposition suppression|nom=" +\
-        article_name + u"|" +\
-        date.__str__() + u"}}"
-        #TODO: gni str/unicode ?
+            article_name + u"|" +\
+            date.__str__() + u"}}"
+    #TODO: gni str/unicode ?
 
 
 
@@ -164,8 +168,11 @@ def insert_new_announces(old_text, dated_new_announces):
     # prétraitement des annonces : création d'une liste de couple (template, Date)
     announces_lines = section_annonces.split(u"\n")
 
-    dated_old_announces = [(text, extract_date(text))
-            for text in announces_lines if text != u""]
+    dated_old_announces = [
+        (text, extract_date(text))
+        for text in announces_lines 
+        if text != u""
+    ]
 
     # tri par date
     sorted_announces = sorted(dated_old_announces + dated_new_announces,
@@ -209,7 +216,7 @@ def projects_maintenance(projects, options):
     for project in projects:
         # TODO: log
 
-        pywikibot.log("Project : " + project.project_name)
+        pywikibot.log("Project : " + project.name)
 
         deletion_prop_maintenance(project)
         fusion_prop_maintenance(project)
@@ -268,14 +275,6 @@ def deletion_prop_status_update(announce_page):
     return unicode(parsed)
 
 
-def get_page(name, namespace=None):
-    """ get a Page in frwiki """
-    site = pywikibot.getSite("fr")
-
-    if namespace:
-        return pywikibot.Page(site, name, defaultNamespace=namespace)
-
-    return pywikibot.Page(site, name)
 
 def deletion_prop_maintenance(project):
     """ Real Action """
@@ -295,9 +294,12 @@ def deletion_prop_maintenance(project):
     (articles, new_discussion_text) = extract_full_del_props(discussion_text)
 
     # stats sur le diff entre page générée et page originale
-    logging.info(u"Before : {} ; After {} ; expected around {}".format(len(discussion_text),
-                                len(new_discussion_text),
-                                len(discussion_text) - len(articles) * 1200))
+    logging.info(u"Before : {} ; After {} ; expected around {}"
+                 .format(len(discussion_text),
+                         len(new_discussion_text),
+                        len(discussion_text) - len(articles) * 1200)
+                )
+
     logging.info(u"Articles extraits")
     for elem in articles:
         (nom, date) = elem
@@ -305,8 +307,10 @@ def deletion_prop_maintenance(project):
 
     # insertions des annonces extraites dans la page d'annonce
 
-    dated_new_announces = [(format_del_announce(date, name), date)
-            for name, date in articles]
+    dated_new_announces = [
+        (format_del_announce(date, name), date)
+        for name, date in articles
+    ]
     new_announces_text = insert_new_announces(announces_text, dated_new_announces)
 
     announce_comment = u"proposition(s) de suppression déplacée(s) depuis [[{}|La page de discussion]]"\
@@ -322,7 +326,7 @@ def deletion_prop_maintenance(project):
 
 
     comment = u"Déplacements vers [[{}|la page d'annonces]]".format(announces_pagename)
-    announce_comment = u"Mise à jour de l'état de propositions de suppression"\
+    announce_comment = u"Mise à jour de l'état de propositions de suppression"
 
     project.discussion_page.set_content(new_discussion_text, comment)
     project.announce_page.set_content(new_announces_text, announce_comment)
@@ -330,12 +334,18 @@ def deletion_prop_maintenance(project):
 
 def format_fusion_props(articles, section, date):
     """ format a fusion proposition """
-    debut = u"{{Annonce fusion d'article|" + unicode(date) + u'|[[{}|Proposition de fusion]] entre '.format(section)
+    debut = u"{{Annonce fusion d'article|" +\
+            unicode(date) +\
+            u'|[[{}|Proposition de fusion]] entre '.format(section)
+    
     suite = ""
+    
     if len(articles) > 2:
         suite = u", ".join(u'[[{}]]'.format(articles[3:]))
     fin = "}}"
+    
     msg = debut + suite + u'[[' + articles[1] + u']]' + u" et [["+ articles[0] + ']]' + fin
+    
     return msg
 
 def fusion_prop_maintenance(project):
@@ -363,8 +373,11 @@ from argparse import ArgumentParser
 
 def create_options():
     """ Script option parsing """
-    options = ArgumentParser()
+    options = ArgumentParser("Project talk page cleaner")
 
+
+    options.add_argument('-C', '--config-file', metavar='FILE',
+            help="configuration file", dest="conffile")
     options.add_argument('-s', '--simulate', action='store_true',
             help="don't save changes", dest="simulate")
     options.add_argument('-t', '--test', action='store_true',
@@ -402,36 +415,50 @@ class Test(unittest.TestCase):
                    ])
     def test_real(self):
         """ Real World extraction """
-        text = FULL_TEST
+        import datas.test_data as datas
+        text = datas.FULL_TEST
         num_titles = self.count_titles(text)
         (articles, new_text) = extract_full_del_props(text)
         new_num_titles = self.count_titles(new_text)
         self.assertEqual(num_titles, len(articles) + new_num_titles)
+
+def test_doctest():
+    """ testing doctests string """
+    print("\ndoctests ...")
+    import doctest
+    doctest.testmod()
+    print("/doctests")
 
 def test():
     """ unittest launching :
         * TestCases from unittest module,
         * docstring tests
     """
-    import doctest
-    doctest.testmod()
+    test_doctest()
     unittest.main(argv=[sys.argv[0]])
 
 def main():
     """ Main function"""
     opt_parse = create_options()
     opts = opt_parse.parse_args()
+    
     if opts.debug:
         logging.basicConfig(level=logging.DEBUG)
     if opts.test:
         test()
     else:
         # paramètres par defaut : "Projet:Informatique", False
-        projects = [project
-                    for project in projects.get_projects()
-                    if "announces" in project.tasks
-                   ]
-        projects_maintenance(projects.get_projects(), opts)
+        if opts.conffile:
+            
+            projects = [project
+                        for project in read_conffile(opts.conffile)
+                        if "announces" in project.tasks
+                       ]
+            projects_maintenance(projects, opts)
+        else:
+            print("configuration file not found, it is mandatory for regular execution")
+            opts.print_help()
+            return 0
 
 from datas import test_data
 

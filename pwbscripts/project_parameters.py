@@ -20,17 +20,21 @@ class ProjectParameters(object):
 
         init from a config obejct (result of the conf file parsing typically
     """
-    def __init__(self, name,
-          config_obj, site="fr"):
+    def __init__(
+        self, name,
+        config_obj, site="fr"
+    ):
 
         self._config_obj = config_obj
 
         self._name = name
-
+        self._discussion_pagename = None
         # HyuBot
-
         self._wiki = pwb.Site(site)
-
+        
+        #Pages objects attributes
+        self._discussion = None
+        self._announce = None
 
     def get(self, prop, default):
         """ getter : config obj key or default value """
@@ -56,7 +60,7 @@ class ProjectParameters(object):
     @property
     def wiki_basename(self):
         """ returns the base page name of the project """
-        return "Projet:" + self.name 
+        return "Projet:{}".format(self.name)
 
     @property
     def discussion_pagename(self):
@@ -86,7 +90,8 @@ class ProjectParameters(object):
         """ the list of tasks to handle for this project """
         test = self.get("tasks", [])
         
-        if test == [] : warn("/!\ no task for project {}".format(self.name)) 
+        if test == [] :
+            warn("/!\ no task for project {}".format(self.name)) 
         
         return test
 
