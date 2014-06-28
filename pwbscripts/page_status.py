@@ -40,8 +40,8 @@ class PageStatus(object):
     def set_content(self, new_text, comment):
         """ setter for content, without writing"""
 
-        modif = unicode(new_text) != unicode(self._cached_content)
-        self.mofified = self.modified or modif
+        modif = not(unicode(new_text) == unicode(self._cached_content))
+        self.modified = self.modified or modif
 
         if modif:
             if len(self.edit_comment) > 0:
@@ -82,6 +82,7 @@ class PageStatus(object):
             return True
         return False
 
+    
     def is_proposed_to_fusion(self):
         """ try to guess if there is a deletion proposition related to this page"""
 
@@ -98,6 +99,12 @@ class PageStatus(object):
         """ show our changes """
         if self._cached_content:
             pywikibot.showDiff(self._original_content, self._cached_content)
+    
+    def __str__(self):
+        return "Status object of page {}. Modified : {}".format(self.page, self.modified)
+
+    def __unicode__(self):
+        return u"Status object of page {}. Modified : {}".format(self.page, self.modified)
 
 def get_page_status(pagename):
     """ Returns a page status object

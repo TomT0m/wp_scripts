@@ -228,6 +228,10 @@ def projects_maintenance(projects, options):
         print(u"> Diff PDD <\n")
         project.discussion_page.show_diff()
 
+        pywikibot.log("Simulate ? {}".format(options.simulate))
+
+        pywikibot.log(u"> touched files : {} ; {}".format(project.discussion_page, project.announce_page))
+
         # Sauvegarde éventuelle #
         if not options.simulate:
             if project.discussion_page.modified:
@@ -457,7 +461,7 @@ def main():
             projects_maintenance(projects, opts)
         else:
             print("configuration file not found, it is mandatory for regular execution")
-            opts.print_help()
+            opt_parse.print_help()
             return 0
 
 from datas import test_data
