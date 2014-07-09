@@ -13,6 +13,6 @@ done
 #done
 
 for module in $(cat module_list) ; do
-	echo "modulizing module " $module ...
+	echo_color "$White" "modulizing module <$module> ..."
 	./getmodule.sh "$module"
 done

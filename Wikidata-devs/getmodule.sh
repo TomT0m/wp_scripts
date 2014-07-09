@@ -29,7 +29,7 @@ modulelocalname="$(modulename "$1")"
 # if we don't have last revision yet, then download it and replace old one.
 
 if [ ! -e "${revisionfile_path}" ] ; then 
-	
+	echo_color $Blue ">No revision known yet, downloading ..."
 	if [ -e ${curversion_path}/${module}-*.lua ] ; then 
 		mv ${curversion_path}/${module}-*.lua ${oldversions_path}
 	fi
@@ -39,12 +39,21 @@ if [ ! -e "${revisionfile_path}" ] ; then
 	if [ -L "${modulelocalname}" ] ; then
 		ln -sf ${revisionfile_path} "${modulelocalname}"
 	fi
+else
+	echo_color $Blue "> No need to download"
 fi
 
 # recreation if deleted
 
 if [ ! -e "${modulelocalname}" ] ; then
+	echo_color $Blue "> Creating symlink to revision ..."
+	echo
 	ln -sf ${revisionfile_path} "${modulelocalname}"
+else
+	echo_color $Blue "> version of this module already edited locally, keeping it."
+	echo_color $Light_Blue ">> showing diff ..."
+	colordiff  ${revisionfile_path} "${modulelocalname}"
 fi
+
 
 

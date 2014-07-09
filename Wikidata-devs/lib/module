@@ -1,0 +1,5 @@
+
+function modulename() {
+	echo "Module:${1}.lua"
+}
+

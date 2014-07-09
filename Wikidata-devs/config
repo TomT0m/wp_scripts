@@ -25,9 +25,11 @@ for var in "$stub_path" "$oldversions_path" "$curversion_path" "$testenv_path" ;
 	mkdir -p "$var"
 done
 
+
 ########### lib #################
 
-function modulename() {
-	echo "Module:${1}.lua"
-}
+for lib in lib/* ; do
+	source "$lib"
+done
+
 
