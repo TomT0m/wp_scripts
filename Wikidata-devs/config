@@ -1,0 +1,33 @@
+
+base_path=$(pwd)
+
+############# vars ##############
+
+# stub_path :
+stub_path="./stubs"
+
+#olversion_path : history of dowloaded module versions path
+oldversions_path="./versions/old"
+
+#last dowloaded version of module
+curversion_path="./versions"
+
+#testcases path in which test scripts are written
+testcases_path="$(pwd)/tests"
+
+#path in which compiling the module versions, tests scripts, localy edited and stubs to run tests (tmp)
+testenv_path="./run"
+
+########### code ################
+
+# path creation if they do not exists
+for var in "$stub_path" "$oldversions_path" "$curversion_path" "$testenv_path" ; do
+	mkdir -p "$var"
+done
+
+########### lib #################
+
+function modulename() {
+	echo "Module:${1}.lua"
+}
+
