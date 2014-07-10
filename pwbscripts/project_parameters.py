@@ -1,5 +1,5 @@
 #! /usr/bin/python
-#encoding: utf-8
+# encoding: utf-8
 
 """
 
@@ -12,7 +12,9 @@ import pywikibot as pwb
 from page_status import get_page_status
 from logging import warn
 
+
 class ProjectParameters(object):
+
     """ Project parameters storage class, stores :
         * project name
         * parameters pages names : Announces, discussion pagename.
@@ -20,6 +22,7 @@ class ProjectParameters(object):
 
         init from a config obejct (result of the conf file parsing typically
     """
+
     def __init__(
         self, name,
         config_obj, site="fr"
@@ -31,17 +34,19 @@ class ProjectParameters(object):
         self._discussion_pagename = None
         # HyuBot
         self._wiki = pwb.Site(site)
-        
-        #Pages objects attributes
+
+        # Pages objects attributes
         self._discussion = None
         self._announce = None
+
+        self._insite = None
 
     def get(self, prop, default):
         """ getter : config obj key or default value """
         if prop in self._config_obj:
             return self._config_obj[prop]
         return default
-    
+
     @property
     def name(self):
         """ returns the string name of the project """
@@ -51,7 +56,7 @@ class ProjectParameters(object):
     def site(self):
         """ returns the site object of the project """
         return self._site
-    
+
     @property
     def announce_pagename(self):
         """ Getter for announce pagename property """
@@ -89,35 +94,41 @@ class ProjectParameters(object):
     def tasks(self):
         """ the list of tasks to handle for this project """
         test = self.get("tasks", [])
-        
-        if test == [] :
-            warn("/!\ no task for project {}".format(self.name)) 
-        
+
+        if test == []:
+            warn("/!\ no task for project {}".format(self.name))
+
         return test
 
     @property
+    def insite(self):
+        # TODO: document use
+        return self.get("insite", None)
+
+    @property
     def portals(self):
-        """ Returns the a list of couples of the portals 
+        """ Returns the a list of couples of the portals
         attached to the project with theirs options
         """
+
         def options(self, portal):
-            arry_opt = self.get("option", [])
+            array_opt = self.get("option", [])
 
             if portal in array_opt:
                 return array_opt(portal)
             return []
 
-        portals = [ (portal, options(self, portal)) 
+        portals = [(portal, options(self, portal))
                    for portal in self.get("portals", [])
-                  ]
+                   ]
 
-        if portals == [] : warn("/!\ no portals for project {}".format(self.name))
+        if portals == []:
+            warn("/!\ no portals for project {}".format(self.name))
 
         return portals
 
     def has_task(self, task):
-        """ 
+        """
         accessor : returns true if the project is candidate to run some task
         """
         return task in self.tasks
-

@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#encoding: utf-8
+# encoding: utf-8
 
 """
 Project parameters handling : read & load configuration
@@ -20,9 +20,11 @@ def load_parameters(name, project_obj):
     """
     translate a yaml parsed project object in the file into a ProjectParameters object
     """
+
     return ProjectParameters(name,
                              project_obj
-                            )
+                             )
+
 
 def read_conffile(conffilepath):
     """
@@ -35,4 +37,3 @@ def read_conffile(conffilepath):
             for name in content
         ]
         return projects
-

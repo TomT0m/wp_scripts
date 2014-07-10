@@ -13,7 +13,7 @@ Philosophie:
 
 # Tunisie
 
-Tunisie: 
+Tunisie:
         page: Projet:Tunisie
         portal_names: [Tunisie]
         tasks: ["HyuBot"]
@@ -26,7 +26,7 @@ Sciences:
 
 # Mathématiques
 
-Mathématiques: 
+Mathématiques:
         page: "Projet:Mathématiques"
         portal_names : ["Mathématiques",
                                 #u'Algèbre nouvelle',
@@ -39,11 +39,11 @@ Mathématiques:
                                 'Probabilités et statistiques',
                                 'Arithmétique et théorie des nombres']
         tasks: ["HyuBot"]
-             
+
 
 # Alimentation et gastronomie
 
-"Alimentation et gastronomie": 
+"Alimentation et gastronomie":
         page: "Projet:Alimentation et gastronomie"
         portal_names: ['Alimentation et gastronomie',
                                 'Bière',
@@ -57,7 +57,7 @@ Mathématiques:
 
 # Économie
 
-'Économie': 
+'Économie':
         page: "Projet:économie"
         portal_names: ['Économie',
                        'Commerce',
@@ -68,7 +68,7 @@ Mathématiques:
 
 # Littérature
 
-Littérature: 
+Littérature:
         page: "Projet:Littérature"
         portal_names: ['Littérature',
                        'Fantasy',
@@ -80,7 +80,7 @@ Littérature:
 
 # Nord-Pas-de-Calais
 
-Nord-Pas-de-Calais: 
+Nord-Pas-de-Calais:
         page: 'Projet:Nord-Pas-de-Calais'
         portal_names:  ['Nord-Pas-de-Calais',
                         'Bassin minier du Nord-Pas-de-Calais',

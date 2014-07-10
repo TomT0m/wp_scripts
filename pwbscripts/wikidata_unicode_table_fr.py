@@ -1,5 +1,6 @@
 #! /usr/bin/python
-#encoding: utf-8
+# encoding: utf-8
+
 """
 Serie formatting in wikidata
 
@@ -9,7 +10,6 @@ TODO: Handle serie season redirects not associated to any particular article
 
 # import pywikibot
 # create a site object, here for en-wiki
-import logging
 
 from wd_lib import set_for_lang, make_sequence, item_by_title
 
@@ -78,8 +78,7 @@ MAINS = [
     u"Table des caractères Unicode (100000-10FFFF)"
 ]
 
-LESSER =\
-"""0000 0FFF
+LESSER = """0000 0FFF
 1000 1FFF
 2000 2FFF
 3000 3FFF
@@ -99,17 +98,21 @@ F000 FFFF"""
 
 import re
 
+
 def label(mi_, ma_):
     """ returns a calculated label from a range """
     return "caractères Unicode des points de code {} à {}".format(mi_, ma_)
+
 
 def enlabel(mi_, ma_):
     """ returns a calculated label from a range """
     return "Unicode characters from {} to {} codepoints".format(mi_, ma_)
 
+
 def frtitle(mi_, ma_):
     """returns formated title """
     return u"Table des caractères Unicode ({}-{})".format(mi_, ma_)
+
 
 def main():
     """ main script function """
@@ -118,8 +121,10 @@ def main():
         res = re.split(u"[()-]", titl)
         return res[1], res[2]
 
-    items  = [ item_by_title("fr", title)  for title in MAINS ]
-    ranges = [ extr_mini_maxi(title) for title in MAINS ]
+    items = [item_by_title("fr", title)
+             for title in MAINS]
+    ranges = [extr_mini_maxi(title)
+              for title in MAINS]
 
     # items : the main articles, 7 main ranges, separated into subranges each
 
@@ -132,16 +137,17 @@ def main():
         (min_, max_) = rang_
         prefix = min_[0:-4]
         print ("====================='{}'========================".format(prefix))
+
         def gen_title(lrange):
             """ title gen"""
             mi_ = ('{}{}'.format(prefix, lrange.split(" ")[0]))
             ma_ = ('{}{}'.format(prefix, lrange.split(" ")[1]))
             # import pdb ; pdb.set_trace()
             return frtitle(mi_, ma_)
-        titles = [  gen_title(lrange) for lrange in LESSER.split("\n") ]
-        
-        items  = [ item_by_title("fr", title) for title in titles ]
-        ranges = [ extr_mini_maxi(title) for title in titles ]
+
+        titles = [gen_title(lrange) for lrange in LESSER.split("\n")]
+        items = [item_by_title("fr", title) for title in titles]
+        ranges = [extr_mini_maxi(title) for title in titles]
 
         make_sequence(items)
         # suboptimal
@@ -149,13 +155,12 @@ def main():
         all_ranges = all_ranges + ranges
 
     for (item, (min_, max_)) in zip(all_items, all_ranges):
-        set_for_lang( item, u"Table des caractères Unicode", "fr", label(min_, max_), "ambiguity and label correction")
-        set_for_lang( item, u"", "en", enlabel(min_, max_), "ambiguity and label correction")
+        set_for_lang(item, u"Table des caractères Unicode", "fr", label(min_, max_), "ambiguity and label correction")
+        set_for_lang(item, u"", "en", enlabel(min_, max_), "ambiguity and label correction")
 
         # correction of previous bug as it seems
-        set_for_lang( item, u"Unicode characters from 100000 to 10FFFF codepoints",\
-                       "en", enlabel(min_, max_), "ambiguity and label correction")
+        set_for_lang(item, u"Unicode characters from 100000 to 10FFFF codepoints",
+                     "en", enlabel(min_, max_), "ambiguity and label correction")
 
 if __name__ == "__main__":
     main()
-
