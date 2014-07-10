@@ -1,15 +1,15 @@
 
-ORD_MAP = { 1 : "first", 2:"second",     
-3:"third", 4:"fourth",
-5:"fifth", 6:"sixth",
-7:"seventh", 8:"eighth",     
-9:"ninth", 10:"tenth"}
+ORD_MAP = {1: "first", 2: "second",
+           3: "third", 4: "fourth",
+           5: "fifth", 6: "sixth",
+           7: "seventh", 8: "eighth",
+           9: "ninth", 10: "tenth"}
 
 
 def get_en_ordinal(number):
-    """ formats a number into a correct (I hope) ordinal english version of that number 
+    """ formats a number into a correct (I hope) ordinal english version of that number
     """
-    
+
     if number <= 10 and number > 0:
         # suffixes = ["th", "st", "nd", "rd", ] + ["th"] * 16
         # return str(number) + suffixes[num % 100]
@@ -26,4 +26,5 @@ def get_en_ordinal(number):
 
         return u"{}{}".format(number, suffix)
 
-    else: raise ValueError("Must be > 0")
+    else:
+        raise ValueError("Must be > 0")

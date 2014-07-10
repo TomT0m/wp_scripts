@@ -1,20 +1,21 @@
 #! /usr/bin/python
 # -*- coding: UTF-8 -*-
 """
-#Description: Déplace les annonces de proposition de suppression de la page Projet:Informatique vers la page d'annonces
+#Description: Déplace les annonces de proposition de suppression de la page
+ Projet:Informatique vers la page d'annonces du projet
 
 """
 
-#TODO: Fix duplicates announces bug.
-#TODO: Fix fusion status.
+# TODO: Fix duplicates announces bug.
+# TODO: Fix fusion status.
 
-import re, logging
+import re
+import logging
 
 import pywikibot
 import mwparserfromhell
 
 from date import Date, extract_date
-from project_parameters import ProjectParameters
 from projects import read_conffile
 from page_status import get_page_status
 
@@ -25,8 +26,9 @@ ANNOUNCE_FUSION_TMPL = "Annonce fusion d'articles"
 
 # Parsing functions
 
-#pylint: disable=W0611
+# pylint: disable=W0611
 import os
+
 
 def msg_line_eating():
     """
@@ -50,7 +52,7 @@ def msg_line_eating():
     # newline_pattern = "(?:$\n)?^"
     not_eq_eq = "^(?:[^=]|=?!=)"
 
-    return '(?:' + '^$\n?' +'|'+ not_eq_eq + ".*$\n?" + ')'
+    return '(?:' + '^$\n?' + '|' + not_eq_eq + ".*$\n?" + ')'
 
 
 def extract_full_del_props(text):
@@ -59,7 +61,7 @@ def extract_full_del_props(text):
 
     Searches deletion proposition generated with the standard ''full template'' form
     """
-    pattern = u"""== L'article {} est proposé à la suppression ==$\n""" + '((?:' + msg_line_eating() +')*'+ ')'
+    pattern = u"""== L'article {} est proposé à la suppression ==$\n""" + '((?:' + msg_line_eating() + ')*' + ')'
     articles = []
     del_sum = 0
 
@@ -74,25 +76,20 @@ def extract_full_del_props(text):
     del_pattern = pattern.format(u'.*')
     newpage = re.sub(del_pattern, '', text, flags=re.MULTILINE)
 
-
     logging.debug(u"(taille en octets) : Supprimé {} - nouvelle : {}, ancienne {}, différence {}: "
                   .format(
                       del_sum,
                       len(newpage),
                       len(text),
-                      del_sum-(len(text) - len(newpage))
+                      del_sum - (len(text) - len(newpage)))
                   )
-                 )
 
     return (articles, newpage)
 
+
 def format_del_announce(date, article_name):
     """ returns a mediawiki template text for a deletion announce"""
-    return u"{{Annonce proposition suppression|nom=" +\
-            article_name + u"|" +\
-            date.__str__() + u"}}"
-    #TODO: gni str/unicode ?
-
+    return u"{{Annonce proposition suppression|nom={nom}|{date}}}".format(article_name, date)
 
 
 def extract_fusion_articles(title):
@@ -107,6 +104,7 @@ def extract_fusion_articles(title):
     match = re.findall("{}(.*?){}".format(lbegin, lend), title)
     return match
 
+
 SAMPLE_FUSION_ANNOUNCE = u"""== Les articles [[Jasper]] et [[Jasper (informatique)]] sont proposés à la fusion ==
 [[Image:Merge-arrows.svg|60px|left|Proposition de fusion en cours.]]
 
@@ -114,6 +112,7 @@ La discussion a lieu sur la page [[Wikipédia:Pages à fusionner#Jasper et Jaspe
 
 [[Utilisateur:Silex6|Silex6]] ([[Discussion utilisateur:Silex6|d]]) 25 juillet 2013 à 12:23 (CEST)
 """
+
 
 def extract_link_to_fusionprops(section):
     """ Extracts the section in fusion prop global page from a (parsed) fusion prop section in Project Chat
@@ -123,6 +122,7 @@ def extract_link_to_fusionprops(section):
     """
     expected = unicode(section.filter_wikilinks(matches=u"Wikipédia:Pages à fusionner#")[0])
     return expected[2:-2]
+
 
 def extract_fusion_props(text):
     """ returns a couple:
@@ -152,12 +152,11 @@ def extract_fusion_props(text):
 
     return (fusions, text)
 
+
 def insert_new_announces(old_text, dated_new_announces):
     """ Creates a text with to_del_list announces inserted at timely sorted"""
 
-
     # découpage en utilisant les marqueurs de la section annonces dans la page
-
 
     sep_preamble = u"------->"
     sep_end = u"<noinclude>"
@@ -170,7 +169,7 @@ def insert_new_announces(old_text, dated_new_announces):
 
     dated_old_announces = [
         (text, extract_date(text))
-        for text in announces_lines 
+        for text in announces_lines
         if text != u""
     ]
 
@@ -185,6 +184,9 @@ def insert_new_announces(old_text, dated_new_announces):
     return preamble + sep_preamble + u"\n" + new_section + u"\n" + sep_end + rest
 
 
+def gen_month_announces(month):
+    return "\n* ".join(month)
+
 
 def gen_archives_page(old_archive_text, new_archived_announces):
     """ génère une page d'archive à partir de l'ancienne page et des nouvelles archives """
@@ -198,18 +200,19 @@ def gen_archives_page(old_archive_text, new_archived_announces):
                               key=lambda (_, date): date, reverse=False)
 
     by_month = {month: [value for (date, value) in sorted_announces + dated_old_announces
-                          if date.mois == month] for month in Date.MOIS
+                        if date.mois == month] for month in Date.MOIS
                 }
-    #new_text = reduce(, string.concat)
+    # new_text = reduce(, string.concat)
 
     new_text = "\n".join([
-        "== {} ==\n{}\n".format(date.MOIS[mois], by_month[annonce])
+        "== {} ==\n{}\n".format(date.MOIS[mois], gen_month_announces(by_month[mois]))
         for mois in by_month
     ])
 
     return new_text
 
 # writing functions
+
 
 def projects_maintenance(projects, options):
     """ Function launching maintenance for all projects """
@@ -220,7 +223,6 @@ def projects_maintenance(projects, options):
 
         deletion_prop_maintenance(project)
         fusion_prop_maintenance(project)
-
 
         print(u"> Diff des Annonces <\n")
         project.announce_page.show_diff()
@@ -240,6 +242,7 @@ def projects_maintenance(projects, options):
             if project.announce_page.modified:
                 project.announce_page.save()
 
+
 def del_prop_iteration(page):
     """ iterator on deletion proposition announces in announce page
     >>> liste = list(del_prop_iteration(mwparserfromhell.parse(ANNOUNCES_SAMPLE)))
@@ -254,6 +257,7 @@ def del_prop_iteration(page):
     for tmpl in page.filter_templates():
         if tmpl.name == ANNOUNCE_DEL_TMPL:
             yield tmpl
+
 
 def deletion_prop_status_update(announce_page):
     """ returns an updated announce page
@@ -270,6 +274,9 @@ def deletion_prop_status_update(announce_page):
             status = get_page_status(unicode(article_title))
             if status.is_proposed_to_deletion():
                 pywikibot.output("* still opened")
+            elif status.is_redirect_page():
+                announce.add(2, u"fusionné")
+                announce.add("fusionné_avec", status.redirected_to)
             else:
                 if "fait" not in announce:
                     announce.add(2, u"fait")
@@ -277,7 +284,6 @@ def deletion_prop_status_update(announce_page):
             logging.warn("Annonce malformée !! {}".format(article_title))
 
     return unicode(parsed)
-
 
 
 def deletion_prop_maintenance(project):
@@ -301,8 +307,8 @@ def deletion_prop_maintenance(project):
     logging.info(u"Before : {} ; After {} ; expected around {}"
                  .format(len(discussion_text),
                          len(new_discussion_text),
-                        len(discussion_text) - len(articles) * 1200)
-                )
+                         len(discussion_text) - len(articles) * 1200)
+                 )
 
     logging.info(u"Articles extraits")
     for elem in articles:
@@ -317,19 +323,17 @@ def deletion_prop_maintenance(project):
     ]
     new_announces_text = insert_new_announces(announces_text, dated_new_announces)
 
-    announce_comment = u"proposition(s) de suppression déplacée(s) depuis [[{}|La page de discussion]]"\
-            .format(discussion_pagename)
-    project.discussion_page.set_content(new_announces_text, announce_comment)
+    announce_commentP = u"proposition(s) de suppression déplacée(s) depuis [[{disc_page}|La page de discussion]]"
+    announce_comment = announce_commentP.format(disc_page=discussion_pagename)
+    # project.discussion_page.set_content(new_discussion_text, announce_comment)
     project.announce_page.set_content(new_announces_text, announce_comment)
-
-
 
     # mise à jour de l'état des annonces #
 
     new_announces_text = deletion_prop_status_update(new_announces_text)
 
-
-    comment = u"Déplacements vers [[{}|la page d'annonces]]".format(announces_pagename)
+    commentP = u"Déplacements vers [[{announce_page}|la page d'annonces]]"
+    comment = commentP.format(announce_page=announces_pagename)
     announce_comment = u"Mise à jour de l'état de propositions de suppression"
 
     project.discussion_page.set_content(new_discussion_text, comment)
@@ -338,19 +342,20 @@ def deletion_prop_maintenance(project):
 
 def format_fusion_props(articles, section, date):
     """ format a fusion proposition """
-    debut = u"{{Annonce fusion d'article|" +\
-            unicode(date) +\
+    debut = u"{{Annonce fusion d'article|" + \
+            unicode(date) + \
             u'|[[{}|Proposition de fusion]] entre '.format(section)
-    
+
     suite = ""
-    
+
     if len(articles) > 2:
         suite = u", ".join(u'[[{}]]'.format(articles[3:]))
     fin = "}}"
-    
-    msg = debut + suite + u'[[' + articles[1] + u']]' + u" et [["+ articles[0] + ']]' + fin
-    
+
+    msg = debut + suite + u'[[' + articles[1] + u']]' + u" et [[" + articles[0] + ']]' + fin
+
     return msg
+
 
 def fusion_prop_maintenance(project):
     """ Testing """
@@ -360,46 +365,27 @@ def fusion_prop_maintenance(project):
     if len(fusion_prop_list) > 0:
         dated_new_announces = [(format_fusion_props(*elem), elem[2]) for elem in fusion_prop_list]
         new_a_text = insert_new_announces(project.announce_page.get_content(), dated_new_announces)
-        project.announce_page.set_content(new_a_text,
-                          u"Déplacement d'annonces de proposition de fusion depuis la [[{}|La PDD]]"
-                              .format(project.discussion_pagename)
-        )
 
+        fusion_msgP = u"Déplacement d'annonces de proposition de fusion depuis la [[{}|La PDD]]"
+
+        project.announce_page.set_content(new_a_text,
+                                          fusion_msgP.format(project.discussion_pagename))
+
+        msgP = u"Déplacement des annonces de proposition fusion vers [[{}|La page d'annonce]] "
         project.discussion_page.set_content(new_d_text,
-                          u"Déplacement des annonces de proposition fusion vers [[{}|La page d'annonce]] "
-                              .format(project.announce_pagename)
-        )
+                                            msgP.format(project.announce_pagename))
 
 
 # CLI management, UI
 
-from argparse import ArgumentParser
-
-def create_options():
-    """ Script option parsing """
-    options = ArgumentParser("Project talk page cleaner")
-
-
-    options.add_argument('-C', '--config-file', metavar='FILE',
-            help="configuration file", dest="conffile")
-    options.add_argument('-s', '--simulate', action='store_true',
-            help="don't save changes", dest="simulate")
-    options.add_argument('-t', '--test', action='store_true',
-            help="run tests", dest="test")
-    options.add_argument('-p', '--page',
-            help="run tests", metavar="PAGE", dest="page",
-            default="Projet:Informatique")
-    options.add_argument('-v', '--verbose', action='store_true',
-            help="show debugging messages", dest="debug")
-    return options
-
-
+from bots_commons import create_options
 
 #############################################################
 # testing
 
 import unittest
 import sys
+
 
 class Test(unittest.TestCase):
     """ Test cases : test of deletion proposition extraction"""
@@ -415,8 +401,9 @@ class Test(unittest.TestCase):
     def count_titles(self, text):
         """ count wiki section titles in a text """
         return len([line for line in text.split("\n")
-                      if "==" in line
-                   ])
+                    if "==" in line
+                    ])
+
     def test_real(self):
         """ Real World extraction """
         import datas.test_data as datas
@@ -426,12 +413,14 @@ class Test(unittest.TestCase):
         new_num_titles = self.count_titles(new_text)
         self.assertEqual(num_titles, len(articles) + new_num_titles)
 
+
 def test_doctest():
     """ testing doctests string """
     print("\ndoctests ...")
     import doctest
     doctest.testmod()
     print("/doctests")
+
 
 def test():
     """ unittest launching :
@@ -441,11 +430,12 @@ def test():
     test_doctest()
     unittest.main(argv=[sys.argv[0]])
 
+
 def main():
     """ Main function"""
     opt_parse = create_options()
     opts = opt_parse.parse_args()
-    
+
     if opts.debug:
         logging.basicConfig(level=logging.DEBUG)
     if opts.test:
@@ -453,16 +443,15 @@ def main():
     else:
         # paramètres par defaut : "Projet:Informatique", False
         if opts.conffile:
-            
-            projects = [project
-                        for project in read_conffile(opts.conffile)
-                        if "announces" in project.tasks
-                       ]
-            projects_maintenance(projects, opts)
+            conffile = opts.conffile
         else:
-            print("configuration file not found, it is mandatory for regular execution")
-            opt_parse.print_help()
-            return 0
+            conffile = os.path.expanduser("~/.config/pwb/projects.yaml")
+
+        projects = [project
+                    for project in read_conffile(conffile)
+                    if "announces" in project.tasks
+                    ]
+        projects_maintenance(projects, opts)
 
 from datas import test_data
 
@@ -470,7 +459,7 @@ SAMPLE_TEXT = test_data.SAMPLE_TEXT
 
 ####
 ####
-#### Tests samples
+# Tests samples
 
 
 if __name__ == "__main__":

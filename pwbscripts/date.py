@@ -1,9 +1,10 @@
 #!/usr/bin/python
-#encoding:utf-8
+# encoding:utf-8
 
 
 from functools import total_ordering
 import re
+
 
 @total_ordering
 class Date(object):
@@ -20,7 +21,8 @@ class Date(object):
 
     def __init__(self, jour, mois, annee):
         if not Date.REV_MOIS:
-            Date.REV_MOIS = {self.MOIS[x]:x for x in range(1, 13)}
+            Date.REV_MOIS = {self.MOIS[x]: x
+                             for x in range(1, 13)}
         self._jour = int(jour)
         self._mois = self.REV_MOIS[mois]
         self._annee = int(annee)
@@ -32,6 +34,7 @@ class Date(object):
         return self.annee < other.annee or (
             self.annee == other.annee and self.mois < other.mois or (
                 self.mois == other.mois and self.jour < other.jour))
+
     def __str__(self):
         res = u"{:2d} {} {:4d}".format(self.jour, self.MOIS[self.mois], self.annee)
         return res
@@ -49,10 +52,12 @@ class Date(object):
     def annee(self):
         """ année """
         return self._annee
+
     @property
     def jour(self):
         """ jour """
         return self._jour
+
 
 def extract_date(text):
     u""" Returns a date object if text seems to countain a date textual description,
@@ -74,8 +79,7 @@ def extract_date(text):
                               jour=u"[0-9]{1,2}",
                               annee=u"[0-9]{4}"
                           ),
-                          line
-        )
+                          line)
         if match:
             return Date(match.group(1), match.group(2), match.group(3))
     return None

@@ -11,15 +11,15 @@ import pkgutil
 
 import yaml
 
-from project_parameters import ProjectParameters
-import projects
+from pwbscripts.project_parameters import ProjectParameters
+import pwbscripts.projects as projects
 
-import scripts
+# import pwbscripts.projects
+# import pwbscripts.scripts
 
 from StringIO import StringIO
 
-SAMPLEYAML = \
-u"""
+SAMPLEYAML = u"""
 Informatique:
         page:  Projet:Informatique
         tasks: [announces]
@@ -35,12 +35,12 @@ Mathématiques:
 class TestParser(unittest.TestCase):
     """ Preliminary & API tests """
 
-    def assertIn(self, elem, list):
+    def assertIn(self, elem, tlist):
         """ custom test : elem in list"""
-        self.assertTrue(elem in list)
+        self.assertTrue(elem in tlist)
 
     def testParse(self):
-        """ yaml parser object loading and structure """ 
+        """ yaml parser object loading and structure """
         obj = yaml.load(SAMPLEYAML)
         print(obj)
 
@@ -48,6 +48,7 @@ class TestParser(unittest.TestCase):
         self.assertIn("announces", obj["Informatique"]["tasks"])
 
         self.assertIn(u"Portail:Algèbre", obj[u"Mathématiques"][u"portals"])
+
 
 class TestConfigObj(unittest.TestCase):
     """ ProjectParameters Test """
@@ -59,18 +60,24 @@ class TestConfigObj(unittest.TestCase):
 
         self.assertTrue(proj.has_task(u"announces"))
 
+
 class TestConfigFile(unittest.TestCase):
     """ test our real config file """
 
     def testConfigLoad(self):
         """ the truth on the conffile loading and parsing """
         config = pkgutil.get_data("pwbscripts", "projects.yaml")
+
         obj = yaml.load(config)
-        
+
         fakefile = StringIO(config)
 
         confs = projects.read_conffile(fakefile)
 
-        # loaded OK
+        self.assertNotEqual(obj, None)
+        self.assertNotEqual(confs, None)
+
+
+#        loaded OK
 
 
