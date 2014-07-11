@@ -174,4 +174,5 @@ def main():
     print ("Nombre de changements : {}".format(NUM_CHANGED))
     return True
 
-exit(main())
+if __name__ == "__main__":
+    exit(main())
