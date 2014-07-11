@@ -1,6 +1,9 @@
 #! /usr/bin/python
-# -*- coding: UTF-8 -*-
-"""
+# -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
+
+u"""
 #Description: Déplace les annonces de proposition de suppression de la page
  Projet:Informatique vers la page d'annonces du projet
 
@@ -21,8 +24,8 @@ from page_status import get_page_status
 
 # Constants
 
-ANNOUNCE_DEL_TMPL = "Annonce proposition suppression"
-ANNOUNCE_FUSION_TMPL = "Annonce fusion d'articles"
+ANNOUNCE_DEL_TMPL = u"Annonce proposition suppression"
+ANNOUNCE_FUSION_TMPL = u"Annonce fusion d'articles"
 
 # Parsing functions
 
@@ -31,23 +34,23 @@ import os
 
 
 def msg_line_eating():
-    """
+    u"""
     generates a pattern matching a complete line not beginning with '=='
     >>> opts = re.MULTILINE # | re.DEBUG
     >>> re.match(msg_line_eating(), "plop").group(0)
-    'plop'
+    u'plop'
     >>> re.match(msg_line_eating(), "p").group(0)
-    'p'
+    u'p'
     >>> re.match(msg_line_eating(), "== plop ==")
 
     >>> re.match(u"([^=]|=?!=).*$", u"aa").group(0)
     u'aa'
     >>> msg = "ab" + os.linesep + "b" + os.linesep + "==plop=="
     >>> re.match('(' +msg_line_eating() + ')*', msg, opts).group(0).split(os.linesep)
-    ['ab', 'b', '']
+    [u'ab', u'b', u'']
     >>> msg = msg + os.linesep + os.linesep + "==plop==" + os.linesep
     >>> re.match('(' +msg_line_eating() + ')*', msg, opts).group(0).split(os.linesep)
-    ['ab', 'b', '']
+    [u'ab', u'b', u'']
     """
     # newline_pattern = "(?:$\n)?^"
     not_eq_eq = "^(?:[^=]|=?!=)"
@@ -93,10 +96,10 @@ def format_del_announce(date, article_name):
 
 
 def extract_fusion_articles(title):
-    """ Extracts article titles from section title
+    u""" Extracts article titles from section title
     >>> title = '== Les articles [[Jasper]] et [[Jasper (informatique)]] sont proposés à la fusion =='
     >>> extract_fusion_articles(title)
-    ['Jasper', 'Jasper (informatique)']
+    [u'Jasper', u'Jasper (informatique)']
 
     """
     lbegin = re.escape("[[")
@@ -105,7 +108,7 @@ def extract_fusion_articles(title):
     return match
 
 
-SAMPLE_FUSION_ANNOUNCE = u"""== Les articles [[Jasper]] et [[Jasper (informatique)]] sont proposés à la fusion ==
+SAMPLE_FUSION_ANNOUNCE = """== Les articles [[Jasper]] et [[Jasper (informatique)]] sont proposés à la fusion ==
 [[Image:Merge-arrows.svg|60px|left|Proposition de fusion en cours.]]
 
 La discussion a lieu sur la page [[Wikipédia:Pages à fusionner#Jasper et Jasper (informatique)]]. La procédure de fusion est consultable sur [[Wikipédia:Pages à fusionner]].
@@ -120,12 +123,12 @@ def extract_link_to_fusionprops(section):
     >>> extract_link_to_fusionprops(parsed)
     u'Wikipédia:Pages à fusionner#Jasper et Jasper (informatique)'
     """
-    expected = unicode(section.filter_wikilinks(matches=u"Wikipédia:Pages à fusionner#")[0])
+    expected = section.filter_wikilinks(matches="Wikipédia:Pages à fusionner#")[0]
     return expected[2:-2]
 
 
 def extract_fusion_props(text):
-    """ returns a couple:
+    u""" returns a couple:
 
         (props, new_text)
         with props a triple:
@@ -243,14 +246,20 @@ def projects_maintenance(projects, options):
                 project.announce_page.save()
 
 
+import datas.test_data as tdata
+ANNOUNCES_SAMPLE = tdata.ANNOUNCES_SAMPLE
+
+
 def del_prop_iteration(page):
-    """ iterator on deletion proposition announces in announce page
-    >>> liste = list(del_prop_iteration(mwparserfromhell.parse(ANNOUNCES_SAMPLE)))
-    >>> liste[0].get("nom").value
+    u""" iterator on deletion proposition announces in announce page
+
+    >>>
+    >>> liste = list(del_prop_iteration(mwparserfromhell.parse(tdata.ANNOUNCES_SAMPLE)))
+    >>> liste[0].get(u"nom").value
     u'PagePlus'
     >>> len(liste)
     13
-    >>> liste[0].name ==  ANNOUNCE_DEL_TMPL
+    >>> liste[0].name == ANNOUNCE_DEL_TMPL
     True
     """
 
@@ -272,7 +281,9 @@ def deletion_prop_status_update(announce_page):
         pywikibot.output("-> {}".format(article_title))
         try:
             status = get_page_status(unicode(article_title))
-            if status.is_proposed_to_deletion():
+            if status.is_deleted():
+                announce.add(2, u"supprimé")
+            elif status.is_proposed_to_deletion():
                 pywikibot.output("* still opened")
             elif status.is_redirect_page():
                 announce.add(2, u"fusionné")
@@ -384,11 +395,14 @@ from bots_commons import create_options
 # testing
 
 import unittest
-import sys
+
+from unittest import TestCase
 
 
-class Test(unittest.TestCase):
+class Test(TestCase):
+
     """ Test cases : test of deletion proposition extraction"""
+
     def test_extraction(self):
         """ Simple test """
         text = SAMPLE_TEXT
@@ -416,23 +430,25 @@ class Test(unittest.TestCase):
 
 def test_doctest():
     """ testing doctests string """
-    print("\ndoctests ...")
+    print(u"\ndoctests ...")
     import doctest
     doctest.testmod()
-    print("/doctests")
+    print(u"/doctests")
 
 
 def test():
-    """ unittest launching :
+    u""" unittest launching :
         * TestCases from unittest module,
         * docstring tests
     """
+    import sys
+
     test_doctest()
     unittest.main(argv=[sys.argv[0]])
 
 
 def main():
-    """ Main function"""
+    u""" Main function"""
     opt_parse = create_options()
     opts = opt_parse.parse_args()
 
@@ -445,11 +461,11 @@ def main():
         if opts.conffile:
             conffile = opts.conffile
         else:
-            conffile = os.path.expanduser("~/.config/pwb/projects.yaml")
+            conffile = os.path.expanduser(u"~/.config/pwb/projects.yaml")
 
         projects = [project
                     for project in read_conffile(conffile)
-                    if "announces" in project.tasks
+                    if u"announces" in project.tasks
                     ]
         projects_maintenance(projects, opts)
 

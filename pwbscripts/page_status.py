@@ -1,6 +1,7 @@
 #! /usr/bin/python
 # encoding:utf-8
 
+from __future__ import unicode_literals
 
 """
 A Project page information state
@@ -22,7 +23,9 @@ def get_page(name, namespace=None):
 
 
 class PageStatus(object):
+
     """ Status object """
+
     def __init__(self, page):
         self.page = page
         self._cached_content = None
@@ -48,10 +51,21 @@ class PageStatus(object):
         try:
             self.page.get()
         except pywikibot.IsRedirectPage as arg:
-            self._redirected_to = arg.message()
+            print("!!!!!!!!! {}".format(self.page.getRedirectTarget().title()))
+            self._redirected_to = self.page.getRedirectTarget().title()
             return True
 
+        except pywikibot.NoPage:
+            pass
         return False
+
+    def is_deleted(self):
+        try:
+            self.page.get()
+        except pywikibot.NoPage:
+            return True
+        finally:
+            return False
 
     def set_content(self, new_text, comment):
         """ setter for content, without writing"""
