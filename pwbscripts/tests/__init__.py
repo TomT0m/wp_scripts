@@ -1,3 +1,3 @@
-"""
+u"""
 testing module
 """

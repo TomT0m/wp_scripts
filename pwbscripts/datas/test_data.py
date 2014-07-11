@@ -1,5 +1,7 @@
 
-#encoding:utf-8
+# coding: utf-8
+
+from __future__ import unicode_literals
 
 SAMPLE_TEXT = u"""
 ==Plop==
@@ -27,7 +29,7 @@ FULL_TEST = """{{/En-tête}}
 == pose de bandeau de portails ==
 
 Bonjour. Dans le cadre de l'amélioration du [[Portail:Logiciel]], j'ai modifié les bandeaux de portail d'un certain nombre d'articles en rapport avec des logiciels (paquets, fonctionalités, notions du marché du logiciel,personnalités, entreprises, etc). J'ai appliqué la [[WP:BDP|règle de proximité]] qui veut que seul le portail le plus proche du sujet soit mentionné: logiciel libre, Internet, programmation, logiciel, etc. Notamment en application de la règle de proximité, le bandeau ''portail de l'informatique'' a été retiré d'articles déjà attachés à des sous-portails (logiciel libre, Internet, ...) et dont le sujet n'a pas une importance historique en informatique (logiciels, personnalités). Des contributeurs apparemment ne sont pas du même avis et recouvrent sans avertissement mes modifications. Parmi les articles concernés, il y a :
-# [[Ulrich Drepper]] - personnalité dans le monde du libre, pas notoire dans l'histoire de l'informatique. 
+# [[Ulrich Drepper]] - personnalité dans le monde du libre, pas notoire dans l'histoire de l'informatique.
 # [[Eclipse (logiciel)]] - environnement de développement notoire en dehors des habitués du libre, appliqué l'[[WP:BDP|exception de pertinence]] et placé le bandeau ''portail du logiciel''.
 # [[Open Source]], type de licence, pertinent pour le portail du logiciel, appliqué l'[[WP:BDP|exception de pertinence]].
 # [[Red Hat]], la société, pas d'importance historique en informatique. importance pour l'économie du secteur informatique uniquement (logiciel en particulier).
@@ -121,28 +123,28 @@ Bonjour. cet article comporte un bandeau ''événement à venir'' placé il y a 
 
 Bonjour {{sourire}}
 
-Je sollicite l'avis du projet quand à l’admissibilité de ce pirate informatique qui semble très connu dans le monde du Warez. 
+Je sollicite l'avis du projet quand à l’admissibilité de ce pirate informatique qui semble très connu dans le monde du Warez.
 
 Son brouillon est visible [[Utilisateur:Warezscene/Brouillon|ici]], et d'autres éléments de références ont été apportés [[Utilisateur:Warezscene/Brouillon#Mamoune Lahlou|ici]].
 
-De mon point de vue, il semble admissible. Mais les sources sont insuffisantes. 
+De mon point de vue, il semble admissible. Mais les sources sont insuffisantes.
 
 Cordialement. --[[Utilisateur:Superjuju10|Superjuju10]] <sup>&#91;[[Discussion utilisateur:Superjuju10|'''''Contacter la Aubline''''']]&#93;</sup>, le 12 septembre 2012 à 16:45 (CEST)
 :Excellente question ! Une recherche google confirme que le nom de Mamoune Lahlou est connu sur les réseaux sociaux (notamment linked in, Facebook et Twitter) est-ce toujours la même personne, ou y a-il des homonymes ? je n'ai pas vérifié. Maintenant si je regarde le contenu du brouillon, je constate des sources de fiabilité douteuse (des blogs), et des pages de sites de warez qui parlent de Mr Hero. par contre je n'ai pas trouvé son vrai nom dans les sources et je n'ai pas trouvé de page centrée sur le sujet de ''la personne'' de Mr Hero. En absence de telles informations, ce brouillon est inédit...--[[Utilisateur:Silex6|Silex6]] ([[Discussion utilisateur:Silex6|d]]) 12 septembre 2012 à 17:33 (CEST)
 ::PS: voila une source intéressante: un inteview à MrHero, administrateur de oleoo.com, [http://www.undernews.fr/interviews/warez-interview-mrhero-administrateur-doleoo.html] Dans cet article paru en décembre 2010, l'administrateur (''MrHero'', marocain, dont le vrai nom n'est pas mentionné) dit avoir 26 ans. Or le brouillon lui donne 21 ans.--[[Utilisateur:Silex6|Silex6]] ([[Discussion utilisateur:Silex6|d]]) 12 septembre 2012 à 19:05 (CEST)
 :::Bonjour la compagnie
 :::comme je l'ai déjà précisé, les interviews sont bidon : peut être que ce dernier a menti pour ne pas avoir affaire avec les autorités
-:::en ce qui concerne l'identité de la personne c'est simple : sur son compte facebook il y a 2 adresse emails qui prouvent qu'il s'agit bien de GRIZZLY admin@projetcw.org et admin@warez-bb.org même chose pour son compte sur linkedin je pense 
+:::en ce qui concerne l'identité de la personne c'est simple : sur son compte facebook il y a 2 adresse emails qui prouvent qu'il s'agit bien de GRIZZLY admin@projetcw.org et admin@warez-bb.org même chose pour son compte sur linkedin je pense
 :::c'était depuis son profil sur facebook que j'ai récupéré ses infos personnelles : nationalité,age, etc...
 :::Soyez logiques un peu ! ce n'est pas un inventeur ni un écrivain, c'est un pirate informatique, donc il est normal que ne puissions pas trouver beaucoup de références à son sujet. et puis il est vachement connu sur internet, je ne cherche pas a prouver l'improuvable puisque notre gars a réellement existé et existe encore  {{sourire}} <br>--[[Utilisateur:warezscene|warezscene]] ([[Discussion utilisateur:warezscene|d]]) 12 septembre 2012 à 19:43 (CEST)
-::::Les pirates informatiques ne sont pas dispensés de sources {{clin}}. Et Wikipédia fonctionne selon ce principe de connaissances vérifiables et neutres. 
+::::Les pirates informatiques ne sont pas dispensés de sources {{clin}}. Et Wikipédia fonctionne selon ce principe de connaissances vérifiables et neutres.
 ::::Le plus simple Warezscene est de continuer votre brouillon en prenant soin de bien [[Aide:Présentez vos sources|présentez vos sources]]. Cordialement. --[[Utilisateur:Superjuju10|Superjuju10]] <sup>&#91;[[Discussion utilisateur:Superjuju10|'''''Contacter la Aubline''''']]&#93;</sup>, le 12 septembre 2012 à 20:50 (CEST)
 
 ::::@warezscene: je cite {{citation|La vérifiabilité n'est pas la vérité : nos opinions personnelles sur la nature vraie ou fausse des informations n'ont aucune importance dans Wikipédia}} c'est une [[WP:V|règle de Wikipédia]]. Une information est digne de figurer dans Wikipédia du moment que celle-ci peut être tirée d'une source de qualité (webzine, article de presse, ouvrage écrit, ...) En l'occurence l'interview l'est. Si il s'avère que l'affirmation comme quoi cet interview est bidon peut être tirée d'une source, alors rien n'empêche de la mettre dans l'article de Wikipédia. Pour ce qui est du manque d'information, c'est logique en effet, vu qu'un pirate (comme n'importe quel bandit) agit dans l'ombre. Dans ces conditions un article à son sujet se limitera à ce qui été écrit à son sujet: très peu de choses - un interview, un rapport de police, un article de presse. Je rajouterais que les articles qui sont le fruit de [[WP:TI|recherches personnelles]] sur un sujet sont interdits dans Wikipédia.--[[Utilisateur:Silex6|Silex6]] ([[Discussion utilisateur:Silex6|d]]) 12 septembre 2012 à 21:52 (CEST)
 
 
 @silex: je suis complètement d'accord avec vous en ce qui concerne les opinions personnelles, mais il faut que vous sachiez qu'il s'agit pas de mon opinion perso personnelle puisque les profils de la personne prouvent bel et bien que c'est lui le fameux GRIZZLY et qu'il a 21 ans actuellement, de nationalité marocaine, etc ... <br>
-autre source ou le nom de mamoune Lahlou est cité : 
+autre source ou le nom de mamoune Lahlou est cité :
 [https://encyclopediadramatica.se/Warez-bb#Origins ici] --[[Utilisateur:warezscene|warezscene]]
 :Celle-ci me paraît moyennement fiable :p [[Utilisateur:Zandr4|Zandr4]]<sup><small>&#91;[[Discussion Utilisateur:Zandr4|Kupopo ?]]&#93;</small></sup> 13 septembre 2012 à 08:30 (CEST)
 ::@warezscene: Merci de signer les messages. Une page Facebook est à mon avis une source d'information fiable concernant une personne du moment que les informations source ont été écrites par la personne elle-même. Dans mon message précédent, je parlait de l'affirmation que l'interview est bidon: est-ce que cette information provient d'une source officielle ? ou s'agit-il de oui-dires écrits sur un blog ? Et puis concernant cette nouvelle source: un wiki écrit par des bénévoles, qui ressemble étrangement à Wikipédia, c'est pas vraiment le genre de source qui permet d'améliorer la fiabilité du contenu de Wikipédia.--[[Utilisateur:Silex6|Silex6]] ([[Discussion utilisateur:Silex6|d]]) 13 septembre 2012 à 09:29 (CEST)
@@ -326,8 +328,8 @@ Alors, amélioration bienvenue, ou tentative de spam ?--[[Utilisateur:Silex6|Sil
 : C’est une question intéressante, je n’ai pas d’avis tranché immédiatement ... Quelques réflexions, il y a plusieurs points de vue possibles
 :# La politique globale de classification : la redondance est avéré, c’est clairement l’intersection entre les logiciels libres et les logiciels éducatifs. De manière générale, ne pas faire les combinaisons de toutes les sous catégorie possible est un point de vue qui se défend. D'un autre côté est-ce qu’il existe une politique claire du point de vue de la classification sur wikipedia ? Je n’ai jamais creusé la question je dois dire. L’avantage des catégories c’est qu’on peut en créer autant qu’on veut.
 :# D'un point de vue pratique, en supposant qu’on fasse la chasse aux redondances : quelqu’un qui voudrait trouver l’ensemble des logiciels libres éducatif pourrait le faire, le moteur de recherche propose une directive "incategory" qui permettrait de calculer l’intersection en faisant incategory:"logiciel libre" and incategory":logiciel éducatif. Ça n’a cependant pas l’air de bien marcher, cette directive à l’air capricieuse, et ce n’est de toute façon pas vraiment à la portée d’un néophyte ou d’un simple utilisateur de l’encyclopédie. Cette remarque est valable pour n’importe quel croisement de catégorie.
-:# Si on considère que la redondance n’est pas rédhibitoire et que l’avantage du système de catégorisation de wikipedia, c’est qu’on peut ajouter plusieurs catégories à un article, il faut décider si cette catégorie en particulier est pertinente. Elle pourrait à la fois être une sous catégorie de logiciel libre et de logiciel éducatif. Une recherche google {{Google|logiciel libre éducatif}} permet de découvrir que des gens sont intéressés par ce type de logiciels en particulier, par exemple [http://www.tice.ac-versailles.fr/logicielslibres/ l’académie de Versaille y consacre une page]. 
-:# D’un point de vue pratique toujours, la catégorie [[:Catégorie:Logiciel sous licence libre|logiciels sous licence libre]] englobe beaucoup de logiciel, il ne semble pas absurde de la découper en sous catégorie pour s’y retrouver. Dans ce cas une sous catégorie "logiciels éducatifs sous licence libre" n’est pas idiote. Ça implique que cette sous catégorie soit aussi une sous catégorie de "logiciel éducatif", ce qui pourrait être source de conflit ici. Je vois pas d’autre solution à part éventuellement à ce qu’un logiciel se retrouve à la fois dans une catégorie et une de ses sous catégorie, ce qui viole par contre une règle de base. Ou alors ne pas catégoriser "logiciel libre éducatif" comme sous catégorie de "logiciel éducatif". 
+:# Si on considère que la redondance n’est pas rédhibitoire et que l’avantage du système de catégorisation de wikipedia, c’est qu’on peut ajouter plusieurs catégories à un article, il faut décider si cette catégorie en particulier est pertinente. Elle pourrait à la fois être une sous catégorie de logiciel libre et de logiciel éducatif. Une recherche google {{Google|logiciel libre éducatif}} permet de découvrir que des gens sont intéressés par ce type de logiciels en particulier, par exemple [http://www.tice.ac-versailles.fr/logicielslibres/ l’académie de Versaille y consacre une page].
+:# D’un point de vue pratique toujours, la catégorie [[:Catégorie:Logiciel sous licence libre|logiciels sous licence libre]] englobe beaucoup de logiciel, il ne semble pas absurde de la découper en sous catégorie pour s’y retrouver. Dans ce cas une sous catégorie "logiciels éducatifs sous licence libre" n’est pas idiote. Ça implique que cette sous catégorie soit aussi une sous catégorie de "logiciel éducatif", ce qui pourrait être source de conflit ici. Je vois pas d’autre solution à part éventuellement à ce qu’un logiciel se retrouve à la fois dans une catégorie et une de ses sous catégorie, ce qui viole par contre une règle de base. Ou alors ne pas catégoriser "logiciel libre éducatif" comme sous catégorie de "logiciel éducatif".
 :— [[Utilisateur:TomT0m|TomT0m]] <sup>&#91;[[Discussion Utilisateur:TomT0m|bla]]&#93;</sup> 8 octobre 2012 à 16:08 (CEST)
 ::Il n'existe pas à ma connaissance ''une'', mais ''deux'' politiques de catégorisations: par tags et par découpage du savoir (voir [[Projet:Catégories/Réflexions]]). Depuis 2009,les catégories des logiciels sont du style ''par tag'', ce qui permet de résoudre des problèmes comme les logiciels multi-licences, multi-plateformes ou multi-fonctions. Comme indiqué dans les réflexions, {{citation|Les catégories par tag sont un moyen de navigation très pratique à travers les articles ; de plus, il permettent d'opérer des recherches croisées (?). Mais leur souplesse se paie par des catégories sur-peuplées qui ne distinguent pas l'essentiel de l'accessoire.}}
 ::Ensuite que la catégorie ''logiciel sous licence libre'' ainsi que ces sous-catégories contient un grand nombre d'article, ça me parait normal, étant donné qu'elle couvre 90% du contenu du portail du logiciel libre (2600 articles), dans le cadre de la réorganisation de 2009, différentes sous-catégories ont été faites pour classifier les logiciels en fonction de la licence (GPL, MPL, Apache, ...). Aujourd'hui il y a encore 350 articles qui ne sont pas placés dans les sous-catégories. quels sont ces articles ? sont-ils mal classés ? manque-il une sous-catégorie ? à voir de plus près. En attendant j'ai placé le bandeau ''à diffuser'' sur cette catégorie.
@@ -344,9 +346,9 @@ Alors, amélioration bienvenue, ou tentative de spam ?--[[Utilisateur:Silex6|Sil
 
 Bonjour à tous!!!
 
-Aidez-moi pour avoir la solution: j'avais eu un problème à mon PC, il se plantait quand je travaillais, j'ai donc été obligé de faire une nouvelle réinstallation de Windows. Mais les anciens programmes et installation ne sont pas détruits. Quand je fais une recherche pour le nettoyage de mon disque, je voie des fichier et documents que j’aimerais les supprimés mais l'accès à ces fichiers et documents sont refusés. 
+Aidez-moi pour avoir la solution: j'avais eu un problème à mon PC, il se plantait quand je travaillais, j'ai donc été obligé de faire une nouvelle réinstallation de Windows. Mais les anciens programmes et installation ne sont pas détruits. Quand je fais une recherche pour le nettoyage de mon disque, je voie des fichier et documents que j’aimerais les supprimés mais l'accès à ces fichiers et documents sont refusés.
 
-La deuxième choses : mon lecteur de CD s'ouvre tout seule et refuse de fermer ? 
+La deuxième choses : mon lecteur de CD s'ouvre tout seule et refuse de fermer ?
 
 Alors qu'est-ce que je dois faire pour résoudre mes problèmes ? Aidez-mois chers amis.
 : mauvais endroit pour poser cette question, on ne fait pas de support informatique, on discute de la présentation des articles consacrés à l’informatique sur wikipedia. — [[Utilisateur:TomT0m|TomT0m]] <sup>&#91;[[Discussion Utilisateur:TomT0m|bla]]&#93;</sup> 9 novembre 2012 à 16:36 (CET)
@@ -444,7 +446,7 @@ Bien cordialement,
 
 Bonjour,
 
-J'ai constaté en passant par l'article [[schéma conceptuel]] que celui-ci regroupait plusieurs notions, dont des notions informatiques. Or, dans la page de discussion, plusieurs messages critiquaient la manière dont la partie informatique était traitée (voir remettaient en cause sa place à cet endroit), sans qu'aucune modification n'ait été faite par la suite... Je viens donc vous mettre au courant. 
+J'ai constaté en passant par l'article [[schéma conceptuel]] que celui-ci regroupait plusieurs notions, dont des notions informatiques. Or, dans la page de discussion, plusieurs messages critiquaient la manière dont la partie informatique était traitée (voir remettaient en cause sa place à cet endroit), sans qu'aucune modification n'ait été faite par la suite... Je viens donc vous mettre au courant.
 Il s'agit de savoir si la description donnée sur la page est correcte, complète, pertinente ; s'il serait nécessaire de rediriger vers un article existant plus crédible ou de dissocier la page (pour avoir un article traitant spécifiquement de l'aspect informatique du ''« schéma conceptuel »''), ..?
 
 Qui plus est, je constate que la page [[modèle (informatique)]] n'est pas terrible non plus. Regardez notamment les liens interlangues qui ne m'ont pas l'air pertinents. Si quelqu'un pouvait rediriger vers quelque chose de mieux ou améliorer globalement l'article, ça serait cool.
@@ -525,7 +527,7 @@ ANNOUNCES_SAMPLE = u"""<noinclude>[[Catégorie:Projet:Informatique|Annonces]]</n
 {{Annonce proposition suppression|nom=Prodware Innovation & Design|25 janvier 2013}}
 {{Annonce proposition suppression|nom=Gironde Logiciels Libres|21 janvier 2013}}
 {{Annonce proposition suppression|nom=Twago|20 janvier 2013}}
-{{annonce fusion d'article|12 janvier 2013|[[Linguistique informatique]] et [[Traitement automatique du langage naturel]] [[Wikipédia:Pages_à_fusionner#Linguistique_informatique_et_Traitement_automatique_du_langage_naturel|ici]]}} 
+{{annonce fusion d'article|12 janvier 2013|[[Linguistique informatique]] et [[Traitement automatique du langage naturel]] [[Wikipédia:Pages_à_fusionner#Linguistique_informatique_et_Traitement_automatique_du_langage_naturel|ici]]}}
 {{annonce fusion d'article|12 janvier 2013|proposition fusion [[Agent logiciel]] et [[Agent (informatique)]] [[Wikipédia:Pages_à_fusionner#Agent_logiciel_et_Agent_.28informatique.29|ici]] }}
 {{Annonce proposition suppression|nom=Jean-Daniel Fekete| 3 janvier 2013}}
 <noinclude>
@@ -566,7 +568,7 @@ ANNOUNCES_SAMPLE = u"""<noinclude>[[Catégorie:Projet:Informatique|Annonces]]</n
 {{!}} <tt><nowiki>{{Annonce prise de décision|</nowiki>''jour du mois''<nowiki>|</nowiki>''texte''<nowiki>}}</nowiki></tt>
 {{!}}-----
 {{!}} '''demandes de suppression d'articles'''
-{{!}}<div> 
+{{!}}<div>
 * {{Annonce proposition suppression |25 |nom=Plog }}
 ou
 * {{Annonce proposition suppression |25 |nom=Plog|traité }}</div>
@@ -624,4 +626,3 @@ ou
 {{!}}}
 <center><u>Remarque :</u> Voir aussi les [[:Catégorie:Modèle d'annonce|autres modèles d'annonce spécifiques]].</center></div></noinclude>
 """
-

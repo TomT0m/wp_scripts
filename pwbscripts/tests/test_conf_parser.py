@@ -1,8 +1,8 @@
 #!/usr/bin/python
-#encoding:utf-8
+# -*- coding:utf-8 -*-
 
 
-"""
+u"""
 Yaml parser & ProjectParameters objects test
 """
 
@@ -33,6 +33,7 @@ Mathématiques:
 
 
 class TestParser(unittest.TestCase):
+
     """ Preliminary & API tests """
 
     def assertIn(self, elem, tlist):
@@ -51,7 +52,9 @@ class TestParser(unittest.TestCase):
 
 
 class TestConfigObj(unittest.TestCase):
+
     """ ProjectParameters Test """
+
     def testObj(self):
         """ test of a sample ProjectParameters Object """
 
@@ -62,22 +65,25 @@ class TestConfigObj(unittest.TestCase):
 
 
 class TestConfigFile(unittest.TestCase):
+
     """ test our real config file """
 
     def testConfigLoad(self):
         """ the truth on the conffile loading and parsing """
-        config = pkgutil.get_data("pwbscripts", "projects.yaml")
 
-        obj = yaml.load(config)
+        actual_config = (pkgutil.get_data("pwbscripts", "projects.yaml")).decode("utf-8")
+        #  print(type(actual_config))
 
-        fakefile = StringIO(config)
+        self.assertEqual(type(actual_config), type(u"ààeiu"))
 
-        confs = projects.read_conffile(fakefile)
+        obj = yaml.load(actual_config)
+
+        #  fakefile = StringIO(actual_config)
+
+        confs = projects.read_conffile(actual_config)
 
         self.assertNotEqual(obj, None)
         self.assertNotEqual(confs, None)
 
 
 #        loaded OK
-
-
