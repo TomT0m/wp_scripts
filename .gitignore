@@ -1,4 +1,9 @@
 *.pyc
 *~
 *.swp
+*.[a-zAZ][a-zA-Z]?[a-zA-Z]?.swo
 
+Wikidata-devs/run*
+Wikidata-devs/jsawk
+
+*trial_temp*
