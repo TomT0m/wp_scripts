@@ -17,7 +17,7 @@ import pwbscripts.projects as projects
 # import pwbscripts.projects
 # import pwbscripts.scripts
 
-from StringIO import StringIO
+# from StringIO import StringIO
 
 SAMPLEYAML = u"""
 Informatique:

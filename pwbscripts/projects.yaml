@@ -1,91 +1,103 @@
+Projects:
+        # Informatique
 
-# Informatique
+        Informatique:
+                page:  "Projet:Informatique"
+                tasks: ["announces", "HyuBot"]
+                partal_names: ["Programmation informatique",
+                                        "Logiciel",
+                                        "Algorithmique",
+                                        "Informatique théorique",
+                                        "Informatique"
+                                        "Jeu vidéo",
+                                        "Logiciels libres"]
 
-Informatique:
-        page:  Projet:Informatique
-        tasks: [announces]
+        # Philosophie
 
-# Philosophie
+        Philosophie:
+                page: Projet:Philosophie
+                tasks: [announces]
 
-Philosophie:
-        page: Projet:Philosophie
-        tasks: [announces]
+        # Tunisie
 
-# Tunisie
+        Tunisie: 
+                page: Projet:Tunisie
+                portal_names: [Tunisie]
+                tasks: ["HyuBot"]
 
-Tunisie:
-        page: Projet:Tunisie
-        portal_names: [Tunisie]
-        tasks: ["HyuBot"]
-
-# Sciences
-Sciences:
-        page: Projet:Sciences
-        tasks: [announces]
-
-
-# Mathématiques
-
-Mathématiques:
-        page: "Projet:Mathématiques"
-        portal_names : ["Mathématiques",
-                                #u'Algèbre nouvelle',
-                                'Algèbre',
-                                'Algorithmique',
-                                'Analyse',
-                                'Géométrie',
-                                'Informatique théorique',
-                                'Logique',
-                                'Probabilités et statistiques',
-                                'Arithmétique et théorie des nombres']
-        tasks: ["HyuBot"]
+        # Sciences
+        Sciences:
+                page: Projet:Sciences
+                tasks: [announces]
 
 
-# Alimentation et gastronomie
+        # Mathématiques
 
-"Alimentation et gastronomie":
-        page: "Projet:Alimentation et gastronomie"
-        portal_names: ['Alimentation et gastronomie',
-                                'Bière',
-                                #u'Café',
-                                'Chocolat',
-                                'Fromage',
-                                'Pomme de terre',
-                                'Vigne et vin',
-                                'Whisky']
-        tasks: ["HyuBot"]
+        Mathématiques: 
+                page: "Projet:Mathématiques"
+                portal_names : ["Mathématiques",
+                                        #u'Algèbre nouvelle',
+                                        'Algèbre',
+                                        'Algorithmique',
+                                        'Analyse',
+                                        'Géométrie',
+                                        'Informatique théorique',
+                                        'Logique',
+                                        'Probabilités et statistiques',
+                                        'Arithmétique et théorie des nombres']
+                tasks: ["HyuBot"]
+                     
 
-# Économie
+        # Alimentation et gastronomie
 
-'Économie':
-        page: "Projet:économie"
-        portal_names: ['Économie',
-                       'Commerce',
-                       'Finance',
-                       'Industrie',
-                       'Management']
-        tasks: ["HyuBot"]
+        "Alimentation et gastronomie": 
+                page: "Projet:Alimentation et gastronomie"
+                portal_names: ['Alimentation et gastronomie',
+                                        'Bière',
+                                        #u'Café',
+                                        'Chocolat',
+                                        'Fromage',
+                                        'Pomme de terre',
+                                        'Vigne et vin',
+                                        'Whisky']
+                tasks: ["HyuBot"]
 
-# Littérature
+        # Économie
 
-Littérature:
-        page: "Projet:Littérature"
-        portal_names: ['Littérature',
-                       'Fantasy',
-                       'Poésie',
-                       'Polar',
-                       'Science-fiction']
-        option: {'Littérature':['nolink']}
-        tasks:  ["HyuBot"]
+        'Économie': 
+                page: "Projet:économie"
+                portal_names: ['Économie',
+                               'Commerce',
+                               'Finance',
+                               'Industrie',
+                               'Management']
+                tasks: ["HyuBot"]
 
-# Nord-Pas-de-Calais
+        # Littérature
 
-Nord-Pas-de-Calais:
-        page: 'Projet:Nord-Pas-de-Calais'
-        portal_names:  ['Nord-Pas-de-Calais',
-                        'Bassin minier du Nord-Pas-de-Calais',
-                        'Flandres',
-                        'Lille Métropole']
-        tasks: ["HyuBot"]
+        Littérature: 
+                page: "Projet:Littérature"
+                portal_names: ['Littérature',
+                               'Fantasy',
+                               'Poésie',
+                               'Polar',
+                               'Science-fiction']
+                option: {'Littérature':['nolink']}
+                tasks:  ["HyuBot"]
 
+        # Nord-Pas-de-Calais
+
+        Nord-Pas-de-Calais: 
+                page: 'Projet:Nord-Pas-de-Calais'
+                portal_names:  ['Nord-Pas-de-Calais',
+                                'Bassin minier du Nord-Pas-de-Calais',
+                                'Flandres',
+                                'Lille Métropole']
+                tasks: ["HyuBot"]
+
+
+HyuBot:
+        report_page:
+                site: "frwiki"
+                pagename: "Utilisateur:HyuBot/Contrôle"
 

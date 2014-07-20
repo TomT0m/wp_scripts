@@ -1,9 +1,9 @@
 
-#encoding: utf-8
+# coding: utf-8
 
 whatlinks = []
 
-whatlinks.append ( """<!DOCTYPE html>
+whatlinks.append("""<!DOCTYPE html>
 <html lang="en" dir="ltr" class="client-nojs">
 <head>
 <meta charset="UTF-8" /><title>Pages that link to "Q1660508" - Wikidata</title>
@@ -35,19 +35,19 @@ mw.loader.load(["mediawiki.page.startup","mediawiki.legacy.wikibits","mediawiki.
 }</script>
 <script src="//bits.wikimedia.org/geoiplookup"></script><link rel="dns-prefetch" href="//meta.wikimedia.org" /><!--[if lt IE 7]><style type="text/css">body{behavior:url("/w/static-1.22wmf20/skins/vector/csshover.min.htc")}</style><![endif]--></head>
 <body class="mediawiki ltr sitedir-ltr ns--1 ns-special mw-special-Whatlinkshere page-Special_WhatLinksHere_Q1660508 skin-vector action-view vector-animateLayout">
-		<div id="mw-page-base" class="noprint"></div>
-		<div id="mw-head-base" class="noprint"></div>
-		<div id="content" class="mw-body" role="main">
-			<a id="top"></a>
-			<div id="mw-js-message" style="display:none;"></div>
-						<div id="siteNotice"><!-- CentralNotice --></div>
-						<h1 id="firstHeading" class="firstHeading" lang="en"><span dir="auto">Pages that link to "Q1660508"</span></h1>
-			<div id="bodyContent">
-								<div id="contentSub">← <a href="/wiki/Q1660508" title="Q1660508"><span class="wb-itemlink"><span class="wb-itemlink-label" lang="en" dir="ltr"></span> <span class="wb-itemlink-id">(Q1660508)</span></span></a></div>
-												<div id="jump-to-nav" class="mw-jump">
-					Jump to:					<a href="#mw-navigation">navigation</a>, 					<a href="#p-search">search</a>
-				</div>
-				<div id="mw-content-text"><form action="/w/index.php"><input type="hidden" value="Special:WhatLinksHere" name="title" /><input type="hidden" value="500" name="limit" /><fieldset>
+        <div id="mw-page-base" class="noprint"></div>
+        <div id="mw-head-base" class="noprint"></div>
+        <div id="content" class="mw-body" role="main">
+            <a id="top"></a>
+            <div id="mw-js-message" style="display:none;"></div>
+                        <div id="siteNotice"><!-- CentralNotice --></div>
+                        <h1 id="firstHeading" class="firstHeading" lang="en"><span dir="auto">Pages that link to "Q1660508"</span></h1>
+            <div id="bodyContent">
+                                <div id="contentSub">← <a href="/wiki/Q1660508" title="Q1660508"><span class="wb-itemlink"><span class="wb-itemlink-label" lang="en" dir="ltr"></span> <span class="wb-itemlink-id">(Q1660508)</span></span></a></div>
+                                                <div id="jump-to-nav" class="mw-jump">
+                    Jump to:                    <a href="#mw-navigation">navigation</a>,                     <a href="#p-search">search</a>
+                </div>
+                <div id="mw-content-text"><form action="/w/index.php"><input type="hidden" value="Special:WhatLinksHere" name="title" /><input type="hidden" value="500" name="limit" /><fieldset>
 <legend>What links here</legend>
 <label for="mw-whatlinkshere-target">Page:</label>&#160;<input name="target" size="40" value="Q1660508" id="mw-whatlinkshere-target" /> <label for="namespace">Namespace:</label>&#160;<select class="namespaceselector" id="namespace" name="namespace">
 <option value="" selected="">all</option>
@@ -581,110 +581,110 @@ mw.loader.load(["mediawiki.page.startup","mediawiki.legacy.wikibits","mediawiki.
 <li><a href="/wiki/Q4401829" title="‎Richard Bruynoghe‎"><span class="wb-itemlink"><span class="wb-itemlink-label" lang="nl" dir="ltr">Richard Bruynoghe</span> <span class="wb-itemlink-id">(Q4401829)</span></span></a>  ‎ <span class="mw-whatlinkshere-tools">(<a href="/w/index.php?title=Special:WhatLinksHere&amp;target=Q4401829" title="Special:WhatLinksHere">← links</a>)</span></li>
 <li><a href="/wiki/Q4453071" title="‎Martin Fase‎"><span class="wb-itemlink"><span class="wb-itemlink-label" lang="nl" dir="ltr">Martin Fase</span> <span class="wb-itemlink-id">(Q4453071)</span></span></a>  ‎ <span class="mw-whatlinkshere-tools">(<a href="/w/index.php?title=Special:WhatLinksHere&amp;target=Q4453071" title="Special:WhatLinksHere">← links</a>)</span></li>
 <li><a href="/wiki/Q4464983" title="‎Albert Ascanius van Heusden‎"><span class="wb-itemlink"><span class="wb-itemlink-label" lang="nl" dir="ltr">Albert Ascanius van Heusden</span> <span class="wb-itemlink-id">(Q4464983)</span></span></a>  ‎ <span class="mw-whatlinkshere-tools">(<a href="/w/index.php?title=Special:WhatLinksHere&amp;target=Q4464983" title="Special:WhatLinksHere">← links</a>)</span></li>
-</ul>View (previous 500  |  <a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=500&amp;from=4265808&amp;back=0" title="Special:WhatLinksHere/Q1660508">next 500</a>) (<a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=20" title="Special:WhatLinksHere/Q1660508">20</a> | <a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=50" title="Special:WhatLinksHere/Q1660508">50</a> | <a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=100" title="Special:WhatLinksHere/Q1660508">100</a> | <a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=250" title="Special:WhatLinksHere/Q1660508">250</a> | <a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=500" title="Special:WhatLinksHere/Q1660508">500</a>)<noscript><img src="//www.wikidata.org/w/index.php?title=Special:CentralAutoLogin/start&amp;type=1x1" alt="" title="" width="1" height="1" style="border: none; position: absolute;" /></noscript></div>								<div class="printfooter">
-				Retrieved from "<a href="http://www.wikidata.org/wiki/Special:WhatLinksHere/Q1660508">http://www.wikidata.org/wiki/Special:WhatLinksHere/Q1660508</a>"				</div>
-												<div id='catlinks' class='catlinks catlinks-allhidden'></div>												<div class="visualClear"></div>
-							</div>
-		</div>
-		<div id="mw-navigation">
-			<h2>Navigation menu</h2>
-			<div id="mw-head">
-				<div id="p-personal" role="navigation" class="" aria-labelledby="p-personal-label">
-	<h3 id="p-personal-label">Personal tools</h3>
-	<ul>
-<li id="pt-uls" class="active"><a href="#" class="uls-trigger">English</a></li><li id="pt-createaccount"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=Special%3AWhatLinksHere%2FQ1660508&amp;returntoquery=limit%3D500&amp;type=signup">Create account</a></li><li id="pt-login"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=Special%3AWhatLinksHere%2FQ1660508&amp;returntoquery=limit%3D500" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o">Log in</a></li>	</ul>
+</ul>View (previous 500  |  <a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=500&amp;from=4265808&amp;back=0" title="Special:WhatLinksHere/Q1660508">next 500</a>) (<a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=20" title="Special:WhatLinksHere/Q1660508">20</a> | <a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=50" title="Special:WhatLinksHere/Q1660508">50</a> | <a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=100" title="Special:WhatLinksHere/Q1660508">100</a> | <a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=250" title="Special:WhatLinksHere/Q1660508">250</a> | <a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=500" title="Special:WhatLinksHere/Q1660508">500</a>)<noscript><img src="//www.wikidata.org/w/index.php?title=Special:CentralAutoLogin/start&amp;type=1x1" alt="" title="" width="1" height="1" style="border: none; position: absolute;" /></noscript></div>                                <div class="printfooter">
+                Retrieved from "<a href="http://www.wikidata.org/wiki/Special:WhatLinksHere/Q1660508">http://www.wikidata.org/wiki/Special:WhatLinksHere/Q1660508</a>"                </div>
+                                                <div id='catlinks' class='catlinks catlinks-allhidden'></div>                                                <div class="visualClear"></div>
+                            </div>
+        </div>
+        <div id="mw-navigation">
+            <h2>Navigation menu</h2>
+            <div id="mw-head">
+                <div id="p-personal" role="navigation" class="" aria-labelledby="p-personal-label">
+    <h3 id="p-personal-label">Personal tools</h3>
+    <ul>
+<li id="pt-uls" class="active"><a href="#" class="uls-trigger">English</a></li><li id="pt-createaccount"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=Special%3AWhatLinksHere%2FQ1660508&amp;returntoquery=limit%3D500&amp;type=signup">Create account</a></li><li id="pt-login"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=Special%3AWhatLinksHere%2FQ1660508&amp;returntoquery=limit%3D500" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o">Log in</a></li>    </ul>
 </div>
-				<div id="left-navigation">
-					<div id="p-namespaces" role="navigation" class="vectorTabs" aria-labelledby="p-namespaces-label">
-	<h3 id="p-namespaces-label">Namespaces</h3>
-	<ul>
-					<li  id="ca-nstab-main" class="selected"><span><a href="/wiki/Q1660508"  title="View the item [c]" accesskey="c">Item</a></span></li>
-					<li  id="ca-talk" class="new"><span><a href="/w/index.php?title=Talk:Q1660508&amp;action=edit&amp;redlink=1"  title="Discussion about the content page [t]" accesskey="t">Discussion</a></span></li>
-			</ul>
+                <div id="left-navigation">
+                    <div id="p-namespaces" role="navigation" class="vectorTabs" aria-labelledby="p-namespaces-label">
+    <h3 id="p-namespaces-label">Namespaces</h3>
+    <ul>
+                    <li  id="ca-nstab-main" class="selected"><span><a href="/wiki/Q1660508"  title="View the item [c]" accesskey="c">Item</a></span></li>
+                    <li  id="ca-talk" class="new"><span><a href="/w/index.php?title=Talk:Q1660508&amp;action=edit&amp;redlink=1"  title="Discussion about the content page [t]" accesskey="t">Discussion</a></span></li>
+            </ul>
 </div>
 <div id="p-variants" role="navigation" class="vectorMenu emptyPortlet" aria-labelledby="p-variants-label">
-	<h3 id="mw-vector-current-variant">
-		</h3>
-	<h3 id="p-variants-label"><span>Variants</span><a href="#"></a></h3>
-	<div class="menu">
-		<ul>
-					</ul>
-	</div>
+    <h3 id="mw-vector-current-variant">
+        </h3>
+    <h3 id="p-variants-label"><span>Variants</span><a href="#"></a></h3>
+    <div class="menu">
+        <ul>
+                    </ul>
+    </div>
 </div>
-				</div>
-				<div id="right-navigation">
-					<div id="p-views" role="navigation" class="vectorTabs" aria-labelledby="p-views-label">
-	<h3 id="p-views-label">Views</h3>
-	<ul>
-					<li id="ca-view"><span><a href="/wiki/Q1660508" >Read</a></span></li>
-					<li id="ca-edit"><span><a href="/w/index.php?title=Q1660508&amp;action=edit"  title="You can edit this page. Please use the preview button before saving [e]" accesskey="e">Edit</a></span></li>
-					<li id="ca-history" class="collapsible"><span><a href="/w/index.php?title=Q1660508&amp;action=history"  title="Past revisions of this page [h]" accesskey="h">View history</a></span></li>
-			</ul>
+                </div>
+                <div id="right-navigation">
+                    <div id="p-views" role="navigation" class="vectorTabs" aria-labelledby="p-views-label">
+    <h3 id="p-views-label">Views</h3>
+    <ul>
+                    <li id="ca-view"><span><a href="/wiki/Q1660508" >Read</a></span></li>
+                    <li id="ca-edit"><span><a href="/w/index.php?title=Q1660508&amp;action=edit"  title="You can edit this page. Please use the preview button before saving [e]" accesskey="e">Edit</a></span></li>
+                    <li id="ca-history" class="collapsible"><span><a href="/w/index.php?title=Q1660508&amp;action=history"  title="Past revisions of this page [h]" accesskey="h">View history</a></span></li>
+            </ul>
 </div>
 <div id="p-cactions" role="navigation" class="vectorMenu emptyPortlet" aria-labelledby="p-cactions-label">
-	<h3 id="p-cactions-label"><span>Actions</span><a href="#"></a></h3>
-	<div class="menu">
-		<ul>
-					</ul>
-	</div>
+    <h3 id="p-cactions-label"><span>Actions</span><a href="#"></a></h3>
+    <div class="menu">
+        <ul>
+                    </ul>
+    </div>
 </div>
 <div id="p-search" role="search">
-	<h3><label for="searchInput">Search</label></h3>
-	<form action="/w/index.php" id="searchform">
-				<div id="simpleSearch">
-						<input name="search" placeholder="Search" title="Search Wikidata [f]" accesskey="f" id="searchInput" />						<button type="submit" name="button" title="Search the pages for this text" id="searchButton"><img src="//bits.wikimedia.org/static-1.22wmf20/skins/vector/images/search-ltr.png?303-4" alt="Search" width="12" height="13" /></button>								<input type='hidden' name="title" value="Special:Search"/>
-		</div>
-	</form>
+    <h3><label for="searchInput">Search</label></h3>
+    <form action="/w/index.php" id="searchform">
+                <div id="simpleSearch">
+                        <input name="search" placeholder="Search" title="Search Wikidata [f]" accesskey="f" id="searchInput" />                        <button type="submit" name="button" title="Search the pages for this text" id="searchButton"><img src="//bits.wikimedia.org/static-1.22wmf20/skins/vector/images/search-ltr.png?303-4" alt="Search" width="12" height="13" /></button>                                <input type='hidden' name="title" value="Special:Search"/>
+        </div>
+    </form>
 </div>
-				</div>
-			</div>
-			<div id="mw-panel">
-					<div id="p-logo" role="banner"><a style="background-image: url(//upload.wikimedia.org/wikipedia/commons/e/e4/Wikidata-logo-en-135px.png);" href="/wiki/Wikidata:Main_Page"  title="Visit the main page"></a></div>
-				<div class="portal" role="navigation" id='p-navigation' aria-labelledby='p-navigation-label'>
-	<h3 id='p-navigation-label'>Navigation</h3>
-	<div class="body">
-		<ul>
-			<li id="n-mainpage-description"><a href="/wiki/Wikidata:Main_Page" title="Visit the main page [z]" accesskey="z">Main page</a></li>
-			<li id="n-portal"><a href="/wiki/Special:MyLanguage/Project:Community_portal" title="About the project, what you can do, where to find things">Community portal</a></li>
-			<li id="n-villagepump"><a href="/wiki/Wikidata:Project_chat">Project chat</a></li>
-			<li id="n-special-newitem"><a href="/wiki/Special:NewItem">Create a new item</a></li>
-			<li id="n-special-itembytitle"><a href="/wiki/Special:ItemByTitle" title="Search for items by site and title">Item by title</a></li>
-			<li id="n-recentchanges"><a href="/wiki/Special:RecentChanges" title="A list of recent changes in the wiki [r]" accesskey="r">Recent changes</a></li>
-			<li id="n-randompage"><a href="/wiki/Special:Random" title="Load a random item [x]" accesskey="x">Random item</a></li>
-			<li id="n-help"><a href="/wiki/Special:MyLanguage/Help:Contents" title="The place to find out">Help</a></li>
-			<li id="n-sitesupport"><a href="//donate.wikimedia.org/wiki/Special:FundraiserRedirector?utm_source=donate&amp;utm_medium=sidebar&amp;utm_campaign=C13_wikidata.org&amp;uselang=en" title="Support us">Donate</a></li>
-		</ul>
-	</div>
+                </div>
+            </div>
+            <div id="mw-panel">
+                    <div id="p-logo" role="banner"><a style="background-image: url(//upload.wikimedia.org/wikipedia/commons/e/e4/Wikidata-logo-en-135px.png);" href="/wiki/Wikidata:Main_Page"  title="Visit the main page"></a></div>
+                <div class="portal" role="navigation" id='p-navigation' aria-labelledby='p-navigation-label'>
+    <h3 id='p-navigation-label'>Navigation</h3>
+    <div class="body">
+        <ul>
+            <li id="n-mainpage-description"><a href="/wiki/Wikidata:Main_Page" title="Visit the main page [z]" accesskey="z">Main page</a></li>
+            <li id="n-portal"><a href="/wiki/Special:MyLanguage/Project:Community_portal" title="About the project, what you can do, where to find things">Community portal</a></li>
+            <li id="n-villagepump"><a href="/wiki/Wikidata:Project_chat">Project chat</a></li>
+            <li id="n-special-newitem"><a href="/wiki/Special:NewItem">Create a new item</a></li>
+            <li id="n-special-itembytitle"><a href="/wiki/Special:ItemByTitle" title="Search for items by site and title">Item by title</a></li>
+            <li id="n-recentchanges"><a href="/wiki/Special:RecentChanges" title="A list of recent changes in the wiki [r]" accesskey="r">Recent changes</a></li>
+            <li id="n-randompage"><a href="/wiki/Special:Random" title="Load a random item [x]" accesskey="x">Random item</a></li>
+            <li id="n-help"><a href="/wiki/Special:MyLanguage/Help:Contents" title="The place to find out">Help</a></li>
+            <li id="n-sitesupport"><a href="//donate.wikimedia.org/wiki/Special:FundraiserRedirector?utm_source=donate&amp;utm_medium=sidebar&amp;utm_campaign=C13_wikidata.org&amp;uselang=en" title="Support us">Donate</a></li>
+        </ul>
+    </div>
 </div>
 <div class="portal" role="navigation" id='p-tb' aria-labelledby='p-tb-label'>
-	<h3 id='p-tb-label'>Toolbox</h3>
-	<div class="body">
-		<ul>
-			<li id="t-specialpages"><a href="/wiki/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q">Special pages</a></li>
-			<li id="t-print"><a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=500&amp;printable=yes" rel="alternate" title="Printable version of this page [p]" accesskey="p">Printable version</a></li>
-		</ul>
-	</div>
+    <h3 id='p-tb-label'>Toolbox</h3>
+    <div class="body">
+        <ul>
+            <li id="t-specialpages"><a href="/wiki/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q">Special pages</a></li>
+            <li id="t-print"><a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=500&amp;printable=yes" rel="alternate" title="Printable version of this page [p]" accesskey="p">Printable version</a></li>
+        </ul>
+    </div>
 </div>
-			</div>
-		</div>
-		<div id="footer" role="contentinfo">
-							<ul id="footer-places">
-											<li id="footer-places-privacy"><a href="//wikimediafoundation.org/wiki/Privacy_policy" title="wikimedia:Privacy policy">Privacy policy</a></li>
-											<li id="footer-places-about"><a href="/wiki/Wikidata:About" title="Wikidata:About">About Wikidata</a></li>
-											<li id="footer-places-disclaimer"><a href="/wiki/Wikidata:General_disclaimer" title="Wikidata:General disclaimer">Disclaimers</a></li>
-											<li id="footer-places-developers"><a class="external" href="https://www.mediawiki.org/wiki/Special:MyLanguage/How_to_contribute">Developers</a></li>
-									</ul>
-										<ul id="footer-icons" class="noprint">
-					<li id="footer-copyrightico">
-						<a href="//wikimediafoundation.org/"><img src="//bits.wikimedia.org/images/wikimedia-button.png" width="88" height="31" alt="Wikimedia Foundation"/></a>
-					</li>
-					<li id="footer-poweredbyico">
-						<a href="//www.mediawiki.org/"><img src="//bits.wikimedia.org/static-1.22wmf20/skins/common/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" width="88" height="31" /></a>
-					</li>
-				</ul>
-						<div style="clear:both"></div>
-		</div>
-		<script>/*<![CDATA[*/window.jQuery && jQuery.ready();/*]]>*/</script><script>if(window.mw){
+            </div>
+        </div>
+        <div id="footer" role="contentinfo">
+                            <ul id="footer-places">
+                                            <li id="footer-places-privacy"><a href="//wikimediafoundation.org/wiki/Privacy_policy" title="wikimedia:Privacy policy">Privacy policy</a></li>
+                                            <li id="footer-places-about"><a href="/wiki/Wikidata:About" title="Wikidata:About">About Wikidata</a></li>
+                                            <li id="footer-places-disclaimer"><a href="/wiki/Wikidata:General_disclaimer" title="Wikidata:General disclaimer">Disclaimers</a></li>
+                                            <li id="footer-places-developers"><a class="external" href="https://www.mediawiki.org/wiki/Special:MyLanguage/How_to_contribute">Developers</a></li>
+                                    </ul>
+                                        <ul id="footer-icons" class="noprint">
+                    <li id="footer-copyrightico">
+                        <a href="//wikimediafoundation.org/"><img src="//bits.wikimedia.org/images/wikimedia-button.png" width="88" height="31" alt="Wikimedia Foundation"/></a>
+                    </li>
+                    <li id="footer-poweredbyico">
+                        <a href="//www.mediawiki.org/"><img src="//bits.wikimedia.org/static-1.22wmf20/skins/common/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" width="88" height="31" /></a>
+                    </li>
+                </ul>
+                        <div style="clear:both"></div>
+        </div>
+        <script>/*<![CDATA[*/window.jQuery && jQuery.ready();/*]]>*/</script><script>if(window.mw){
 mw.loader.state({"site":"loading","user":"ready","user.groups":"ready"});
 }</script>
 <script>if(window.mw){
@@ -692,7 +692,7 @@ mw.loader.load(["mediawiki.user","mediawiki.hidpi","mediawiki.page.ready","media
 }</script>
 <script src="//bits.wikimedia.org/www.wikidata.org/load.php?debug=false&amp;lang=en&amp;modules=site&amp;only=scripts&amp;skin=vector&amp;*"></script>
 <!-- Served by mw1212 in 2.705 secs. -->
-	</body>
+    </body>
 </html>""")
 
 
@@ -729,19 +729,19 @@ mw.loader.load(["mediawiki.page.startup","mediawiki.legacy.wikibits","mediawiki.
 }</script>
 <script src="//bits.wikimedia.org/geoiplookup"></script><link rel="dns-prefetch" href="//meta.wikimedia.org" /><!--[if lt IE 7]><style type="text/css">body{behavior:url("/w/static-1.22wmf20/skins/vector/csshover.min.htc")}</style><![endif]--></head>
 <body class="mediawiki ltr sitedir-ltr ns--1 ns-special mw-special-Whatlinkshere page-Special_WhatLinksHere_Q1660508 skin-vector action-view vector-animateLayout">
-		<div id="mw-page-base" class="noprint"></div>
-		<div id="mw-head-base" class="noprint"></div>
-		<div id="content" class="mw-body" role="main">
-			<a id="top"></a>
-			<div id="mw-js-message" style="display:none;"></div>
-						<div id="siteNotice"><!-- CentralNotice --></div>
-						<h1 id="firstHeading" class="firstHeading" lang="en"><span dir="auto">Pages that link to "Q1660508"</span></h1>
-			<div id="bodyContent">
-								<div id="contentSub">← <a href="/wiki/Q1660508" title="Q1660508"><span class="wb-itemlink"><span class="wb-itemlink-label" lang="en" dir="ltr"></span> <span class="wb-itemlink-id">(Q1660508)</span></span></a></div>
-												<div id="jump-to-nav" class="mw-jump">
-					Jump to:					<a href="#mw-navigation">navigation</a>, 					<a href="#p-search">search</a>
-				</div>
-				<div id="mw-content-text"><form action="/w/index.php"><input type="hidden" value="Special:WhatLinksHere" name="title" /><input type="hidden" value="500" name="limit" /><fieldset>
+        <div id="mw-page-base" class="noprint"></div>
+        <div id="mw-head-base" class="noprint"></div>
+        <div id="content" class="mw-body" role="main">
+            <a id="top"></a>
+            <div id="mw-js-message" style="display:none;"></div>
+                        <div id="siteNotice"><!-- CentralNotice --></div>
+                        <h1 id="firstHeading" class="firstHeading" lang="en"><span dir="auto">Pages that link to "Q1660508"</span></h1>
+            <div id="bodyContent">
+                                <div id="contentSub">← <a href="/wiki/Q1660508" title="Q1660508"><span class="wb-itemlink"><span class="wb-itemlink-label" lang="en" dir="ltr"></span> <span class="wb-itemlink-id">(Q1660508)</span></span></a></div>
+                                                <div id="jump-to-nav" class="mw-jump">
+                    Jump to:                    <a href="#mw-navigation">navigation</a>,                     <a href="#p-search">search</a>
+                </div>
+                <div id="mw-content-text"><form action="/w/index.php"><input type="hidden" value="Special:WhatLinksHere" name="title" /><input type="hidden" value="500" name="limit" /><fieldset>
 <legend>What links here</legend>
 <label for="mw-whatlinkshere-target">Page:</label>&#160;<input name="target" size="40" value="Q1660508" id="mw-whatlinkshere-target" /> <label for="namespace">Namespace:</label>&#160;<select class="namespaceselector" id="namespace" name="namespace">
 <option value="" selected="">all</option>
@@ -851,110 +851,110 @@ mw.loader.load(["mediawiki.page.startup","mediawiki.legacy.wikibits","mediawiki.
 <li><a href="/wiki/User:Yair_rand/International_Project_Chat" title="User:Yair rand/International Project Chat">User:Yair rand/International Project Chat</a> (transclusion) ‎ <span class="mw-whatlinkshere-tools">(<a href="/w/index.php?title=Special:WhatLinksHere&amp;target=User%3AYair+rand%2FInternational+Project+Chat" title="Special:WhatLinksHere">← links</a>)</span></li>
 <li><a href="/wiki/Wikidata:Requests_for_deletions/All/lv" title="Wikidata:Requests for deletions/All/lv">Wikidata:Requests for deletions/All/lv</a>  ‎ <span class="mw-whatlinkshere-tools">(<a href="/w/index.php?title=Special:WhatLinksHere&amp;target=Wikidata%3ARequests+for+deletions%2FAll%2Flv" title="Special:WhatLinksHere">← links</a>)</span></li>
 <li><a href="/wiki/Wikidata:Requests_for_deletions/Archive/2013/10/11" title="Wikidata:Requests for deletions/Archive/2013/10/11">Wikidata:Requests for deletions/Archive/2013/10/11</a>  ‎ <span class="mw-whatlinkshere-tools">(<a href="/w/index.php?title=Special:WhatLinksHere&amp;target=Wikidata%3ARequests+for+deletions%2FArchive%2F2013%2F10%2F11" title="Special:WhatLinksHere">← links</a>)</span></li>
-</ul>View (<a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=500&amp;from=0" title="Special:WhatLinksHere/Q1660508">previous 500</a>  |  next 500) (<a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=20&amp;from=4265808" title="Special:WhatLinksHere/Q1660508">20</a> | <a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=50&amp;from=4265808" title="Special:WhatLinksHere/Q1660508">50</a> | <a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=100&amp;from=4265808" title="Special:WhatLinksHere/Q1660508">100</a> | <a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=250&amp;from=4265808" title="Special:WhatLinksHere/Q1660508">250</a> | <a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=500&amp;from=4265808" title="Special:WhatLinksHere/Q1660508">500</a>)<noscript><img src="//www.wikidata.org/w/index.php?title=Special:CentralAutoLogin/start&amp;type=1x1" alt="" title="" width="1" height="1" style="border: none; position: absolute;" /></noscript></div>								<div class="printfooter">
-				Retrieved from "<a href="http://www.wikidata.org/wiki/Special:WhatLinksHere/Q1660508">http://www.wikidata.org/wiki/Special:WhatLinksHere/Q1660508</a>"				</div>
-												<div id='catlinks' class='catlinks catlinks-allhidden'></div>												<div class="visualClear"></div>
-							</div>
-		</div>
-		<div id="mw-navigation">
-			<h2>Navigation menu</h2>
-			<div id="mw-head">
-				<div id="p-personal" role="navigation" class="" aria-labelledby="p-personal-label">
-	<h3 id="p-personal-label">Personal tools</h3>
-	<ul>
-<li id="pt-uls" class="active"><a href="#" class="uls-trigger">English</a></li><li id="pt-createaccount"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=Special%3AWhatLinksHere%2FQ1660508&amp;returntoquery=limit%3D500%26from%3D4265808%26back%3D0&amp;type=signup">Create account</a></li><li id="pt-login"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=Special%3AWhatLinksHere%2FQ1660508&amp;returntoquery=limit%3D500%26from%3D4265808%26back%3D0" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o">Log in</a></li>	</ul>
+</ul>View (<a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=500&amp;from=0" title="Special:WhatLinksHere/Q1660508">previous 500</a>  |  next 500) (<a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=20&amp;from=4265808" title="Special:WhatLinksHere/Q1660508">20</a> | <a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=50&amp;from=4265808" title="Special:WhatLinksHere/Q1660508">50</a> | <a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=100&amp;from=4265808" title="Special:WhatLinksHere/Q1660508">100</a> | <a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=250&amp;from=4265808" title="Special:WhatLinksHere/Q1660508">250</a> | <a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=500&amp;from=4265808" title="Special:WhatLinksHere/Q1660508">500</a>)<noscript><img src="//www.wikidata.org/w/index.php?title=Special:CentralAutoLogin/start&amp;type=1x1" alt="" title="" width="1" height="1" style="border: none; position: absolute;" /></noscript></div>                                <div class="printfooter">
+                Retrieved from "<a href="http://www.wikidata.org/wiki/Special:WhatLinksHere/Q1660508">http://www.wikidata.org/wiki/Special:WhatLinksHere/Q1660508</a>"                </div>
+                                                <div id='catlinks' class='catlinks catlinks-allhidden'></div>                                                <div class="visualClear"></div>
+                            </div>
+        </div>
+        <div id="mw-navigation">
+            <h2>Navigation menu</h2>
+            <div id="mw-head">
+                <div id="p-personal" role="navigation" class="" aria-labelledby="p-personal-label">
+    <h3 id="p-personal-label">Personal tools</h3>
+    <ul>
+<li id="pt-uls" class="active"><a href="#" class="uls-trigger">English</a></li><li id="pt-createaccount"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=Special%3AWhatLinksHere%2FQ1660508&amp;returntoquery=limit%3D500%26from%3D4265808%26back%3D0&amp;type=signup">Create account</a></li><li id="pt-login"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=Special%3AWhatLinksHere%2FQ1660508&amp;returntoquery=limit%3D500%26from%3D4265808%26back%3D0" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o">Log in</a></li>    </ul>
 </div>
-				<div id="left-navigation">
-					<div id="p-namespaces" role="navigation" class="vectorTabs" aria-labelledby="p-namespaces-label">
-	<h3 id="p-namespaces-label">Namespaces</h3>
-	<ul>
-					<li  id="ca-nstab-main" class="selected"><span><a href="/wiki/Q1660508"  title="View the item [c]" accesskey="c">Item</a></span></li>
-					<li  id="ca-talk" class="new"><span><a href="/w/index.php?title=Talk:Q1660508&amp;action=edit&amp;redlink=1"  title="Discussion about the content page [t]" accesskey="t">Discussion</a></span></li>
-			</ul>
+                <div id="left-navigation">
+                    <div id="p-namespaces" role="navigation" class="vectorTabs" aria-labelledby="p-namespaces-label">
+    <h3 id="p-namespaces-label">Namespaces</h3>
+    <ul>
+                    <li  id="ca-nstab-main" class="selected"><span><a href="/wiki/Q1660508"  title="View the item [c]" accesskey="c">Item</a></span></li>
+                    <li  id="ca-talk" class="new"><span><a href="/w/index.php?title=Talk:Q1660508&amp;action=edit&amp;redlink=1"  title="Discussion about the content page [t]" accesskey="t">Discussion</a></span></li>
+            </ul>
 </div>
 <div id="p-variants" role="navigation" class="vectorMenu emptyPortlet" aria-labelledby="p-variants-label">
-	<h3 id="mw-vector-current-variant">
-		</h3>
-	<h3 id="p-variants-label"><span>Variants</span><a href="#"></a></h3>
-	<div class="menu">
-		<ul>
-					</ul>
-	</div>
+    <h3 id="mw-vector-current-variant">
+        </h3>
+    <h3 id="p-variants-label"><span>Variants</span><a href="#"></a></h3>
+    <div class="menu">
+        <ul>
+                    </ul>
+    </div>
 </div>
-				</div>
-				<div id="right-navigation">
-					<div id="p-views" role="navigation" class="vectorTabs" aria-labelledby="p-views-label">
-	<h3 id="p-views-label">Views</h3>
-	<ul>
-					<li id="ca-view"><span><a href="/wiki/Q1660508" >Read</a></span></li>
-					<li id="ca-edit"><span><a href="/w/index.php?title=Q1660508&amp;action=edit"  title="You can edit this page. Please use the preview button before saving [e]" accesskey="e">Edit</a></span></li>
-					<li id="ca-history" class="collapsible"><span><a href="/w/index.php?title=Q1660508&amp;action=history"  title="Past revisions of this page [h]" accesskey="h">View history</a></span></li>
-			</ul>
+                </div>
+                <div id="right-navigation">
+                    <div id="p-views" role="navigation" class="vectorTabs" aria-labelledby="p-views-label">
+    <h3 id="p-views-label">Views</h3>
+    <ul>
+                    <li id="ca-view"><span><a href="/wiki/Q1660508" >Read</a></span></li>
+                    <li id="ca-edit"><span><a href="/w/index.php?title=Q1660508&amp;action=edit"  title="You can edit this page. Please use the preview button before saving [e]" accesskey="e">Edit</a></span></li>
+                    <li id="ca-history" class="collapsible"><span><a href="/w/index.php?title=Q1660508&amp;action=history"  title="Past revisions of this page [h]" accesskey="h">View history</a></span></li>
+            </ul>
 </div>
 <div id="p-cactions" role="navigation" class="vectorMenu emptyPortlet" aria-labelledby="p-cactions-label">
-	<h3 id="p-cactions-label"><span>Actions</span><a href="#"></a></h3>
-	<div class="menu">
-		<ul>
-					</ul>
-	</div>
+    <h3 id="p-cactions-label"><span>Actions</span><a href="#"></a></h3>
+    <div class="menu">
+        <ul>
+                    </ul>
+    </div>
 </div>
 <div id="p-search" role="search">
-	<h3><label for="searchInput">Search</label></h3>
-	<form action="/w/index.php" id="searchform">
-				<div id="simpleSearch">
-						<input name="search" placeholder="Search" title="Search Wikidata [f]" accesskey="f" id="searchInput" />						<button type="submit" name="button" title="Search the pages for this text" id="searchButton"><img src="//bits.wikimedia.org/static-1.22wmf20/skins/vector/images/search-ltr.png?303-4" alt="Search" width="12" height="13" /></button>								<input type='hidden' name="title" value="Special:Search"/>
-		</div>
-	</form>
+    <h3><label for="searchInput">Search</label></h3>
+    <form action="/w/index.php" id="searchform">
+                <div id="simpleSearch">
+                        <input name="search" placeholder="Search" title="Search Wikidata [f]" accesskey="f" id="searchInput" />                        <button type="submit" name="button" title="Search the pages for this text" id="searchButton"><img src="//bits.wikimedia.org/static-1.22wmf20/skins/vector/images/search-ltr.png?303-4" alt="Search" width="12" height="13" /></button>                                <input type='hidden' name="title" value="Special:Search"/>
+        </div>
+    </form>
 </div>
-				</div>
-			</div>
-			<div id="mw-panel">
-					<div id="p-logo" role="banner"><a style="background-image: url(//upload.wikimedia.org/wikipedia/commons/e/e4/Wikidata-logo-en-135px.png);" href="/wiki/Wikidata:Main_Page"  title="Visit the main page"></a></div>
-				<div class="portal" role="navigation" id='p-navigation' aria-labelledby='p-navigation-label'>
-	<h3 id='p-navigation-label'>Navigation</h3>
-	<div class="body">
-		<ul>
-			<li id="n-mainpage-description"><a href="/wiki/Wikidata:Main_Page" title="Visit the main page [z]" accesskey="z">Main page</a></li>
-			<li id="n-portal"><a href="/wiki/Special:MyLanguage/Project:Community_portal" title="About the project, what you can do, where to find things">Community portal</a></li>
-			<li id="n-villagepump"><a href="/wiki/Wikidata:Project_chat">Project chat</a></li>
-			<li id="n-special-newitem"><a href="/wiki/Special:NewItem">Create a new item</a></li>
-			<li id="n-special-itembytitle"><a href="/wiki/Special:ItemByTitle" title="Search for items by site and title">Item by title</a></li>
-			<li id="n-recentchanges"><a href="/wiki/Special:RecentChanges" title="A list of recent changes in the wiki [r]" accesskey="r">Recent changes</a></li>
-			<li id="n-randompage"><a href="/wiki/Special:Random" title="Load a random item [x]" accesskey="x">Random item</a></li>
-			<li id="n-help"><a href="/wiki/Special:MyLanguage/Help:Contents" title="The place to find out">Help</a></li>
-			<li id="n-sitesupport"><a href="//donate.wikimedia.org/wiki/Special:FundraiserRedirector?utm_source=donate&amp;utm_medium=sidebar&amp;utm_campaign=C13_wikidata.org&amp;uselang=en" title="Support us">Donate</a></li>
-		</ul>
-	</div>
+                </div>
+            </div>
+            <div id="mw-panel">
+                    <div id="p-logo" role="banner"><a style="background-image: url(//upload.wikimedia.org/wikipedia/commons/e/e4/Wikidata-logo-en-135px.png);" href="/wiki/Wikidata:Main_Page"  title="Visit the main page"></a></div>
+                <div class="portal" role="navigation" id='p-navigation' aria-labelledby='p-navigation-label'>
+    <h3 id='p-navigation-label'>Navigation</h3>
+    <div class="body">
+        <ul>
+            <li id="n-mainpage-description"><a href="/wiki/Wikidata:Main_Page" title="Visit the main page [z]" accesskey="z">Main page</a></li>
+            <li id="n-portal"><a href="/wiki/Special:MyLanguage/Project:Community_portal" title="About the project, what you can do, where to find things">Community portal</a></li>
+            <li id="n-villagepump"><a href="/wiki/Wikidata:Project_chat">Project chat</a></li>
+            <li id="n-special-newitem"><a href="/wiki/Special:NewItem">Create a new item</a></li>
+            <li id="n-special-itembytitle"><a href="/wiki/Special:ItemByTitle" title="Search for items by site and title">Item by title</a></li>
+            <li id="n-recentchanges"><a href="/wiki/Special:RecentChanges" title="A list of recent changes in the wiki [r]" accesskey="r">Recent changes</a></li>
+            <li id="n-randompage"><a href="/wiki/Special:Random" title="Load a random item [x]" accesskey="x">Random item</a></li>
+            <li id="n-help"><a href="/wiki/Special:MyLanguage/Help:Contents" title="The place to find out">Help</a></li>
+            <li id="n-sitesupport"><a href="//donate.wikimedia.org/wiki/Special:FundraiserRedirector?utm_source=donate&amp;utm_medium=sidebar&amp;utm_campaign=C13_wikidata.org&amp;uselang=en" title="Support us">Donate</a></li>
+        </ul>
+    </div>
 </div>
 <div class="portal" role="navigation" id='p-tb' aria-labelledby='p-tb-label'>
-	<h3 id='p-tb-label'>Toolbox</h3>
-	<div class="body">
-		<ul>
-			<li id="t-specialpages"><a href="/wiki/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q">Special pages</a></li>
-			<li id="t-print"><a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=500&amp;from=4265808&amp;back=0&amp;printable=yes" rel="alternate" title="Printable version of this page [p]" accesskey="p">Printable version</a></li>
-		</ul>
-	</div>
+    <h3 id='p-tb-label'>Toolbox</h3>
+    <div class="body">
+        <ul>
+            <li id="t-specialpages"><a href="/wiki/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q">Special pages</a></li>
+            <li id="t-print"><a href="/w/index.php?title=Special:WhatLinksHere/Q1660508&amp;limit=500&amp;from=4265808&amp;back=0&amp;printable=yes" rel="alternate" title="Printable version of this page [p]" accesskey="p">Printable version</a></li>
+        </ul>
+    </div>
 </div>
-			</div>
-		</div>
-		<div id="footer" role="contentinfo">
-							<ul id="footer-places">
-											<li id="footer-places-privacy"><a href="//wikimediafoundation.org/wiki/Privacy_policy" title="wikimedia:Privacy policy">Privacy policy</a></li>
-											<li id="footer-places-about"><a href="/wiki/Wikidata:About" title="Wikidata:About">About Wikidata</a></li>
-											<li id="footer-places-disclaimer"><a href="/wiki/Wikidata:General_disclaimer" title="Wikidata:General disclaimer">Disclaimers</a></li>
-											<li id="footer-places-developers"><a class="external" href="https://www.mediawiki.org/wiki/Special:MyLanguage/How_to_contribute">Developers</a></li>
-									</ul>
-										<ul id="footer-icons" class="noprint">
-					<li id="footer-copyrightico">
-						<a href="//wikimediafoundation.org/"><img src="//bits.wikimedia.org/images/wikimedia-button.png" width="88" height="31" alt="Wikimedia Foundation"/></a>
-					</li>
-					<li id="footer-poweredbyico">
-						<a href="//www.mediawiki.org/"><img src="//bits.wikimedia.org/static-1.22wmf20/skins/common/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" width="88" height="31" /></a>
-					</li>
-				</ul>
-						<div style="clear:both"></div>
-		</div>
-		<script>/*<![CDATA[*/window.jQuery && jQuery.ready();/*]]>*/</script><script>if(window.mw){
+            </div>
+        </div>
+        <div id="footer" role="contentinfo">
+                            <ul id="footer-places">
+                                            <li id="footer-places-privacy"><a href="//wikimediafoundation.org/wiki/Privacy_policy" title="wikimedia:Privacy policy">Privacy policy</a></li>
+                                            <li id="footer-places-about"><a href="/wiki/Wikidata:About" title="Wikidata:About">About Wikidata</a></li>
+                                            <li id="footer-places-disclaimer"><a href="/wiki/Wikidata:General_disclaimer" title="Wikidata:General disclaimer">Disclaimers</a></li>
+                                            <li id="footer-places-developers"><a class="external" href="https://www.mediawiki.org/wiki/Special:MyLanguage/How_to_contribute">Developers</a></li>
+                                    </ul>
+                                        <ul id="footer-icons" class="noprint">
+                    <li id="footer-copyrightico">
+                        <a href="//wikimediafoundation.org/"><img src="//bits.wikimedia.org/images/wikimedia-button.png" width="88" height="31" alt="Wikimedia Foundation"/></a>
+                    </li>
+                    <li id="footer-poweredbyico">
+                        <a href="//www.mediawiki.org/"><img src="//bits.wikimedia.org/static-1.22wmf20/skins/common/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" width="88" height="31" /></a>
+                    </li>
+                </ul>
+                        <div style="clear:both"></div>
+        </div>
+        <script>/*<![CDATA[*/window.jQuery && jQuery.ready();/*]]>*/</script><script>if(window.mw){
 mw.loader.state({"site":"loading","user":"ready","user.groups":"ready"});
 }</script>
 <script>if(window.mw){
@@ -962,6 +962,5 @@ mw.loader.load(["mediawiki.user","mediawiki.hidpi","mediawiki.page.ready","media
 }</script>
 <script src="//bits.wikimedia.org/www.wikidata.org/load.php?debug=false&amp;lang=en&amp;modules=site&amp;only=scripts&amp;skin=vector&amp;*"></script>
 <!-- Served by mw1077 in 1.157 secs. -->
-	</body>
+    </body>
 </html>""")
-

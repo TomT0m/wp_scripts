@@ -1,16 +1,18 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
-
 """
 #Description: Déplace les annonces de proposition de suppression de la page
  Projet:Informatique vers la page d'annonces du projet
 
 """
 
+
+from __future__ import unicode_literals
+
 # TODO: Fix duplicates announces bug.
 # TODO: Fix fusion status.
+
 
 import re
 import logging
@@ -92,7 +94,7 @@ def extract_full_del_props(text):
 
 def format_del_announce(date, article_name):
     """ returns a mediawiki template text for a deletion announce"""
-    return "{{Annonce proposition suppression|nom={article_name}|{date}}}".format(article_name=article_name, date= date)
+    return "{{Annonce proposition suppression|nom={article_name}|{date}}}".format(article_name=article_name, date=date)
 
 
 def extract_fusion_articles(title):
@@ -208,7 +210,7 @@ def gen_archives_page(old_archive_text, new_archived_announces):
     # new_text = reduce(, string.concat)
 
     new_text = "\n".join([
-        "== {} ==\n{}\n".format(date.MOIS[mois], gen_month_announces(by_month[mois]))
+        "== {} ==\n{}\n".format(Date.MOIS[mois], gen_month_announces(by_month[mois]))
         for mois in by_month
     ])
 
@@ -350,22 +352,32 @@ def deletion_prop_maintenance(project):
     project.discussion_page.set_content(new_discussion_text, comment)
     project.announce_page.set_content(new_announces_text, announce_comment)
 
+from pwbscripts.wikitext import Text as WikiText, Link as WikiLink, Template as WikiTmpl
+from pwbscripts.wikitext import Pattern as WikiPattern
+
 
 def format_fusion_props(articles, section, date):
-    """ format a fusion proposition """
-    debut = "{{Annonce fusion d'article|" + \
-            unicode(date) + \
-            u'|[[{}|Proposition de fusion]] entre '.format(section)
+    """ format a fusion proposition announce name
 
-    suite = ""
+    >>> format_fusion_props(["a", "b"], "wow", Date(1, 1, 2001)
 
-    if len(articles) > 2:
-        suite = ", ".join(u'[[{}]]'.format(articles[3:]))
-    fin = "}}"
+    """
 
-    msg = debut + suite + u'[[' + articles[1] + u']]' + " et [[" + articles[0] + ']]' + fin
+    msgP = WikiPattern.format("{paf_link} entre {articles_links}")
+    list_article_msgP = WikiPattern("{rest}{antepenultimate} et {last}")
 
-    return msg
+    wikiannounce_PaF_link = WikiLink(section,
+                                     WikiText("Proposition de fusion"))
+
+    all_links = [WikiLink(name) for name in format]
+    (antepenultimate, last) = (all_links[-2], all_links[-1])
+
+    list_article_msg = list_article_msgP.format(rest=", ".join(all_links[:-2]),
+                                                antepenultimate=antepenultimate,
+                                                last=last)
+    msg = msgP.format(paf_link=wikiannounce_PaF_link, articles_links=list_article_msg)
+
+    return WikiTmpl(ANNOUNCE_FUSION_TMPL, [msg, date])
 
 
 def fusion_prop_maintenance(project):

@@ -6,7 +6,7 @@ Project parameters handling : read & load configuration
 """
 
 import yaml
-from project_parameters import ProjectParameters
+from pwbscripts.project_parameters import ProjectParameters
 
 """
 tasks :
@@ -14,6 +14,16 @@ tasks :
     * announces : maintains a list of project announces with
                   the properties for deletion and fusion of this project talk page.
 """
+
+# Configuration file structure validation
+
+
+class ConfigFilePattern(object):
+
+    """Class defined to validate config file"""
+
+    def __init__(self, pattern):
+        "pattern : a dic of ke"
 
 
 def load_parameters(name, project_obj):
@@ -32,8 +42,37 @@ def read_conffile(conffilepath):
     """
     with open(conffilepath, 'r') as stream:
         content = yaml.load(stream)
+
         projects = [
             load_parameters(name, content[name])
-            for name in content
+            for name in content.projects
         ]
+
         return projects
+
+
+class ConfigError(Exception):
+
+    """Class related to non correct config path"""
+
+    def __init__(self):
+        pass
+
+from Schema import ObjectFragment, ListFragment, StringParamUnit
+
+
+def get_project_schema():
+    project_conf = ObjectFragment("Project",
+                                  "configuration for a WikiProject",
+                                  {StringParamUnit("name", "the name of the project (without Projet:)"),
+                                   StringParamUnit("tasks", "the tasks ")
+                                   })
+    return project_conf
+
+
+class Config(object):
+
+    '''config object, used to store configuration'''
+
+    def __init__(self, filepath):
+        self.projects = read_conffile

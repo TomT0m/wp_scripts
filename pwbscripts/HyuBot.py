@@ -20,22 +20,23 @@ Features :
     * update article stats for portals
 """
 
-import string
 import re
 
 import pywikibot as wikipedia
 import pywikibot.catlib as catlib
 
-from projects import read_conffile
-import bots_commons
+from pwbscripts.projects import read_conffile
+from pwbscripts import bots_commons
 
-from HyuBotParser import Delimiter as Delimiter
-from HyuBotParser import bot_tag, noinclude_tag
-import HyuBotParser
+from pwbscripts.HyuBotParser import Delimiter as Delimiter
+from pwbscripts.HyuBotParser import bot_tag, noinclude_tag
 
-from HyuBotIO import Outputer
+import pwbscripts.HyuBotParser as HyuBotParser
+
+from pwbscripts.HyuBotIO import IOModule
 
 # TODO: check the API to know if it is still needed (quick and dirty fix)
+
 
 def unique(l):
     """Given a list of hashable object, return an alphabetized unique list."""
@@ -727,12 +728,28 @@ class ProjectPage(wikipedia.Page):
 warnings_page = wikipedia.Page(wikipedia.getSite(),
                                u'Utilisateur:HyuBoT/Contrôle')
 
+class HuyBotApp(object):
+
+    @inject(io = IOModule)
+    def __init__(self, io):
+        self.io = io
+
+    def run(self):
+        nominations_checklist = NominationsChecklist()
+        nominations_checklist.gatherNominations()
+
+# Bot plumbing part
+
+from snakeguice.modules import Module
+
+from HyuBotIO import IOModule
+
+class HyuBotModule(Module):
+    def configure(self, linker): pass
+
 
 def main():
     """ main function : defines global logger and so on"""
-
-    nominations_checklist = NominationsChecklist()
-    nominations_checklist.gatherNominations()
 
     arguments = bots_commons.create_options()
 
