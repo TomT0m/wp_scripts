@@ -2,15 +2,15 @@ Projects:
         # Informatique
 
         Informatique:
-                page:  "Projet:Informatique"
-                tasks: ["announces", "HyuBot"]
-                partal_names: ["Programmation informatique",
-                                        "Logiciel",
-                                        "Algorithmique",
-                                        "Informatique théorique",
-                                        "Informatique"
-                                        "Jeu vidéo",
-                                        "Logiciels libres"]
+                page:  Projet:Informatique
+                tasks: [announces, HyuBot]
+                portal_names: [Programmation informatique,
+                                        Logiciel,
+                                        Algorithmique,
+                                        Informatique théorique,
+                                        Informatique,
+                                        Jeu vidéo,
+                                        Logiciels libres]
 
         # Philosophie
 
@@ -20,7 +20,7 @@ Projects:
 
         # Tunisie
 
-        Tunisie: 
+        Tunisie:
                 page: Projet:Tunisie
                 portal_names: [Tunisie]
                 tasks: ["HyuBot"]
@@ -33,7 +33,7 @@ Projects:
 
         # Mathématiques
 
-        Mathématiques: 
+        Mathématiques:
                 page: "Projet:Mathématiques"
                 portal_names : ["Mathématiques",
                                         #u'Algèbre nouvelle',
@@ -46,11 +46,11 @@ Projects:
                                         'Probabilités et statistiques',
                                         'Arithmétique et théorie des nombres']
                 tasks: ["HyuBot"]
-                     
+
 
         # Alimentation et gastronomie
 
-        "Alimentation et gastronomie": 
+        "Alimentation et gastronomie":
                 page: "Projet:Alimentation et gastronomie"
                 portal_names: ['Alimentation et gastronomie',
                                         'Bière',
@@ -64,7 +64,7 @@ Projects:
 
         # Économie
 
-        'Économie': 
+        'Économie':
                 page: "Projet:économie"
                 portal_names: ['Économie',
                                'Commerce',
@@ -75,7 +75,7 @@ Projects:
 
         # Littérature
 
-        Littérature: 
+        Littérature:
                 page: "Projet:Littérature"
                 portal_names: ['Littérature',
                                'Fantasy',
@@ -87,7 +87,7 @@ Projects:
 
         # Nord-Pas-de-Calais
 
-        Nord-Pas-de-Calais: 
+        Nord-Pas-de-Calais:
                 page: 'Projet:Nord-Pas-de-Calais'
                 portal_names:  ['Nord-Pas-de-Calais',
                                 'Bassin minier du Nord-Pas-de-Calais',
@@ -100,4 +100,3 @@ HyuBot:
         report_page:
                 site: "frwiki"
                 pagename: "Utilisateur:HyuBot/Contrôle"
-

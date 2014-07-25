@@ -458,6 +458,7 @@ def test():
     test_doctest()
     unittest.main(argv=[sys.argv[0]])
 
+from bots_commons import get_default_configfile
 
 def main():
     """ Main function"""
@@ -473,7 +474,7 @@ def main():
         if opts.conffile:
             conffile = opts.conffile
         else:
-            conffile = os.path.expanduser("~/.config/pwb/projects.yaml")
+            conffile = get_default_configfile()
 
         projects = [project
                     for project in read_conffile(conffile)

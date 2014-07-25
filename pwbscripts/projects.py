@@ -5,7 +5,8 @@
 Project parameters handling : read & load configuration
 """
 
-import yaml
+import yaml    # parser for the config file
+
 from pwbscripts.project_parameters import ProjectParameters
 
 """
@@ -32,8 +33,7 @@ def load_parameters(name, project_obj):
     """
 
     return ProjectParameters(name,
-                             project_obj
-                             )
+                             project_obj)
 
 
 def read_conffile(conffilepath):
@@ -42,10 +42,11 @@ def read_conffile(conffilepath):
     """
     with open(conffilepath, 'r') as stream:
         content = yaml.load(stream)
-
+        print(content)
+        cprojs = content["Projects"]
         projects = [
-            load_parameters(name, content[name])
-            for name in content.projects
+            load_parameters(name, cprojs[name])
+            for name in cprojs
         ]
 
         return projects
