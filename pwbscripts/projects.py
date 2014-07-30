@@ -59,7 +59,7 @@ class ConfigError(Exception):
     def __init__(self):
         pass
 
-from Schema import ObjectFragment, ListFragment, StringParamUnit
+from Schema import ObjectFragment, StringParamUnit
 
 
 def get_project_schema():

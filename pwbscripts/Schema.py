@@ -15,9 +15,9 @@ class FormatFragment(object):
 
     "A grammar rule for the yaml config file format"
 
-    def __init__(self, name, help):
+    def __init__(self, name, help_msg):
         self._name = name
-        self._help = help
+        self._help = help_msg
         self._type = None
 
     def validate(self, param_fragment):
@@ -41,8 +41,8 @@ class StringParamUnit(FormatFragment):
 
     "A terminal symbol in the config file parameter"
 
-    def __init__(self, name, help):
-        FormatFragment.__init__(self, name, help)
+    def __init__(self, name, help_msg):
+        FormatFragment.__init__(self, name, help_msg)
         self._type = "String"
 
     def __str__(self):
@@ -53,8 +53,8 @@ class StringEnumUnit(StringParamUnit):
 
     "A terminal symbol in the config file parameter"
 
-    def __init__(self, name, help):
-        FormatFragment.__init__(self, name, help)
+    def __init__(self, name, help_msg):
+        FormatFragment.__init__(self, name, help_msg)
         self._type = "String"
 
     def __str__(self):
@@ -65,8 +65,8 @@ class ObjectFragment(FormatFragment):
 
     "A map of named parameters"
 
-    def __init__(self, name, help, fragments_map):
-        FormatFragment.__init__(self, name, help)
+    def __init__(self, name, help_msg, fragments_map):
+        FormatFragment.__init__(self, name, help_msg)
         self._type = "Object"
         self._attributes = fragments_map
 
@@ -82,7 +82,7 @@ class ListFragment(FormatFragment):
     "A list of fragments of some type"
     type = "List"
 
-    def __init__(self, name, help, type):
-        FormatFragment.__init__(self, name, help)
+    def __init__(self, name, help_msg, item_type):
+        FormatFragment.__init__(self, name, help_msg)
 
-        self._type = "List [{}]".format(type.name)
+        self._type = "List [{}]".format(item_type.name)

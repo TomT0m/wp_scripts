@@ -15,7 +15,7 @@ from __future__ import unicode_literals
 
 
 import re
-import logging
+from pywikibot import logging
 
 import pywikibot
 import mwparserfromhell
@@ -31,8 +31,6 @@ ANNOUNCE_FUSION_TMPL = "Annonce fusion d'articles"
 
 # Parsing functions
 
-# pylint: disable=W0611
-import os
 
 
 def msg_line_eating():
@@ -92,9 +90,14 @@ def extract_full_del_props(text):
     return (articles, newpage)
 
 
+from wikitext import Template
+
 def format_del_announce(date, article_name):
     """ returns a mediawiki template text for a deletion announce"""
-    return "{{Annonce proposition suppression|nom={article_name}|{date}}}".format(article_name=article_name, date=date)
+
+    announce = Template(ANNOUNCE_DEL_TMPL, posargs = [date], kwargs = {"nom": article_name})
+
+    return str(announce)
 
 
 def extract_fusion_articles(title):
@@ -224,7 +227,7 @@ def projects_maintenance(projects, options):
     for project in projects:
         # TODO: log
 
-        pywikibot.log("Project : " + project.name)
+        pywikibot.output("Project : " + project.name)
 
         deletion_prop_maintenance(project)
         fusion_prop_maintenance(project)
@@ -235,9 +238,9 @@ def projects_maintenance(projects, options):
         print("> Diff PDD <\n")
         project.discussion_page.show_diff()
 
-        pywikibot.log("Simulate ? {}".format(options.simulate))
+        pywikibot.output("Simulate ? {}".format(options.simulate))
 
-        pywikibot.log("> touched files : {} ; {}".format(project.discussion_page, project.announce_page))
+        pywikibot.output("> touched files : {} ; {}".format(project.discussion_page, project.announce_page))
 
         # Sauvegarde éventuelle #
         if not options.simulate:
@@ -298,6 +301,7 @@ def deletion_prop_status_update(announce_page):
 
     return unicode(parsed)
 
+from wikitext import Text
 
 def deletion_prop_maintenance(project):
     """ Real Action """
@@ -331,14 +335,14 @@ def deletion_prop_maintenance(project):
     # insertions des annonces extraites dans la page d'annonce
 
     dated_new_announces = [
-        (format_del_announce(date, name), date)
+        (format_del_announce(Text(str(date)), name), date)
         for name, date in articles
     ]
     new_announces_text = insert_new_announces(announces_text, dated_new_announces)
 
     announce_commentP = "proposition(s) de suppression déplacée(s) depuis [[{disc_page}|La page de discussion]]"
     announce_comment = announce_commentP.format(disc_page=discussion_pagename)
-    # project.discussion_page.set_content(new_discussion_text, announce_comment)
+
     project.announce_page.set_content(new_announces_text, announce_comment)
 
     # mise à jour de l'état des annonces #
