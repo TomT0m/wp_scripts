@@ -17,8 +17,8 @@ import pywikibot
 
 import wd_lib
 
-from pywikibot import output as output
-from pywikibot import NoPage as NoPage
+from pywikibot import output
+from pywikibot import NoPage
 
 
 # from systemd import journal
@@ -29,7 +29,7 @@ ARTICLE = "Gouvernement_de_la_Défense_nationale"
 def main():
     """ plop """
     # journal.send("New serie name treatment")
-
+    output("not implemented")
     #TODO: follow Gouvernement_de_la_Défense_nationale links
 
 main()

@@ -21,7 +21,7 @@ from pywikibot import output as output
 from pywikibot import NoPage as NoPage
 
 
-from systemd import journal
+#from systemd import journal
 
 
 ARTICLE = None
@@ -197,6 +197,7 @@ def main():
     try:
         logmain()
     except Exception as err:
-        journal.send("something went wrong for article {}".format(ARTICLE), ERROR=str(err))
+        output("something went wrong for article {} ; error:<{ERROR}>".format(ARTICLE, ERROR=str(err)) )
+        # journal.send("something went wrong for article {}".format(ARTICLE), ERROR=str(err))
 
 main()

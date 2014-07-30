@@ -10,6 +10,7 @@
 
 import pywikibot as pwb
 import wd_lib
+
 from command import cmds
 
 REPO = None

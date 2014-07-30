@@ -24,7 +24,7 @@ class SimulateIOModule(IOModule):
         pass
 
 class Outputter(object):
-    """base class to screen output message"""
+    """base class to output message on screen or console"""
 
     def __init__(self):
         self.outputted = 0
@@ -37,31 +37,16 @@ class Outputter(object):
     def output_usage(self):
         pywikibot.output("wow : {}".format(self.outputted))
 
-from pwbscripts import projects
+from pwbscripts.projects import Config
+from snakeguice import inject
 
-class Reporter(object):
-    '''class definition for Reporter'''
-    @inject(page_factory=PageFactory, output=Outputter, config=Config)
-    def __init__(self, page_factory, output, config):
-        self._warnings_list = []
-        self.page_factory = page_factory
-        self.output_pagename = config
-        self.outputter = outputter
+class PageFactory(object):
+    @inject(config=Config)
+    def __init__(self, config):
+        self._config = config
 
-    def output(self, text):
-        """ method that both output to screen logger and saves the message"""
-        self.add_warning(text)
-        self.logger.output(text)
-
-    def add_warning(self, warning):
-        """appends a warning report to the message report in prevision of Final report"""
-        self._warnings_list.append(warning)
-
-    @property
-    def warning_list(self):
-        """ getter for warning list messages"""
-        return self._warnings_list
-
-    def final_report(self):
-        #TODO: code
+    def create_page(self, pagename):
         pass
+
+class WikipageFactory(PageFactory):
+    

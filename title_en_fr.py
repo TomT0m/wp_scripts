@@ -4,20 +4,24 @@
 #Description: takes an english title and translates it into french
 """
 
-from pywikidata.wikidata import api 
+from pywikibot.page import Page
+import pywikibot
+
 import sys
 
 def main():
 	""" main """
 	title = sys.argv[1]
+	site = pywikibot.getSite("en", "wikipedia")
 
-	item = api.getItemByInterwiki ("enwiki", title )
-	print("getting item {} for title {} ".format(item, title))
+	datapage = Page(site=site, title).itemPage()
+
+	print("getting item {} for title {} ".format(datapage.name, title))
 
 	#for label in item.labels:
-	#	print(item.labels[label]) 
+	#	print(item.labels[label])
 
-	print(item.labels["fr"])
+	print(datapage.labels["fr"])
 
 if __name__ == "__main__":
 	main()

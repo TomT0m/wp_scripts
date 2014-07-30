@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/pythongather
 # -*- coding: utf-8 -*-
 
 # Description : updates stats and announces and global project watchlist using Portals
@@ -23,7 +23,7 @@ Features :
 import re
 
 import pywikibot as wikipedia
-import pywikibot.catlib as catlib
+from pywikibot.compat import catlib
 
 from pwbscripts.projects import read_conffile
 from pwbscripts import bots_commons
@@ -35,8 +35,10 @@ import pwbscripts.HyuBotParser as HyuBotParser
 
 from pwbscripts.HyuBotIO import IOModule
 
-# TODO: check the API to know if it is still needed (quick and dirty fix)
 
+from snakeguice import inject
+
+# TODO: check the API to know if it is still needed (quick and dirty fix)
 
 def unique(l):
     """Given a list of hashable object, return an alphabetized unique list."""
@@ -70,6 +72,7 @@ def agreement(question, default):
 
     return retval
 
+import string
 
 class TranslationTable:
     def __init__(self, dicOfRelatives={},
@@ -433,7 +436,7 @@ class ListUpdateRobot(object):
             listDict['0'] = titleTag.englobe(u'\n== 0–9 ==')
             listDict['~'] = titleTag.englobe(u'\n== Autres ==')
             for ch in string.uppercase:
-                listDict[ch] = titleTag.englobe('\n== %s ==' % ch)
+                listDict[ch] = titleTag.englobe('\n== {} =='.format(ch))
         for title in titlesList:
             key = self.sortTable.translate(title).lstrip().upper()
             if not key:
@@ -739,14 +742,50 @@ class HuyBotApp(object):
         nominations_checklist.gatherNominations()
 
 # Bot plumbing part
+from snakeguice.assist import assisted_inject
+from HyuBotIO import PageFactory, Outputter
+
+class Reporter(object):
+    '''class definition for Reporter'''
+
+    @assisted_inject(page_factory=PageFactory, output=Outputter, config=Config)
+    def __init__(self, page_factory, output, config):
+        self._warnings_list = []
+        self.page_factory = page_factory
+        self.output_pagename = config
+        self.outputter = output
+
+
+    def output(self, text):
+        """ method that both output to screen logger and saves the message"""
+        self.add_warning(text)
+        self.logger.output(text)
+
+    def add_warning(self, warning):
+        """appends a warning report to the message report in prevision of Final report"""
+        self._warnings_list.append(warning)
+
+    @property
+    def warning_list(self):
+        """ getter for warning list messages"""
+        return self._warnings_list
+
+    def final_report(self):
+        #TODO: code
+        pass
 
 from snakeguice.modules import Module
-
-from HyuBotIO import IOModule
+from HyuBotIO import SimulateIOModule, IOModule
 
 class HyuBotModule(Module):
-    def configure(self, linker): pass
+    def configure(self, binder):
+        self.install(binder, IOModule)
 
+class SimuHyuBotModule(Module):
+    def configure(self, binder):
+        self.install(binder, SimulateIOModule())
+
+from snakeguice import Injector
 
 def main():
     """ main function : defines global logger and so on"""
@@ -765,15 +804,22 @@ def main():
                        if "HyuBot" in project_param.tasks
                        ]
 
-    logger = Outputer()
+    if options.simulate:
+        inj = Injector(SimuHyuBotModule())
+    else:
+        inj = Injector(HyuBotModule())
 
+    logger = inj.instance("Logger")
+    app = inj.instance("Bot")
+
+    checklist = app.gatherNominations()
     for proj_param in proj_param_list:
         ppage = ProjectPage(proj_param, logger=logger)
-        ppage.maintenance(checklist=nominations_checklist)
+        ppage.maintenance(checklist=checklist)
 
     # reports the runs warnings on logging page
 
-    header = u"Opérations du ~~~~~.\n"
+    wpage_header = u"Opérations du ~~~~~.\n"
 
     if utf2ascii.unknownCharList:
 
@@ -784,13 +830,13 @@ def main():
                      for (c, text)
                      in utf2ascii.unknownCharList
                      ]
-        header += (characters_warn_section.format(untranscriptedStr=u' – '.join(warn_list)))
+        wpage_header += (characters_warn_section.format(untranscriptedStr=u' – '.join(warn_list)))
 
     try:
         wpage_pattern = "{header}\n{warn_list}"
 
         wl_content = u'\n'.join(warnings_list)
-
+        header = wpage_header
         warnings_page.put(wpage_pattern.format(header=header,
                                                warn_list=wl_content),
                           comment=u'Contrôle des opérations effectuées.')

@@ -50,7 +50,7 @@ class PageStatus(object):
 
         try:
             self.page.get()
-        except pywikibot.IsRedirectPage as arg:
+        except pywikibot.IsRedirectPage:
             print("!!!!!!!!! {}".format(self.page.getRedirectTarget().title()))
             self._redirected_to = self.page.getRedirectTarget().title()
             return True
