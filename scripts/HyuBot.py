@@ -21,7 +21,7 @@ Features :
 import string, re
 
 import pywikibot as wikipedia
-import pywikibot.catlib as catlib
+import pywikibot.compat.catlib as catlib
 
 # TODO: check the API to know if it is still needed (quick and dirty fix)
 def unique(l):
@@ -786,7 +786,10 @@ projects_list = [
                      portalNamesList = [u'Nord-Pas-de-Calais',
                                         u'Bassin minier du Nord-Pas-de-Calais',
                                         u'Flandres',
-                                        u'Lille Métropole'])]
+                                        u'Lille Métropole']),
+    Project(wikipedia.getSite(), u'Tunisie',
+    		     portalNamesList = [u"Tunisie",
+		     		       u"Tunis"])]
  
 warnings_page = wikipedia.Page(wikipedia.getSite(),
                                u'Utilisateur:HyuBoT/Contrôle')
