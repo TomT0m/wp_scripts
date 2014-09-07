@@ -28,16 +28,17 @@ from pywikibot.compat import catlib
 from pwbscripts.projects import read_conffile
 from pwbscripts import bots_commons
 
-from pwbscripts.HyuBotParser import Delimiter as Delimiter
-from pwbscripts.HyuBotParser import bot_tag, noinclude_tag
+from pwbscripts.HyuBot.HyuBotParser import Delimiter as Delimiter
+from pwbscripts.HyuBot.HyuBotParser import bot_tag, noinclude_tag
 
-import pwbscripts.HyuBotParser as HyuBotParser
+import pwbscripts.HyuBot.HyuBotParser as HyuBotParser
 
-from pwbscripts.HyuBotIO import IOModule
+from pwbscripts.HyuBot.HyuBotIO import IOModule
 
 
 from snakeguice import inject
 
+from pwbscripts.HyuBot.HyuBotIO import agreement
 # TODO: check the API to know if it is still needed (quick and dirty fix)
 
 def unique(l):
@@ -55,86 +56,13 @@ Toolkit
 warnings_list = []
 
 
-def agreement(question, default):
-    print("{} (y/n), default : {}".format(question, default))
-    invalid_input = True
-    while invalid_input:
-        rep = input()
-        if rep in ['y', 'n', '']:
-            invalid_input = False
-
-    if rep == 'y':
-        retval = True
-    if rep == 'n':
-        retval = False
-    if rep == '':
-        retval = default
-
-    return retval
 
 import string
 
-class TranslationTable:
-    def __init__(self, dicOfRelatives={},
-                 defaultValue=None):
-        self.unknownCharList = []
-        self.dict = {}
-        for c in string.printable:
-            self.dict[c] = c
-        for s in dicOfRelatives.keys():
-            for c in dicOfRelatives[s]:
-                self.dict[c] = s
-
-        if defaultValue is not None:
-            self.dict[None] = defaultValue
-
-    def translate(self, text):
-        try:
-            return "".join([self.dict[c] for c in text])
-        except KeyError:
-            for c in text:
-                if c not in self.dict:
-                    self.unknownCharList.append((c, text))
-            return "".join([self.dict.get(c, self.dict.get(None, c))
-                            for c in text])
-
-utf2ascii = TranslationTable(
-    dicOfRelatives={
-        'a': u'áàâäåāảãăạąặắǎấầ',  # 'а' dans l'alphabet cyrillique
-        'e': u'éêèëěėễệęềếē', 'i': u'íîïīıìịǐĩ',
-        'o': u'óôöōőøõòơồόŏờốṓởǫỗớ',  # les deux accents aigus sont différents
-        'A': u'ÀÂÄÅÁĀ', 'E': u'ÉÊÈËĖ', 'I': u'ÎÏİÍ', 'O': u'ÔØÖŌÓÕ',
-        'u': u'ùûüūúưứŭũửůűụ', 'y': u'ÿýỳ', 'U': u'ÙÛÜÚŪ',
-        'ae': u'æ', 'AE': u'Æ', 'oe': u'œ', 'OE': u'Œ',
-        'c': u'çćč', 'C': u'ÇČĈĆ', 'd': u'đð', 'D': u'ĐD̠',
-        'g': u'ğġǧ', 'G': u'Ğ', 'h': u'ĥħ', 'H': u'ḤĦ', 'l': u'ḷłľℓļ', 'L': u'ŁĽ',
-        'm': u'ṃ', 'n': u'ńñňṇņ', 'r': u'řṛṟ', 's': u'śšşs̩ṣș', 'S': u'ŠŞŚŜȘ',
-        't': u'ţťt̠țṭ', 'T': u'T̩ŢȚ', 'z': u'žżź', 'Z': u'ŻŽ',
-        'ss': u'ß', 'th': u'þ', 'Th': u'Þ', 'TM': u'™',
-        'alpha': u'α', 'beta': u'β', 'gamma': u'γ', 'Gamma': u'Γ',
-        'delta': u'δ', 'Delta': u'Δ', 'epsilon': u'ε', 'zeta': u'ζ',
-        'eta': u'η', 'theta': u'θ', 'iota': u'ι', 'kappa': u'κ',
-        'lambda': u'λ', 'Lambda': u'Λ', 'mu': u'μ', 'nu': u'ν',
-        'xi': u'ξ', 'omicron': u'ο', 'pi': u'π', 'rho': u'ρ',
-        'sigma': u'σ', 'Sigma': u'Σ', 'tau': u'τ', 'upsilon': u'υ',
-        'phi': u'φϕ', 'Phi': u'Φ', 'chi': u'χ', 'psi': u'ψ', 'Psi': u'Ψ',
-        'omega': u'ω', 'Omega': u'Ω',
-        '1 2': u'½', '2': u'²', '3': u'³', 'micro': u'µ',  # symbole différent de la lettre mu
-        ' ': u'’–−∞×÷≡«»°…—®⊥‐√ʼ§' + string.whitespace + string.punctuation,
-        # à traiter : '‘´'
-        # supprimé : 人
-        '': u'·ʿ‘'  # diacritiques ou lettres négligées et caractère pour la coupure d'un mot
-    },
-    defaultValue=' '
-)
+from pwbscripts.HyuBot.HyuBotUtils import utf2ascii, uppercase_first
 
 
-def uppercase_first(text):
-    """ returns a similar string with the first characters uppercased"""
-    if text:
-        return text[0].upper() + text[1:]
-    else:
-        return ''
+
 
 #
 # functions on the List (of Pages) article
@@ -743,7 +671,10 @@ class HuyBotApp(object):
 
 # Bot plumbing part
 from snakeguice.assist import assisted_inject
-from HyuBotIO import PageFactory, Outputter
+from pwbscripts.HyuBot.HyuBotIO import PageFactory, Outputter
+
+
+from projects import Config
 
 class Reporter(object):
     '''class definition for Reporter'''
@@ -775,7 +706,7 @@ class Reporter(object):
         pass
 
 from snakeguice.modules import Module
-from HyuBotIO import SimulateIOModule, IOModule
+from pwbscripts.HyuBot.HyuBotIO import SimulateIOModule, IOModule
 
 class HyuBotModule(Module):
     def configure(self, binder):

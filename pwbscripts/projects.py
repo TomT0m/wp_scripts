@@ -7,7 +7,7 @@ Project parameters handling : read & load configuration
 
 import yaml    # parser for the config file
 
-from pwbscripts.project_parameters import ProjectParameters
+from project_parameters import ProjectParameters
 
 """
 tasks :

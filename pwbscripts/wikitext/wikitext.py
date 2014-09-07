@@ -219,6 +219,12 @@ class InvalidPattern(Exception):
     def __str__(self):
         return "{} : Invalid Pattern. {}".format(self._pattern, self._msg)
 
+class _Formated(Wikicode):
+    def __init__(self, text):
+        self._text = text
+
+    def __unicode__(self):
+        return self._text
 
 class Pattern(object):
 
@@ -247,4 +253,4 @@ class Pattern(object):
 
     def format(self, *args, **kwargs):
         "main class method"
-        return self.format(*args, **kwargs)
+        return _Formated(self.pattern.format(*args, **kwargs))

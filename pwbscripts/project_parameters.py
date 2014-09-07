@@ -55,7 +55,7 @@ class ProjectParameters(object):
     @property
     def site(self):
         """ returns the site object of the project """
-        return self._site
+        return self._wiki
 
     @property
     def announce_pagename(self):

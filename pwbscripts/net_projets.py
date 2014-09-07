@@ -15,9 +15,10 @@ from __future__ import unicode_literals
 
 
 import re
-from pywikibot import logging
+#from pwb import pwb
 
-import pywikibot
+
+import pywikibot as pwb
 import mwparserfromhell
 
 from date import Date, extract_date
@@ -73,31 +74,32 @@ def extract_full_del_props(text):
         articles.append((article.group(1), date))
         del_sum += len(article.group(0))
 
-        logging.info(" Article : {} (annoncé le {})".format(article.group(1), date))
-        logging.info(" Annonce : \n'''{}'''".format(len(article.group(2))))
+        pwb.output(" Article : {} (annoncé le {})".format(article.group(1), date))
+        pwb.output(" Annonce : \n'''{}'''".format(len(article.group(2))))
 
     del_pattern = pattern.format(u'.*')
     newpage = re.sub(del_pattern, '', text, flags=re.MULTILINE)
 
-    logging.debug("(taille en octets) : Supprimé {} - nouvelle : {}, ancienne {}, différence {}: "
+    pwb.debug("(taille en octets) : Supprimé {} - nouvelle : {}, ancienne {}, différence {}: "
                   .format(
                       del_sum,
                       len(newpage),
                       len(text),
                       del_sum - (len(text) - len(newpage)))
-                  )
+                  ,
+              "bot")
 
     return (articles, newpage)
 
 
-from wikitext import Template
+from pwbscripts.wikitext.wikitext import Template
 
 def format_del_announce(date, article_name):
     """ returns a mediawiki template text for a deletion announce"""
 
     announce = Template(ANNOUNCE_DEL_TMPL, posargs = [date], kwargs = {"nom": article_name})
 
-    return str(announce)
+    return unicode(announce)
 
 
 def extract_fusion_articles(title):
@@ -187,7 +189,7 @@ def insert_new_announces(old_text, dated_new_announces):
 
     # création de la section finale
 
-    new_section = "\n".join([text for text, _ in sorted_announces])
+    new_section = Text("\n").join([text for text, _ in sorted_announces])
 
     return preamble + sep_preamble + "\n" + new_section + "\n" + sep_end + rest
 
@@ -227,7 +229,7 @@ def projects_maintenance(projects, options):
     for project in projects:
         # TODO: log
 
-        pywikibot.output("Project : " + project.name)
+        pwb.output("Project : " + project.name)
 
         deletion_prop_maintenance(project)
         fusion_prop_maintenance(project)
@@ -238,9 +240,9 @@ def projects_maintenance(projects, options):
         print("> Diff PDD <\n")
         project.discussion_page.show_diff()
 
-        pywikibot.output("Simulate ? {}".format(options.simulate))
+        pwb.output("Simulate ? {}".format(options.simulate))
 
-        pywikibot.output("> touched files : {} ; {}".format(project.discussion_page, project.announce_page))
+        pwb.output("> touched files : {} ; {}".format(project.discussion_page, project.announce_page))
 
         # Sauvegarde éventuelle #
         if not options.simulate:
@@ -283,25 +285,25 @@ def deletion_prop_status_update(announce_page):
 
     for announce in del_prop_iteration(parsed):
         article_title = announce.get("nom").value
-        pywikibot.output("-> {}".format(article_title))
+        pwb.output("-> {}".format(article_title))
         try:
             status = get_page_status(unicode(article_title))
             if status.is_deleted():
                 announce.add(2, "supprimé")
             elif status.is_proposed_to_deletion():
-                pywikibot.output("* still opened")
+                pwb.output("* still opened")
             elif status.is_redirect_page():
                 announce.add(2, "fusionné")
                 announce.add("fusionné_avec", status.redirected_to)
             else:
                 if "fait" not in announce:
                     announce.add(2, "fait")
-        except pywikibot.exceptions.InvalidTitle:
-            logging.warn("Annonce malformée !! {}".format(article_title))
+        except pwb.exceptions.InvalidTitle:
+            pwb.log("Annonce malformée !! {}".format(article_title))
 
     return unicode(parsed)
 
-from wikitext import Text
+from pwbscripts.wikitext.wikitext import Text
 
 def deletion_prop_maintenance(project):
     """ Real Action """
@@ -321,21 +323,21 @@ def deletion_prop_maintenance(project):
     (articles, new_discussion_text) = extract_full_del_props(discussion_text)
 
     # stats sur le diff entre page générée et page originale
-    logging.info("Before : {} ; After {} ; expected around {}"
+    pwb.output("Before : {} ; After {} ; expected around {}"
                  .format(len(discussion_text),
                          len(new_discussion_text),
                          len(discussion_text) - len(articles) * 1200)
                  )
 
-    logging.info("Articles extraits")
+    pwb.output("Articles extraits")
     for elem in articles:
         (nom, date) = elem
-        logging.info("Date d'annonce : {} ; Article à supprimer : {}".format(date, nom))
+        pwb.output("Date d'annonce : {} ; Article à supprimer : {}".format(date, nom))
 
     # insertions des annonces extraites dans la page d'annonce
 
     dated_new_announces = [
-        (format_del_announce(Text(str(date)), name), date)
+        (format_del_announce(Text(unicode(date)), name), date)
         for name, date in articles
     ]
     new_announces_text = insert_new_announces(announces_text, dated_new_announces)
@@ -356,8 +358,8 @@ def deletion_prop_maintenance(project):
     project.discussion_page.set_content(new_discussion_text, comment)
     project.announce_page.set_content(new_announces_text, announce_comment)
 
-from pwbscripts.wikitext import Text as WikiText, Link as WikiLink, Template as WikiTmpl
-from pwbscripts.wikitext import Pattern as WikiPattern
+from pwbscripts.wikitext.wikitext import Text as WikiText, Link as WikiLink, Template as WikiTmpl
+from pwbscripts.wikitext.wikitext import Pattern as WikiPattern
 
 
 def format_fusion_props(articles, section, date):
@@ -367,16 +369,16 @@ def format_fusion_props(articles, section, date):
 
     """
 
-    msgP = WikiPattern.format("{paf_link} entre {articles_links}")
+    msgP = WikiPattern("{paf_link} entre {articles_links}")
     list_article_msgP = WikiPattern("{rest}{antepenultimate} et {last}")
 
     wikiannounce_PaF_link = WikiLink(section,
                                      WikiText("Proposition de fusion"))
 
-    all_links = [WikiLink(name) for name in format]
+    all_links = [WikiLink(name) for name in articles]
     (antepenultimate, last) = (all_links[-2], all_links[-1])
 
-    list_article_msg = list_article_msgP.format(rest=", ".join(all_links[:-2]),
+    list_article_msg = list_article_msgP.format(rest=Text(", ").join(all_links[:-2]),
                                                 antepenultimate=antepenultimate,
                                                 last=last)
     msg = msgP.format(paf_link=wikiannounce_PaF_link, articles_links=list_article_msg)
@@ -386,7 +388,7 @@ def format_fusion_props(articles, section, date):
 
 def fusion_prop_maintenance(project):
     """ Testing """
-    logging.info("gestion des propositions de fusion ...")
+    pwb.output("gestion des propositions de fusion ...")
     (fusion_prop_list, new_d_text) = extract_fusion_props(project.discussion_page.get_content())
 
     if len(fusion_prop_list) > 0:
@@ -470,7 +472,9 @@ def main():
     opts = opt_parse.parse_args()
 
     if opts.debug:
-        logging.basicConfig(level=logging.DEBUG)
+        #pwb.logging.basicConfig(level=logging.DEBUG)
+        #TODO: call the relevant Bot class method
+        pass
     if opts.test:
         test()
     else:

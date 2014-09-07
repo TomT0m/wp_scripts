@@ -8,7 +8,7 @@ from __future__ import unicode_literals
 
 import unittest
 
-import pwbscripts.wikitext as Code
+import pwbscripts.wikitext.wikitext as Code
 
 
 class Test(unittest.TestCase):
@@ -53,7 +53,7 @@ class TestLink(unittest.TestCase):
         link = Code.Link("Plop", Code.Text("wouh |"))
         self.assertEqual(unicode(link), "[[Plop|wouh {{!}}]]")
 
-from pwbscripts.wikitext import Text
+from pwbscripts.wikitext.wikitext import Text
 
 
 class TestTemplate(unittest.TestCase):

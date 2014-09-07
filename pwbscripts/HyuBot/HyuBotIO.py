@@ -49,4 +49,21 @@ class PageFactory(object):
         pass
 
 class WikipageFactory(PageFactory):
-    
+    pass
+
+def agreement(question, default):
+    print("{} (y/n), default : {}".format(question, default))
+    invalid_input = True
+    while invalid_input:
+        rep = input()
+        if rep in ['y', 'n', '']:
+            invalid_input = False
+
+    if rep == 'y':
+        retval = True
+    if rep == 'n':
+        retval = False
+    if rep == '':
+        retval = default
+
+    return retval
