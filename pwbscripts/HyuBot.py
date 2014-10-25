@@ -1,4 +1,4 @@
-#!/usr/bin/pythongather
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # Description : updates stats and announces and global project watchlist using Portals
