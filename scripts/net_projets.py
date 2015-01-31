@@ -362,7 +362,7 @@ def get_page_status(pagename):
     may thow InvalidPage
 
     """
-    site = pywikibot.getSite("fr")
+    site = pywikibot.Site(code="fr", fam="wikipedia")
     regtitle = re.compile("\[\[.*\]\]")
     
     if regtitle.match(pagename):
@@ -441,10 +441,10 @@ def deletion_prop_status_update(announce_page):
 
 def get_page(name, namespace = None):
     """ get a Page in frwiki """
-    site = pywikibot.getSite("fr")
+    site = pywikibot.Site(code="fr", fam="wikipedia")
 
     if namespace:
-        return pywikibot.Page(site, name, defaultNamespace = namespace)
+        return pywikibot.Page(site, name, defaultNamespace=namespace)
     
     return pywikibot.Page(site, name)
 

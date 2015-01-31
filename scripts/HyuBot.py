@@ -42,7 +42,10 @@ warnings_list = []
 def output(text):
     wikipedia.output(text)
     warnings_list.append(text)
- 
+
+def Site():
+    return wikipedia.Site(code="fr", fam="wikipedia")
+
 class TranslationTable:
     def __init__(self, dicOfRelatives = {}, 
                  defaultValue = None):
@@ -528,10 +531,10 @@ class NominationsChecklist:
  
     def run(self):
         for key, name in self.nominTypeDict.items():
-            cat = catlib.Category(wikipedia.getSite(), u'Category:%s' % name)
+            cat = catlib.Category(Site(), u'Category:%s' % name)
             self.nominTypeDict[key] = catlib.unique([
                     article.title() for article in cat.articles()])
-        PAFPage = wikipedia.Page(wikipedia.getSite(),
+        PAFPage = wikipedia.Page(Site(),
                                  u'Wikipédia:Pages à fusionner')
         self.listOfFusionTitles = fusionTitleP.findall(PAFPage.get())
         print self.listOfFusionTitles
@@ -550,10 +553,10 @@ class Portal(wikipedia.Page):
         #   raise ValueError(u'BUG: %s is not in the project namespace!' % name)
         self.name = uppercase_first(name)
         #linkedCatName = u'Portail:%s/Articles liés' % name
-        watchlistPage = BotEditPage(wikipedia.getSite(),
+        watchlistPage = BotEditPage(Site(),
                                     u'Portail:%s/Liste de suivi' % name,
                                     botTag = bot_tag, create = True)
-        totalPage = BotEditPage(wikipedia.getSite(),
+        totalPage = BotEditPage(Site(),
                                 u'Portail:%s/Total' % name, create = True)
         self.listUpdateRobot = ListUpdateRobot(
             watchlistPage, listName =u'* Portail:%s' % name,
@@ -568,7 +571,7 @@ class Portal(wikipedia.Page):
             self.iconName = iconName
         else:
             try:
-                iconPage = wikipedia.Page(wikipedia.getSite(),
+                iconPage = wikipedia.Page(Site(),
                                           u'Portail:%s/Icône' % self.name)
                 self.iconName = noinclude_tag.expurge(iconPage.get())
             except:
@@ -578,7 +581,7 @@ class Portal(wikipedia.Page):
         templist = []
         #wikipedia.output(u"Recherche du bandeau de portail %s" % self.name)
         try:
-            template = wikipedia.Page(wikipedia.getSite(),
+            template = wikipedia.Page(Site(),
                                       u'Modèle:Portail %s' % self.name)
             #wikipedia.output(u'OK.')
         except wikipedia.NoPage:
@@ -609,7 +612,7 @@ class Project(wikipedia.Page):
             print self.namespace()
             raise ValueError(u'BUG: %s is not in the project namespace' % title)
         self.name = uppercase_first(name)
-        self.portalsList = [Portal(wikipedia.getSite(),portalName,
+        self.portalsList = [Portal(Site(),portalName,
                                    edit = portalEdit,
                                    option = option.get(portalName, []))
                             for portalName in portalNamesList]
@@ -629,7 +632,7 @@ class Project(wikipedia.Page):
             self.nominationsListUpdate(checklist)
  
     def totalUpdate(self):
-        totalPage = BotEditPage(wikipedia.getSite(),
+        totalPage = BotEditPage(Site(),
                                 u'Projet:%s/Total articles' % self.name,
                                 create = True)
         totalPage.sectionUpdate(str(len(self.titlesList)))
@@ -669,7 +672,7 @@ class Project(wikipedia.Page):
                            + ' {{subst:CURRENTYEAR}}\n'
                            + '\n'.join(sList))
         if listString:
-            newArticlesPage = BotEditPage(wikipedia.getSite(),
+            newArticlesPage = BotEditPage(Site(),
                                           u'Projet:%s/Articles récents'
                                           % self.name,
                                           botTag = bot_tag, create = True)
@@ -737,7 +740,7 @@ class Project(wikipedia.Page):
                         '\n'.join([u'* {{a|1= %s}}' % t
                                    for t in (projectChecklistDict['PAdQ']
                                              + projectChecklistDict['PBA'])])])
-        nominationsPage = BotEditPage(wikipedia.getSite(),
+        nominationsPage = BotEditPage(Site(),
                                       u'Projet:%s/Consultations' % self.name,
                                       botTag = bot_tag, create = True)
         #output(u"• [[Projet:%s/Consultations|Consultations]] " % self.name)
@@ -748,7 +751,7 @@ class Project(wikipedia.Page):
                              % self.name))
  
 projects_list = [
-    Project(wikipedia.getSite(), u'Mathématiques',
+    Project(Site(), u'Mathématiques',
                      portalNamesList = [u'Mathématiques',
                                         #u'Algèbre nouvelle',
                                         u'Algèbre',
@@ -759,7 +762,7 @@ projects_list = [
                                         u'Logique',
                                         u'Probabilités et statistiques',
                                         u'Arithmétique et théorie des nombres']),
-    Project(wikipedia.getSite(), u'Alimentation et gastronomie',
+    Project(Site(), u'Alimentation et gastronomie',
                      portalNamesList = [u'Alimentation et gastronomie',
                                         u'Bière',
                                         #u'Café',
@@ -768,30 +771,30 @@ projects_list = [
                                         u'Pomme de terre',
                                         u'Vigne et vin',
                                         u'Whisky']),
-    Project(wikipedia.getSite(), u'Économie',
+    Project(Site(), u'Économie',
                      portalNamesList = [u'Économie',
                                         u'Commerce',
                                         #u'Entreprises',
                                         u'Finance',
                                         u'Industrie',
                                         u'Management']),
-    Project(wikipedia.getSite(), u'Littérature',
+    Project(Site(), u'Littérature',
                      portalNamesList = [u'Littérature',
                                         u'Fantasy',
                                         u'Poésie',
                                         u'Polar',
                                         u'Science-fiction'],
                      option = {u'Littérature':['nolink']}),
-    Project(wikipedia.getSite(), u'Nord-Pas-de-Calais',
+    Project(Site(), u'Nord-Pas-de-Calais',
                      portalNamesList = [u'Nord-Pas-de-Calais',
                                         u'Bassin minier du Nord-Pas-de-Calais',
                                         u'Flandres',
                                         u'Lille Métropole']),
-    Project(wikipedia.getSite(), u'Tunisie',
+    Project(Site(), u'Tunisie',
     		     portalNamesList = [u"Tunisie",
 		     		       u"Tunis"])]
  
-warnings_page = wikipedia.Page(wikipedia.getSite(),
+warnings_page = wikipedia.Page(Site(),
                                u'Utilisateur:HyuBoT/Contrôle')
  
 if __name__ == "__main__":
