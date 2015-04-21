@@ -14,7 +14,7 @@ import re
 
 def get_page(name, namespace=None):
     """ get a Page in frwiki """
-    site = pywikibot.getSite("fr")
+    site = pywikibot.Site("fr")
 
     if namespace:
         return pywikibot.Page(site, name, defaultNamespace=namespace)
@@ -147,7 +147,7 @@ def get_page_status(pagename):
     may thow InvalidPage
 
     """
-    site = pywikibot.getSite("fr")
+    site = pywikibot.Site("fr")
     regtitle = re.compile("{}.*{}".format(re.escape("[["),
                                           re.escape("]]"))
                           )

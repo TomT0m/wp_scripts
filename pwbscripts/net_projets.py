@@ -92,7 +92,7 @@ def extract_full_del_props(text):
     return (articles, newpage)
 
 
-from pwbscripts.wikitext.wikitext import Template
+from wikitext.wikitext import Template
 
 def format_del_announce(date, article_name):
     """ returns a mediawiki template text for a deletion announce"""
@@ -303,7 +303,7 @@ def deletion_prop_status_update(announce_page):
 
     return unicode(parsed)
 
-from pwbscripts.wikitext.wikitext import Text
+from wikitext.wikitext import Text
 
 def deletion_prop_maintenance(project):
     """ Real Action """
@@ -358,8 +358,8 @@ def deletion_prop_maintenance(project):
     project.discussion_page.set_content(new_discussion_text, comment)
     project.announce_page.set_content(new_announces_text, announce_comment)
 
-from pwbscripts.wikitext.wikitext import Text as WikiText, Link as WikiLink, Template as WikiTmpl
-from pwbscripts.wikitext.wikitext import Pattern as WikiPattern
+from wikitext.wikitext import Text as WikiText, Link as WikiLink, Template as WikiTmpl
+from wikitext.wikitext import Pattern as WikiPattern
 
 
 def format_fusion_props(articles, section, date):
