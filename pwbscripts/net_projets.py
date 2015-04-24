@@ -94,10 +94,12 @@ def extract_full_del_props(text):
 
 from wikitext.wikitext import Template
 
+
 def format_del_announce(date, article_name):
     """ returns a mediawiki template text for a deletion announce"""
 
-    announce = Template(ANNOUNCE_DEL_TMPL, posargs = [date], kwargs = {"nom": article_name})
+    announce = Template(ANNOUNCE_DEL_TMPL,
+                        posargs=[date], kwargs={"nom": article_name})
 
     return unicode(announce)
 
@@ -199,7 +201,8 @@ def gen_month_announces(month):
 
 
 def gen_archives_page(old_archive_text, new_archived_announces):
-    """ génère une page d'archive à partir de l'ancienne page et des nouvelles archives """
+    """ génère une page d'archive
+    à partir de l'ancienne page et des nouvelles archives """
 
     announces_lines = old_archive_text.split("\n")
 
@@ -215,7 +218,8 @@ def gen_archives_page(old_archive_text, new_archived_announces):
     # new_text = reduce(, string.concat)
 
     new_text = "\n".join([
-        "== {} ==\n{}\n".format(Date.MOIS[mois], gen_month_announces(by_month[mois]))
+        "== {} ==\n{}\n".format(Date.MOIS[mois],
+                                gen_month_announces(by_month[mois]))
         for mois in by_month
     ])
 
@@ -358,6 +362,7 @@ def deletion_prop_maintenance(project):
     project.discussion_page.set_content(new_discussion_text, comment)
     project.announce_page.set_content(new_announces_text, announce_comment)
 
+
 from wikitext.wikitext import Text as WikiText, Link as WikiLink, Template as WikiTmpl
 from wikitext.wikitext import Pattern as WikiPattern
 
@@ -465,6 +470,7 @@ def test():
     unittest.main(argv=[sys.argv[0]])
 
 from bots_commons import get_default_configfile
+
 
 def main():
     """ Main function"""

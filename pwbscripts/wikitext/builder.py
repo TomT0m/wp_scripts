@@ -1,5 +1,11 @@
 
-#coding: utf-8
+# coding: utf-8
+
+
+"""
+module that builds wikitext object
+"""
+
 
 from __future__ import unicode_literals
 

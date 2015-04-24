@@ -219,12 +219,15 @@ class InvalidPattern(Exception):
     def __str__(self):
         return "{} : Invalid Pattern. {}".format(self._pattern, self._msg)
 
+
 class _Formated(Wikicode):
+
     def __init__(self, text):
         self._text = text
 
     def __unicode__(self):
         return self._text
+
 
 class Pattern(object):
 
@@ -241,8 +244,8 @@ class Pattern(object):
         if len(reserved_in_pattern) > 0:
             out_reservered = ['"{}"'.format(reserved for reserved in reserved_in_pattern)]
             raise InvalidPattern(pattern,
-                                 "found reserved {first}{rest}".format(out_reservered[0],
-                                                                       ", ".join(out_reservered[1:])
+                                 "found reserved {first}{rest}".format(first=out_reservered[0],
+                                                                       rest=", ".join(out_reservered[1:])
                                                                        )
                                  )
 

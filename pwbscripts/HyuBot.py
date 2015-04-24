@@ -20,10 +20,12 @@ Features :
     * update article stats for portals
 """
 
+
 import re
 
 import pywikibot as wikipedia
 from pywikibot.compat import catlib
+
 
 from pwbscripts.projects import read_conffile
 from pwbscripts import bots_commons
@@ -39,8 +41,9 @@ from pwbscripts.HyuBot.HyuBotIO import IOModule
 from snakeguice import inject
 
 from pwbscripts.HyuBot.HyuBotIO import agreement
-# TODO: check the API to know if it is still needed (quick and dirty fix)
 
+
+# TODO: check the API to know if it is still needed (quick and dirty fix)
 def unique(l):
     """Given a list of hashable object, return an alphabetized unique list."""
     l = dict.fromkeys(l).keys()
@@ -58,6 +61,7 @@ warnings_list = []
 
 
 import string
+
 
 from pwbscripts.HyuBot.HyuBotUtils import utf2ascii, uppercase_first
 
@@ -740,7 +744,7 @@ def main():
     else:
         inj = Injector(HyuBotModule())
 
-    logger = inj.instance("Logger")
+    logger = inj.get_instance(Logger)
     app = inj.instance("Bot")
 
     checklist = app.gatherNominations()
@@ -772,8 +776,8 @@ def main():
                                                warn_list=wl_content),
                           comment=u'Contrôle des opérations effectuées.')
 
-    except Exception as e:
-        wikipedia.output(u"Erreur lors de l'édition du contrôle.\n {msg}".format(e.msg))
+    except Exception as exc:
+        wikipedia.output(u"Erreur lors de l'édition du contrôle.\n {msg}".format(exc.msg))
     finally:
         wikipedia.stopme()
 

@@ -5,9 +5,9 @@
 Serie formatting in wikidata
 
 TODO: Handle serie season redirects not associated to any particular article
-"""
 
-# Description: tool to set basic claims on TV series seasons on Wikidata where titles on Wikipeda are formated with the year of the season in the title
+#Description: tool to set basic claims on TV series seasons on Wikidata where titles on Wikipeda are formated with the year of the season in the title
+"""
 
 import pywikibot
 # create a site object, here for en-wiki
@@ -22,7 +22,7 @@ from lang import get_en_ordinal
 
 def set_season_labels(page, serie_name, season_num, year):
     """ setting labels """
-    enlabel = u'{name} in {{year}}'.format(name=serie_name, year=year)
+    enlabel = u'{name} in {year}'.format(name=serie_name, year=year)
 
     wd_lib.set_for_lang(page, serie_name, 'en', enlabel, "standard label setting")
     frlabel = u'{name} saison {num}'.format(name=serie_name, num=year)
@@ -77,7 +77,7 @@ def treat_serie(serie_name, site_name='en',
         print(title)
 
         if page.exists():
-            datapage = pywikibot.page.ItemPage()
+            datapage = pywikibot.ItemPage.fromPage(page)
             if datapage.exists():
                 datapage.get()
                 items[current] = datapage

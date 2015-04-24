@@ -24,7 +24,9 @@ def create_options():
 
     return options
 
-import dirspec.basedir # multiformat config file getter
+
+import dirspec.basedir  # multiformat config file getter
+
 
 def get_default_configfile():
     """ returns the file path for the default configuration file """
@@ -32,6 +34,6 @@ def get_default_configfile():
     config_path = dirspec.basedir.get_xdg_config_home()
     basepath = os.path.join(config_path, 'pwb')
 
-    conffile = os.path.join(basepath,'projects.yaml')
+    conffile = os.path.join(basepath, 'projects.yaml')
 
     return conffile

@@ -9,16 +9,15 @@ TODO: * Handle serie season redirects not associated to any particular article
 * Use pywikibot infrastructure logging
 """
 
-import pywikibot
 # create a site object, here for en-wiki
 # import logging
 
 # NUM_CHANGED = 0
 
-import wd_lib
+#import wd_lib
 
 from pywikibot import output
-from pywikibot import NoPage
+#from pywikibot import NoPage
 
 
 # from systemd import journal
@@ -26,12 +25,11 @@ from pywikibot import NoPage
 
 ARTICLE = "Gouvernement_de_la_Défense_nationale"
 
+
 def main():
     """ plop """
     # journal.send("New serie name treatment")
     output("not implemented")
-    #TODO: follow Gouvernement_de_la_Défense_nationale links
+#     TODO: follow Gouvernement_de_la_Défense_nationale links
 
 main()
-
-

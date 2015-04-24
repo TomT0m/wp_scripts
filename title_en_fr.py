@@ -1,5 +1,6 @@
 #! /usr/bin/python
-#encoding: utf-8
+# encoding: utf-8
+
 """
 #Description: takes an english title and translates it into french
 """
@@ -9,20 +10,18 @@ import pywikibot
 
 import sys
 
+
 def main():
-	""" main """
-	title = sys.argv[1]
-	site = pywikibot.getSite("en", "wikipedia")
+    """ main """
+    title = sys.argv[1]
+    site = pywikibot.getSite("en", "wikipedia")
 
-	datapage = Page(site=site, title).itemPage()
+    page = Page(site, title)
+    datapage = pywikibot.ItemPage.fromPage(page)
 
-	print("getting item {} for title {} ".format(datapage.name, title))
+    print("getting item {} for title {} ".format(datapage.name, title))
 
-	#for label in item.labels:
-	#	print(item.labels[label])
-
-	print(datapage.labels["fr"])
+    print(datapage.labels["fr"])
 
 if __name__ == "__main__":
-	main()
-
+    main()
