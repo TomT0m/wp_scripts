@@ -8,7 +8,7 @@ import doctest
 
 from unittest import TestSuite
 
-import pwbscripts.net_projets as net_projets
+import pwbscripts
 # import pwbscripts.projects as projects
 
 CONF = "PWBSCRIPTS_CONFFILE"

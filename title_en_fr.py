@@ -19,7 +19,7 @@ def main():
     page = Page(site, title)
     datapage = pywikibot.ItemPage.fromPage(page)
 
-    print("getting item {} for title {} ".format(datapage.name, title))
+    print("getting item {} for title {} ".format(datapage.title, title))
 
     print(datapage.labels["fr"])
 

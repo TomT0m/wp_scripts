@@ -1,8 +1,15 @@
 
-# coding:utf-8
+# encoding:utf-8
 
 
-class Delimiter:
+"""
+
+Huybot wikitext parsing and deconstructing module
+
+"""
+
+
+class Delimiter(object):
 
     """
     Specifies start tag and end tag.
@@ -17,37 +24,45 @@ class Delimiter:
         """
         self.start = startTag
         self.end = endTag
+        self._errors = None
 
-    def indices(self, txt, textFrom=0):
+    def indices(self, txt, text_from=0):
         """ computes the indexes of the substring delimited by the start and end delimiters
 
         (or (StartIndex, None) if there is no end delimiters
         """
-        startIndex = txt.index(self.start, textFrom)
+        start_index = txt.index(self.start, text_from)
         if self.end:
             try:
-                endIndex = txt.index(self.end, startIndex + len(self.start))
+                end_index = txt.index(self.end, start_index + len(self.start))
             except ValueError:
-                endIndex = None
+                end_index = None
         else:
-            endIndex = None
-        return (startIndex, endIndex)
+            end_index = None
+        return (start_index, end_index)
 
     class EndTagMissing(Exception):
+        """Exception launched when the page misses an end tag on parsing"""
         def __init__(self, message, Errors):
             Exception.__init__(self, message)
 
-            self.Errors = Errors
+            self._errors = Errors
 
     def split(self, text):
+        """
+        in a text "plop<tagdebut>bidou<tagfin>plop2
+        returns ["plop", "bidou", "plop2"]
+        TODO: refactor
+
+        """
         result = []
         index = 0
         try:
             while 1:
-                (startIndex, endIndex) = self.indices(text, index)
-                result.append(text[index:startIndex])
-                result.append(text[startIndex + len(self.start):endIndex])
-                index = endIndex + len(self.end)
+                (start_index, end_index) = self.indices(text, index)
+                result.append(text[index:start_index])
+                result.append(text[start_index + len(self.start):end_index])
+                index = end_index + len(self.end)
         except ValueError:
             result.append(text[index:])
         except TypeError:
@@ -56,36 +71,39 @@ class Delimiter:
 
         return result
 
-    def rebuild(self, stringList):
+    def rebuild(self, string_list):
+        """ I suppose this rebuild a splited string"""
         outside = True
         try:
-            result = [stringList[0]]
+            result = [string_list[0]]
         except IndexError:
             result = []
-        for s in stringList[1:]:
+        for stringinstance in string_list[1:]:
             if outside:
                 result.append(self.start)
             else:
                 result.append(self.end)
             outside = not(outside and self.end)
-            result.append(s)
+            result.append(stringinstance)
         return ''.join(result)
 
-    def expurge(self, text, explicitEnd=False):
-        stringList = self.split(text)
+    def expurge(self, text, explicit_end=False):
+        """ returns the text without the tags and their content """
+        string_list = self.split(text)
         outside = True
-        result = [stringList[0]]
-        for s in stringList[1:]:
-            outside = not(outside)
+        result = [string_list[0]]
+        for str_instance in string_list[1:]:
+            outside = not outside
             if outside:
-                result.append(s)
-        if explicitEnd:
-            if len(stringList) % 2 == 0:
+                result.append(str_instance)
+        if explicit_end:
+            if len(string_list) % 2 == 0:
                 result.append(self.start)
-                result.append(stringList[-1])
+                result.append(string_list[-1])
         return ''.join(result)
 
     def englobe(self, text):
+        """ computes a wikitext str enclosed with the current tags"""
         return self.start + text + self.end
 
 
@@ -95,21 +113,23 @@ class HtmlTag(Delimiter):
     HTML tags delimiters definition
     """
 
-    def __init__(self, s):
-        self.start = '<%s>' % s
-        self.end = '</%s>' % s
+    def __init__(self, tagname):
+        super(HtmlTag, self).__init__()
+        self.start = '<{}>'.format(tagname)
+        self.end = '</{}>'.format(tagname)
 
-bot_tag = Delimiter(u'', u'<!-- FIN BOT -->')
-link_tag = Delimiter(u'[[', u']]')
+BOT_TAG = Delimiter(u'', u'<!-- FIN BOT -->')
+LINK_TAG = Delimiter(u'[[', u']]')
 
-arg_tag = Delimiter(u'{{{', u'}}}')
+ARG_TAG = Delimiter(u'{{{', u'}}}')
 
-comment_tag = Delimiter(u'<!--', u'-->')
-includeonly_tag = HtmlTag('includeonly')
-noinclude_tag = HtmlTag('noinclude')
-nowiki_tag = HtmlTag('nowiki')
+COMMENT_TAG = Delimiter(u'<!--', u'-->')
+INCLUDEONLY_TAG = HtmlTag('includeonly')
+NOINCLUDE_TAG = HtmlTag('noinclude')
+NOWIKI_TAG = HtmlTag('nowiki')
 
 
-def get_reconstruct_errmsgP():
-    err_msgP = u"Balise de début {} manquante; ou numéro de section {} trop élevé dans la page {}."
-    return err_msgP
+def get_reconstruct_errmsg_pattern():
+    """ returns an error message pattern """
+    err_msg_pattern = u"Balise de début {} manquante; ou numéro de section {} trop élevé dans la page {}."
+    return err_msg_pattern

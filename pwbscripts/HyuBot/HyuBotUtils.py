@@ -1,34 +1,40 @@
 
-#coding: utf-8
+# encoding: utf-8
 
+"""
+Utility module used to the transliteration of articles with non ascii unicode characters into ascii
+"""
 
 import string
 
-class TranslationTable:
+
+class TranslationTable(object):
+    """ Class regrouping method to handle unicode caracters in article names"""
     def __init__(self, dicOfRelatives,
                  defaultValue=None):
-        self.unknownCharList = []
+        self.unknown_char_list = []
         self.dict = {}
-        for c in string.printable:
-            self.dict[c] = c
-        for s in dicOfRelatives.keys():
-            for c in dicOfRelatives[s]:
-                self.dict[c] = s
+        for character in string.printable:
+            self.dict[character] = character
+        for transliteration in dicOfRelatives.keys():
+            for character in dicOfRelatives[transliteration]:
+                self.dict[character] = transliteration
 
         if defaultValue is not None:
             self.dict[None] = defaultValue
 
     def translate(self, text):
+        """ translate charset, logging unknown translations"""
         try:
-            return "".join([self.dict[c] for c in text])
+            return "".join([self.dict[character] for character in text])
         except KeyError:
-            for c in text:
-                if c not in self.dict:
-                    self.unknownCharList.append((c, text))
-            return "".join([self.dict.get(c, self.dict.get(None, c))
-                            for c in text])
+            for character in text:
+                if character not in self.dict:
+                    self.unknown_char_list.append((character, text))
+            return "".join([self.dict.get(character, self.dict.get(None, character))
+                            for character in text])
 
-utf2ascii = TranslationTable(
+UTF2ASCII = TranslationTable(
     dicOfRelatives={
         'a': u'áàâäåāảãăạąặắǎấầ',  # 'а' dans l'alphabet cyrillique
         'e': u'éêèëěėễệęềếē', 'i': u'íîïīıìịǐĩ',
