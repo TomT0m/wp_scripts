@@ -5,11 +5,9 @@ Library for script to manipulate Wikidata Data
 """
 
 # import time
-import pywikibot
-
 from pywikibot import output as output
+import pywikibot
 from pywikibot.data.api import APIError
-
 NUM_CHANGED = 0
 
 

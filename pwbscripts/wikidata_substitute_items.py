@@ -8,11 +8,12 @@
 # TODO: finish or delete if useless
 
 
+from StringIO import StringIO as StringIO
+from command import cmds
+from lxml import etree
+
 import pywikibot as pwb
 import wd_lib
-
-from command import cmds
-
 REPO = None
 
 
@@ -90,8 +91,6 @@ def substitute_item_in_claims(subject, old, new):
                 print("#######   {}".format(cla))
                 cla.changeTarget(new)
 
-from lxml import etree
-from StringIO import StringIO as StringIO
 
 
 def iterate_on_items(pagecode):

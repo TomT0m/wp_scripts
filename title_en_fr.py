@@ -5,9 +5,8 @@
 #Description: takes an english title and translates it into french
 """
 
-from pywikibot.page import Page
 import pywikibot
-
+from pywikibot.page import Page
 import sys
 
 

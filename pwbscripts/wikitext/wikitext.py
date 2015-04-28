@@ -222,6 +222,8 @@ class InvalidPattern(Exception):
 
 class _Formated(Wikicode):
 
+    """ class to store text built with a pattern """
+
     def __init__(self, text):
         self._text = text
 

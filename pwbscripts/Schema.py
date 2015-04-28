@@ -1,7 +1,5 @@
 
 # coding : utf-8
-from __future__ import unicode_literals
-
 """
 Simple NIH symdrome class to describe and validate configuration file format
 (found nothing worth the dependance making and the learning curve for my Goldberg Machine codestyle)
@@ -10,7 +8,7 @@ The grammar is self documented : each fragment is attached to an help string who
 file fragment purpose
 """
 
-
+from __future__ import unicode_literals
 class FormatFragment(object):
 
     "A grammar rule for the yaml config file format"

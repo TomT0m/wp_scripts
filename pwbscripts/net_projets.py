@@ -10,28 +10,28 @@
 
 from __future__ import unicode_literals
 
-# TODO: Fix duplicates announces bug.
-# TODO: Fix fusion status.
-
-
+import mwparserfromhell
 import re
-#from pwb import pwb
+from unittest import TestCase
+import unittest
 
+from pwbscripts.bots_commons import create_options, get_default_configfile
+from pwbscripts.datas import test_data
+from pwbscripts.date import Date, extract_date
+from pwbscripts.page_status import get_page_status
+from pwbscripts.projects import read_conffile
+from pwbscripts.wikitext.wikitext import Pattern as WikiPattern
+from pwbscripts.wikitext.wikitext import Text as WikiText, Link as WikiLink, Template as WikiTmpl
 
 import pywikibot as pwb
-import mwparserfromhell
 
-from date import Date, extract_date
-from projects import read_conffile
-from page_status import get_page_status
-
+# TODO: Fix duplicates announces bug.
+# TODO: Fix fusion status.
 # Constants
-
 ANNOUNCE_DEL_TMPL = "Annonce proposition suppression"
 ANNOUNCE_FUSION_TMPL = "Annonce fusion d'articles"
 
 # Parsing functions
-
 
 
 def msg_line_eating():
@@ -81,24 +81,19 @@ def extract_full_del_props(text):
     newpage = re.sub(del_pattern, '', text, flags=re.MULTILINE)
 
     pwb.debug("(taille en octets) : Supprimé {} - nouvelle : {}, ancienne {}, différence {}: "
-                  .format(
-                      del_sum,
+              .format(del_sum,
                       len(newpage),
                       len(text),
-                      del_sum - (len(text) - len(newpage)))
-                  ,
+                      del_sum - (len(text) - len(newpage))),
               "bot")
 
     return (articles, newpage)
 
 
-from wikitext.wikitext import Template
-
-
 def format_del_announce(date, article_name):
     """ returns a mediawiki template text for a deletion announce"""
 
-    announce = Template(ANNOUNCE_DEL_TMPL,
+    announce = WikiTmpl(ANNOUNCE_DEL_TMPL,
                         posargs=[date], kwargs={"nom": article_name})
 
     return unicode(announce)
@@ -117,13 +112,7 @@ def extract_fusion_articles(title):
     return match
 
 
-SAMPLE_FUSION_ANNOUNCE = """== Les articles [[Jasper]] et [[Jasper (informatique)]] sont proposés à la fusion ==
-[[Image:Merge-arrows.svg|60px|left|Proposition de fusion en cours.]]
-
-La discussion a lieu sur la page [[Wikipédia:Pages à fusionner#Jasper et Jasper (informatique)]]. La procédure de fusion est consultable sur [[Wikipédia:Pages à fusionner]].
-
-[[Utilisateur:Silex6|Silex6]] ([[Discussion utilisateur:Silex6|d]]) 25 juillet 2013 à 12:23 (CEST)
-"""
+SAMPLE_FUSION_ANNOUNCE = test_data.SAMPLE_FUSION_ANNOUNCE
 
 
 def extract_link_to_fusionprops(section):
@@ -191,12 +180,13 @@ def insert_new_announces(old_text, dated_new_announces):
 
     # création de la section finale
 
-    new_section = Text("\n").join([text for text, _ in sorted_announces])
+    new_section = WikiText("\n").join([text for text, _ in sorted_announces])
 
     return preamble + sep_preamble + "\n" + new_section + "\n" + sep_end + rest
 
 
 def gen_month_announces(month):
+    """ compute the archive page given the month sections """
     return "\n* ".join(month)
 
 
@@ -257,8 +247,7 @@ def projects_maintenance(projects, options):
                 project.announce_page.save()
 
 
-import datas.test_data as tdata
-ANNOUNCES_SAMPLE = tdata.ANNOUNCES_SAMPLE
+ANNOUNCES_SAMPLE = test_data.ANNOUNCES_SAMPLE
 
 
 def del_prop_iteration(page):
@@ -307,7 +296,6 @@ def deletion_prop_status_update(announce_page):
 
     return unicode(parsed)
 
-from wikitext.wikitext import Text
 
 def deletion_prop_maintenance(project):
     """ Real Action """
@@ -328,10 +316,8 @@ def deletion_prop_maintenance(project):
 
     # stats sur le diff entre page générée et page originale
     pwb.output("Before : {} ; After {} ; expected around {}"
-                 .format(len(discussion_text),
-                         len(new_discussion_text),
-                         len(discussion_text) - len(articles) * 1200)
-                 )
+               .format(len(discussion_text), len(new_discussion_text),
+                       len(discussion_text) - len(articles) * 1200))
 
     pwb.output("Articles extraits")
     for elem in articles:
@@ -341,7 +327,7 @@ def deletion_prop_maintenance(project):
     # insertions des annonces extraites dans la page d'annonce
 
     dated_new_announces = [
-        (format_del_announce(Text(unicode(date)), name), date)
+        (format_del_announce(WikiText(unicode(date)), name), date)
         for name, date in articles
     ]
     new_announces_text = insert_new_announces(announces_text, dated_new_announces)
@@ -363,10 +349,6 @@ def deletion_prop_maintenance(project):
     project.announce_page.set_content(new_announces_text, announce_comment)
 
 
-from wikitext.wikitext import Text as WikiText, Link as WikiLink, Template as WikiTmpl
-from wikitext.wikitext import Pattern as WikiPattern
-
-
 def format_fusion_props(articles, section, date):
     """ format a fusion proposition announce name
 
@@ -374,19 +356,19 @@ def format_fusion_props(articles, section, date):
 
     """
 
-    msgP = WikiPattern("{paf_link} entre {articles_links}")
-    list_article_msgP = WikiPattern("{rest}{antepenultimate} et {last}")
+    msg_pattern = WikiPattern("{paf_link} entre {articles_links}")
+    list_article_msg_pattern = WikiPattern("{rest}{antepenultimate} et {last}")
 
-    wikiannounce_PaF_link = WikiLink(section,
+    wikiannounce_paf_link = WikiLink(section,
                                      WikiText("Proposition de fusion"))
 
     all_links = [WikiLink(name) for name in articles]
     (antepenultimate, last) = (all_links[-2], all_links[-1])
 
-    list_article_msg = list_article_msgP.format(rest=Text(", ").join(all_links[:-2]),
-                                                antepenultimate=antepenultimate,
-                                                last=last)
-    msg = msgP.format(paf_link=wikiannounce_PaF_link, articles_links=list_article_msg)
+    list_article_msg = list_article_msg_pattern.format(rest=WikiText(", ").join(all_links[:-2]),
+                                                       antepenultimate=antepenultimate,
+                                                       last=last)
+    msg = msg_pattern.format(paf_link=wikiannounce_paf_link, articles_links=list_article_msg)
 
     return WikiTmpl(ANNOUNCE_FUSION_TMPL, [msg, date])
 
@@ -400,26 +382,21 @@ def fusion_prop_maintenance(project):
         dated_new_announces = [(format_fusion_props(*elem), elem[2]) for elem in fusion_prop_list]
         new_a_text = insert_new_announces(project.announce_page.get_content(), dated_new_announces)
 
-        fusion_msgP = "Déplacement d'annonces de proposition de fusion depuis la [[{}|La PDD]]"
+        fusion_msg_pattern = "Déplacement d'annonces de proposition de fusion depuis la [[{}|La PDD]]"
 
         project.announce_page.set_content(new_a_text,
-                                          fusion_msgP.format(project.discussion_pagename))
+                                          fusion_msg_pattern.format(project.discussion_pagename))
 
-        msgP = "Déplacement des annonces de proposition fusion vers [[{}|La page d'annonce]] "
+        msg_pattern = "Déplacement des annonces de proposition fusion vers [[{}|La page d'annonce]] "
         project.discussion_page.set_content(new_d_text,
-                                            msgP.format(project.announce_pagename))
+                                            msg_pattern.format(project.announce_pagename))
 
 
 # CLI management, UI
 
-from bots_commons import create_options
 
 #############################################################
 # testing
-
-import unittest
-
-from unittest import TestCase
 
 
 class Test(TestCase):
@@ -443,8 +420,7 @@ class Test(TestCase):
 
     def test_real(self):
         """ Real World extraction """
-        import datas.test_data as datas
-        text = datas.FULL_TEST
+        text = test_data.FULL_TEST
         num_titles = self.count_titles(text)
         (articles, new_text) = extract_full_del_props(text)
         new_num_titles = self.count_titles(new_text)
@@ -469,8 +445,6 @@ def test():
     test_doctest()
     unittest.main(argv=[sys.argv[0]])
 
-from bots_commons import get_default_configfile
-
 
 def main():
     """ Main function"""
@@ -478,7 +452,7 @@ def main():
     opts = opt_parse.parse_args()
 
     if opts.debug:
-        #pwb.logging.basicConfig(level=logging.DEBUG)
+#         pwb.logging.basicConfig(level=logging.DEBUG)
         #TODO: call the relevant Bot class method
         pass
     if opts.test:
@@ -496,7 +470,6 @@ def main():
                     ]
         projects_maintenance(projects, opts)
 
-from datas import test_data
 
 SAMPLE_TEXT = test_data.SAMPLE_TEXT
 

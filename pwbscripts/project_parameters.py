@@ -7,12 +7,10 @@ Projects configurations object
 
 """
 
-import pywikibot as pwb
-
-from page_status import get_page_status
 from logging import warn
 
-
+from page_status import get_page_status
+import pywikibot as pwb
 class ProjectParameters(object):
 
     """ Project parameters storage class, stores :
@@ -32,7 +30,7 @@ class ProjectParameters(object):
 
         self._name = name
         self._discussion_pagename = None
-        # HyuBot
+        # hyuBotLib
         self._wiki = pwb.Site(site)
 
         # Pages objects attributes

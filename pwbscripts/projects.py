@@ -5,20 +5,18 @@
 Project parameters handling : read & load configuration
 """
 
-import yaml    # parser for the config file
-
-from project_parameters import ProjectParameters
-
 """
 tasks :
-    * HyuBot : maintain of a list of pages in a project (pages in one of its subportal)
+    * hyuBotLib : maintain of a list of pages in a project (pages in one of its subportal)
     * announces : maintains a list of project announces with
                   the properties for deletion and fusion of this project talk page.
 """
-
 # Configuration file structure validation
 
+import yaml    # parser for the config file
 
+from Schema import ObjectFragment, StringParamUnit
+from project_parameters import ProjectParameters
 class ConfigFilePattern(object):
 
     """Class defined to validate config file"""
@@ -59,7 +57,6 @@ class ConfigError(Exception):
     def __init__(self):
         pass
 
-from Schema import ObjectFragment, StringParamUnit
 
 
 def get_project_schema():

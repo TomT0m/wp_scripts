@@ -1,8 +1,13 @@
 
-# coding: utf-8
+# encoding: utf-8
 
+# pylint: disable=line-too-long
+
+"""
+datas for testcases
+
+"""
 from __future__ import unicode_literals
-
 SAMPLE_TEXT = u"""
 ==Plop==
 Bidou
@@ -625,4 +630,13 @@ ou
 {{!}}-----
 {{!}}}
 <center><u>Remarque :</u> Voir aussi les [[:Catégorie:Modèle d'annonce|autres modèles d'annonce spécifiques]].</center></div></noinclude>
+"""
+
+
+SAMPLE_FUSION_ANNOUNCE = u"""== Les articles [[Jasper]] et [[Jasper (informatique)]] sont proposés à la fusion ==
+[[Image:Merge-arrows.svg|60px|left|Proposition de fusion en cours.]]
+
+La discussion a lieu sur la page [[Wikipédia:Pages à fusionner#Jasper et Jasper (informatique)]]. [...]
+
+[[Utilisateur:Silex6|Silex6]] ([[Discussion utilisateur:Silex6|d]]) 25 juillet 2013 à 12:23 (CEST)
 """

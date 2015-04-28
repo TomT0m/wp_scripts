@@ -1,9 +1,19 @@
-import pywikibot
 
+# coding:utf-8
+
+""" Module for input/output for HuyBot : logging, wikipages put/get content, ...
+
+    IO modules definition : used when constructing the Bot class with respect to the configuration :
+ TestBot ; Simulation Bot ; Bot
+
+"""
+
+import pywikibot
+from snakeguice import inject
 from snakeguice.modules import Module
 
-# IO modules definition : used when constructing the Bot class with respect to the configuration :
-# TestBot ; Simulation Bot ; Bot
+
+from pwbscripts.projects import Config
 
 
 class IOModule(Module):
@@ -41,34 +51,31 @@ class Outputter(object):
         self.outputted += 1
         pywikibot.output(message)
 
-    def output_usage(self):
-        pywikibot.output("wow : {}".format(self.outputted))
-
-
-from snakeguice import inject
-
-from pwbscripts.projects import Config
+    # def output_usage(self):
+    #    pywikibot.output("wow : {}".format(self.outputted))
 
 
 class PageFactory(object):
 
+    """ How to get a WikiPage
+    """
     @inject(config=Config)
     def __init__(self, config):
         self._config = config
 
     def create_page(self, pagename):
+        """ main page creation function """
         pass
 
 
-class WikipageFactory(PageFactory):
-    pass
-
-
 def agreement(question, default):
-    print("{} (y/n), default : {}".format(question, default))
+    """
+    huybot function that asks for the user agreement to proceed
+    """
+    print(u"{} (y/n), default : {}".format(question, default))
     invalid_input = True
     while invalid_input:
-        rep = input()
+        rep = raw_input()
         if rep in ['y', 'n', '']:
             invalid_input = False
 

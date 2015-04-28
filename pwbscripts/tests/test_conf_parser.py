@@ -6,19 +6,15 @@ u"""
 Yaml parser & ProjectParameters objects test
 """
 
-import unittest
 import pkgutil
-
+import unittest
 import yaml
 
 from pwbscripts.project_parameters import ProjectParameters
 import pwbscripts.projects as projects
-
 # import pwbscripts.projects
 # import pwbscripts.scripts
-
 # from StringIO import StringIO
-
 SAMPLEYAML = u"""
 Informatique:
         page:  Projet:Informatique
@@ -28,7 +24,7 @@ Mathématiques:
     page: Projet:Mathématiques
     tasks: [Hyubot]
     portals: ["Portail:Algèbre"]
-    tasks: [announces, HyuBot]
+    tasks: [announces, hyuBotLib]
 """
 
 

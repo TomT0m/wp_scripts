@@ -4,8 +4,6 @@
 
 from functools import total_ordering
 import re
-
-
 @total_ordering
 class Date(object):
     """ A french (very) simple date object, comparable and that's it,

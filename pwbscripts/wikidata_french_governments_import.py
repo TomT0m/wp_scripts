@@ -18,11 +18,7 @@ TODO: * Handle serie season redirects not associated to any particular article
 
 from pywikibot import output
 #from pywikibot import NoPage
-
-
 # from systemd import journal
-
-
 ARTICLE = "Gouvernement_de_la_Défense_nationale"
 
 

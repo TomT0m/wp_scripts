@@ -19,10 +19,10 @@ Example input:
 """
 
 
-import csv, sys
+import csv
+import sys
+
 import wd_lib
-
-
 def main():
     claimreader = csv.reader(sys.stdin, delimiter="\t")
 

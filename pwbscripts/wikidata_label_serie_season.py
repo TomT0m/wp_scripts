@@ -9,24 +9,20 @@ TODO: * Handle serie season redirects not associated to any particular article
 """
 
 
+from pywikibot import NoPage as NoPage
+from pywikibot import output as output
 import pywikibot
+import sys
+
+import bots_commons
+from lang import get_en_ordinal
+import wd_lib
 # create a site object, here for en-wiki
 # import logging
-
 # NUM_CHANGED = 0
-
-import wd_lib
-
-from pywikibot import output as output
-from pywikibot import NoPage as NoPage
-
-
 #from systemd import journal
-
-
 ARTICLE = None
 
-from lang import get_en_ordinal
 
 __lang_patterns__ = {
     u"fr": {
@@ -84,7 +80,7 @@ def treat_serie(serie_name, site_name='en', main_page_name=None, num=None):
     output(u"======> Serie : {}, Page: {}".format(serie_name, main_page_name))
     serie_item = wd_lib.item_by_title(site, main_page_name)
 
-    title_pattern = u"{}_(season_{})"
+    TITLE_PATTERN = u"{}_(season_{})"
 
     has_previous = True
     current = 1
@@ -95,7 +91,7 @@ def treat_serie(serie_name, site_name='en', main_page_name=None, num=None):
 
     try:
         while has_previous and current <= num:
-            title = title_pattern.format(serie_name, current)
+            title = TITLE_PATTERN.format(serie_name, current)
             page = pywikibot.Page(site, title)
             output(title)
             if page.exists():
@@ -134,7 +130,6 @@ def treat_serie(serie_name, site_name='en', main_page_name=None, num=None):
     output("======> End of serie (maybe) processing\n")
 
 
-import bots_commons
 
 
 def create_options():
@@ -153,7 +148,6 @@ def create_options():
                          )
     return options
 
-import sys
 
 
 def logmain():

@@ -9,15 +9,17 @@ TODO: Handle serie season redirects not associated to any particular article
 #Description: tool to set basic claims on TV series seasons on Wikidata where titles on Wikipeda are formated with the year of the season in the title
 """
 
+from argparse import ArgumentParser
 import pywikibot
-# create a site object, here for en-wiki
-# import logging
-
-NUM_CHANGED = 0
-
-import wd_lib
+import sys
 
 from lang import get_en_ordinal
+import wd_lib
+# create a site object, here for en-wiki
+# import logging
+NUM_CHANGED = 0
+
+
 
 
 def set_season_labels(page, serie_name, season_num, year):
@@ -46,7 +48,7 @@ def set_season_labels(page, serie_name, season_num, year):
 
 def treat_serie(serie_name, site_name='en',
                 main_page_name=None, num=None,
-                start_year=None, title_pattern="{}_{}"):
+                start_year=None, TITLE_PATTERN="{}_{}"):
     """ main """
 
     if not main_page_name:
@@ -69,7 +71,7 @@ def treat_serie(serie_name, site_name='en',
     year = start_year
 
     while has_previous and current < num:
-        title = title_pattern.format(serie_name, year)
+        title = TITLE_PATTERN.format(serie_name, year)
         pywikibot.output("searching article : {}".format(title))
 
         page = pywikibot.Page(site, title)
@@ -108,7 +110,6 @@ def treat_serie(serie_name, site_name='en',
     print(type_item)
     wd_lib.make_sequence(items.itervalues(), type_item)
 
-from argparse import ArgumentParser
 
 
 def create_options():
@@ -138,14 +139,13 @@ def create_options():
     options.add_argument('-n', dest="max_num", type=int,
                          help="number of season to take into account", metavar="MAX_NUM")
 
-    options.add_argument('-P', default=None, dest="title_pattern",
+    options.add_argument('-P', default=None, dest="TITLE_PATTERN",
                          help="pattern of article title", metavar="TITLE_PATTERN")
     options.add_argument('-y', dest='start_year',
                          help="starting year", metavar="START_YEAR", type=int
                          )
     return options
 
-import sys
 
 
 def main():
@@ -167,9 +167,9 @@ def main():
 
     if opt.main_page_name:
         treat_serie(serie_name, "en", opt.main_page_name, num=num,
-                    title_pattern=opt.title_pattern, start_year=year)
+                    TITLE_PATTERN=opt.title_pattern, start_year=year)
     else:
-        treat_serie(serie_name, "en", num=num, title_pattern=opt.title_pattern)
+        treat_serie(serie_name, "en", num=num, TITLE_PATTERN=opt.title_pattern)
 
     print ("Nombre de changements : {}".format(NUM_CHANGED))
     return True

@@ -3,9 +3,8 @@
 
 
 from argparse import ArgumentParser
+import dirspec.basedir  # multiformat config file getter
 import os
-
-
 def create_options():
     """ Script option parsing """
     options = ArgumentParser("Project talk page cleaner")
@@ -25,7 +24,6 @@ def create_options():
     return options
 
 
-import dirspec.basedir  # multiformat config file getter
 
 
 def get_default_configfile():

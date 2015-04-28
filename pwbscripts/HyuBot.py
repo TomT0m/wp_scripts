@@ -17,30 +17,32 @@ Features :
     * reports its finding on a Wikipage
     * maintains a list of articles to be watched by the member of the project
       using the "linked pages changes" Mediawiki features
-    * update article stats for portals
+    * page_update article stats for portals
 """
 
 
-import re
-
-import pywikibot as wikipedia
 from pywikibot.compat import catlib
+import re
+from snakeguice import Injector
+from snakeguice import inject
+from snakeguice.assist import assisted_inject
+from snakeguice.modules import Module
 
+import string
 
-from pwbscripts.projects import read_conffile
+from pwbscripts.projects import Config
 from pwbscripts import bots_commons
 
-from pwbscripts.HyuBot.HyuBotParser import Delimiter as Delimiter
-from pwbscripts.HyuBot.HyuBotParser import bot_tag, noinclude_tag
 
-import pwbscripts.HyuBot.HyuBotParser as HyuBotParser
+from hyuBotLib.HyuBotIO import PageFactory, Outputter
+from hyuBotLib.HyuBotIO import SimulateIOModule, IOModule
+from hyuBotLib.HyuBotIO import agreement
+from hyuBotLib.HyuBotParser import Delimiter as Delimiter
+from hyuBotLib.HyuBotParser import BOT_TAG, NOINCLUDE_TAG, get_reconstruct_errmsg_pattern
+from hyuBotLib.HyuBotUtils import UTF2ASCII, uppercase_first
 
-from pwbscripts.HyuBot.HyuBotIO import IOModule
-
-
-from snakeguice import inject
-
-from pwbscripts.HyuBot.HyuBotIO import agreement
+from pwbscripts.projects import read_conffile
+import pywikibot as wikipedia
 
 
 # TODO: check the API to know if it is still needed (quick and dirty fix)
@@ -59,21 +61,12 @@ Toolkit
 warnings_list = []
 
 
-
-import string
-
-
-from pwbscripts.HyuBot.HyuBotUtils import utf2ascii, uppercase_first
-
-
-
-
 #
 # functions on the List (of Pages) article
 #
 
 
-def compareSortedLists(newList, oldList):
+def compare_sorted_lists(new_list, old_list):
     """ calculates the differences between a list and a newer one
 
     returns a couple of lists (insertions, deletions)
@@ -81,40 +74,41 @@ def compareSortedLists(newList, oldList):
     gain = []
     loss = []
     index = 0
-    for el in oldList:
+    for elem in old_list:
         try:
-            while newList[index] < el:
-                gain.append(newList[index])
+            while new_list[index] < elem:
+                gain.append(new_list[index])
                 index += 1
-            if el == newList[index]:
+            if elem == new_list[index]:
                 index += 1
             else:
-                loss.append(el)
+                loss.append(elem)
         except IndexError:
-            loss.append(el)
-    return (gain + newList[index:], loss)
+            loss.append(elem)
+    return (gain + new_list[index:], loss)
 
 
-def interSortedLists(list1, list2):
+def inter_sorted_lists(list1, list2):
     """ computes the commons elements of two sorted list """
     index = 0
     intersection = []
-    for el in list2:
+    for elem in list2:
         try:
-            while list1[index] < el:
+            while list1[index] < elem:
                 index += 1
-            if list1[index] == el:
-                intersection.append(el)
+            if list1[index] == elem:
+                intersection.append(elem)
                 index += 1
             # else:
-            #    print [el, list1[index]]
+            #    print [elem, list1[index]]
         except IndexError:
             break
     return intersection
 
 
-def oddIndexList(longList):
-    return [longList[i] for i in range(1, len(longList), 2)]
+def odd_index_list(long_list):
+    """ Returns a list of indexes """
+    return [long_list[i] for i in range(1, len(long_list), 2)]
 
 
 """
@@ -122,30 +116,42 @@ Classes and functions for pywikipedia.
 """
 
 
+def format_without_talkpages(title):
+    """ generates a string of wikitext, a wikilink."""
+    return u'* [[{}]]'.format(title)
+
+
+def format_with_talkpages(title):
+    """ generate a string of wikitext, two wikilinks to a page and its takpage, respectively"""
+    return u'* [[{}]] ([[Discussion:{}|d]])'.format(title, title)
+
+
 class BotEditedPage(object):
     """
     Subclass of Page aimed to be edited by a bot.
     """
-    def __init__(self, site, title, logger, insite=None, botTag=None,
+    def __init__(self, site, title, logger, bot_tag=None,
                  create=False
                  # sectionLevel=None, edit=True
                  ):
-        self.wikipage = wikipedia.Page(site, title, insite=insite)
+        self.wikipage = wikipedia.Page(site, title)
 
-        if botTag:
-            self.botTag = botTag
+        if bot_tag:
+            self.bot_tag = bot_tag
         else:
-            self.botTag = Delimiter()
+            self.bot_tag = Delimiter()
         self.splitting = []
-        self.editSummary = u'Robot : mise à jour'
+        self.edit_summary = u'Robot : mise à jour'
         self.recovered = False
         self.create = create
         self.logger = logger
         self._title = title
 
-        # self.edit = edit
+        self.edit = True
+
     @property
     def title(self):
+        """ accessor for the title property"""
         return self._title
 
     def recover(self):
@@ -154,9 +160,9 @@ class BotEditedPage(object):
         """
         if not self.recovered:
             try:
-                self.splitting = self.botTag.split(self.wikipage.get())
+                self.splitting = self.bot_tag.split(self.wikipage.get())
             except wikipedia.NoPage:
-                self.logger.output(u"\nLa page {} n'existe pas.".format(self.title()))
+                self.logger.output(u"\nLa page {} n'existe pas.".format(self.title))
 
                 if self.create:
                     self.splitting = ['', '']
@@ -165,99 +171,119 @@ class BotEditedPage(object):
             finally:
                 self.recovered = True
 
-    def sectionString(self, sectionNumber=0):
-        return self.splitting[2 * sectionNumber + 1]
+    def section_string(self, section_number=0):
+        """ returns the section content given a number
+        (the table countains also section names at odd indexes)"""
 
-    def sectionUpdate(self, newSection, sectionNumber=0,
-                      changeWarning=None, noChangeWarning=False,
-                      comment=None):
+        return self.splitting[2 * section_number + 1]
+
+    def section_update(self, new_section, section_number=0,
+                       change_warning=None, no_change_warning=False,
+                       comment=None):
+        """
+        uploads the content of a section,
+        """
+
         if not self.recovered:
             self.recover()
 
-        index = 2 * sectionNumber + 1
+        index = 2 * section_number + 1
         try:
-            oldSection = self.splitting[index]
+            old_section = self.splitting[index]
         except IndexError:
-            errmsgP = HyuBotParser.get_reconstruct_errmsgP()
-            self.logger.output(errmsgP.format(self.botTag.start, str(sectionNumber), self.title()))
+            errmsg_pattern = get_reconstruct_errmsg_pattern()
+            self.logger.output(errmsg_pattern.format(self.bot_tag.start, str(section_number), self.title))
 
             if self.create:
                 self.logger.output(u"Création de la section à la suite du texte.")
-                oldSection = ''
+                old_section = ''
             else:
                 self.logger.output(u"Abandon des modifications.")
                 return
-        if oldSection == newSection:
-            if noChangeWarning:
-                self.logger.output(u"Pas de changement sur la page {}.".format(self.title()))
+        if old_section == new_section:
+            if no_change_warning:
+                self.logger.output(u"Pas de changement sur la page {}.".format(self.title))
             return
         if not comment:
-            comment = self.editSummary
-        head = self.botTag.rebuild(self.splitting[:index])
+            comment = self.edit_summary
+        head = self.bot_tag.rebuild(self.splitting[:index])
         try:
-            tail = self.botTag.rebuild(self.splitting[index + 1:])
+            tail = self.bot_tag.rebuild(self.splitting[index + 1:])
         except IndexError:
             tail = ''
         try:
-            self.wikipage.put(self.botTag.rebuild([head, newSection, tail]),
+            self.wikipage.put(self.bot_tag.rebuild([head, new_section, tail]),
                               comment=comment)
-        except:
-            self.logger.output(u"Erreur pendant l'édition de la page [[{}]].".format(self.title()))
-        else:
-            if changeWarning:
-                self.logger.output(changeWarning)
 
-    def editContent(self, sectionNumber=0):
+        except Exception as exc:
+            self.logger.output(u"Erreur pendant l'édition de la page [[{}]]: {}.".format(self.title, exc))
+        else:
+            if change_warning:
+                self.logger.output(change_warning)
+
+    def edit_section_content(self, section_number=0):
+        """ modifies the content of a section (no upload)"""
         if not self.recovered:
             self.recover()
-        index = 2 * sectionNumber + 1
+        index = 2 * section_number + 1
         try:
             body = self.splitting[index]
-        except IndexError:
+        except IndexError as exc:
 
-            err_msgP = u"Balise de début {} manquante; ou numéro de section {} trop élevé dans la page {}."
-            self.logger.output(err_msgP.format(self.botTag.start, str(sectionNumber), self.title()))
+            err_msg_pattern = u"Balise de début {} manquante; ou numéro de section {} trop élevé dans la page {}."
+            self.logger.output(err_msg_pattern.format(self.bot_tag.start, str(section_number), self.title))
 
-            raise IndexError
-        # else:
-        #    if self.botTag.end and (len(self.splitting) == index+1):
-        #        wikipedia.output('End tag missing in %s.'
-        #                         % self.title())
+            raise exc
 
         return body
 
-    def update(self, newString, sectionNumber=0, edit=True, comment=None,
-               warning=False):
-        if self.exists():
+    def page_update(self, new_string, section_number=0, edit=True, comment=None,
+                    warning=False):
+        """
+        uploads the content of the whole page
+        """
+
+        if self.wikipage.exists():
             try:
-                body = self.editContent(sectionNumber)
+                body = self.edit_section_content(section_number)
             except IndexError:
                 self.edit = agreement(u'Add bot edit section?', True)
                 body = ''
         else:
             self.edit = agreement(u'Page {} does not exist. Create?'
-                                  .format(self.title()), default=self.edit)
-        if newString == body:
+                                  .format(self.title), default=self.edit)
+        if new_string == body:
             self.edit = False
         elif self.edit and edit:
             if not comment:
-                comment = self.editSummary
+                comment = self.edit_summary
             if warning:
                 self.logger.output(u"(mise à jour) ")
 
-            index = 2 * sectionNumber + 1
-            head = self.botTag.rebuild(self.splitting[:index])
+            index = 2 * section_number + 1
+            head = self.bot_tag.rebuild(self.splitting[:index])
             try:
-                tail = self.botTag.rebuild(self.splitting[index + 1:])
+                tail = self.bot_tag.rebuild(self.splitting[index + 1:])
             except IndexError:
                 tail = ''
             try:
-                self.put(self.botTag.rebuild([head, newString, tail]),
-                         comment=comment)
-            except:
-                self.logger.output(u"Erreur pendant l'édition de la page [[{}]].".format(self.title()))
+                self.wikipage.put(self.bot_tag.rebuild([head, new_string, tail]),
+                                  comment=comment)
+            except Exception as exc:
+                self.logger.output(u"Erreur pendant l'édition de la page [[{}]]: {}".format(self.title, exc))
         else:
-            self.logger.output(u"Pas de modification de la page [[{}]].".format(self.title()))
+            self.logger.output(u"Pas de modification de la page [[{}]].".format(self.title))
+
+
+class Bot(object):
+    """ declaration for the injector """
+    def run(self):
+        """ the main bot task"""
+        pass
+
+    def gather_nominations(self):
+        """ dummy methods, returns lists of nominations to adq, fusion, ..."""
+        pass
 
 
 class ListUpdateRobot(object):
@@ -266,127 +292,147 @@ class ListUpdateRobot(object):
 
     Used to generate all the pages in a WikiProject, for example for a ProjectPage WatchList generation.
     """
-    def __init__(self, listPage, listOfTitles=[], listName=None,
-                 totalPage=None, edit=True, link=True,
-                 itemFormat=None, talkpages=False,
-                 sections=True, sortTable=utf2ascii):
-        self.listPage = listPage
-        self.list = listOfTitles
-        self.totalPage = totalPage
+    def __init__(self, list_page, list_of_titles=None, list_name=None,
+                 article_number_page=None, edit=True, link=True,
+                 talkpages=False,
+                 sections=True, sort_table=UTF2ASCII):
+
+        self.list_page = list_page
+        self.list = list_of_titles
+        self.article_number_page = article_number_page
         self.edit = edit
         self.link = link
         self.talkpages = talkpages
         self.sections = sections
-        self.sortTable = sortTable
+        self.sort_table = sort_table
         self.new = []
         self.deleted = []
-        if listName:
-            self.listName = listName
+        self._list_of_titles = list_of_titles
+
+        if self.list_of_titles is None:
+            self.list_of_titles = []
+        if list_name:
+            self.list_name = list_name
         else:
-            self.listName = listPage.title()
+            self.list_name = list_page.title()
 
-    def load(self, listOfTitles):
-        self.list = listOfTitles
+    @property
+    def list_of_titles(self):
+        """ Accessor for the Portal subjects string"""
+        return self._list_of_titles
 
-    def gatherNominations(self):  # , #newlist = [], edit = True, create = True):
+    @list_of_titles.setter
+    def set_list(self, val):
+        """ Accessor for the Portal subjects string"""
+        self._list_of_titles = val
+
+    def gather_nominations(self):
+        """
+        computes the nominations to deletions, badges, on Wikipedia for the project
+        """
         if not self.edit:
             return
         # try:
-        self.listPage.recover()  # create = create)
-        # except wikipedia.NoPage:
-        #    return
-        oldList = self.extractedList(self.listPage.sectionString())
-        # wikipedia.output(u'Liste extraite')
-        # except wikipedia.Error:
-        #    oldList = []
-        # except IndexError:
-        #    oldList = []
-        if oldList:
-            (self.new, self.deleted) = compareSortedLists(self.list, oldList)
-        # wikipedia.output(u'Comparaison effectuée')
-            if self.deleted:
-                changeWarning = (u" {{Moins2}}"
-                                 + u' • '.join(self.formatTitles(self.deleted)))
-            else:
-                changeWarning = ''
-            if self.new:
-                changeWarning += (u" {{Plus4}}"
-                                  + u' • '.join(self.formatTitle(self.new)))
-        else:
-            changeWarning = u" création."
-        if changeWarning:
-            self.listPage.sectionUpdate(
-                u'\nMise à jour le ~~~~~ pour un total de %d articles.\n%s\n'
-                % (len(self.list), self.listString(self.list) + '\n'),
-                changeWarning=(u"%s :%s" % (self.listName, changeWarning)))
-            if self.totalPage:
-                self.totalPage.sectionUpdate(str(len(self.list)))
-            self.list = oldList
-            # if self.deleted:
-            #    output(u"{{Moins2}}"
-            #           +u' • '.join([u'[[%s]]' % title
-            #                         for title in self.deleted]))
-            # if self.new:
-            #    output(u"{{Plus4}}"
-            #           + u' • '.join([u'[[%s]]' % title
-            #                          for title in self.new]))
-        # else:
-        #    output(u"*:Pas de changement dans la liste.")
+        self.list_page.recover()  # create = create)
 
-    def extractedList(self, listString):
-        formatTag = Delimiter('* [[', ']]')
-        titlesList = []
-        for line in listString.split('\n'):
+        old_list = self.extract_titles(self.list_page.section_string())
+
+        if old_list:
+            (self.new, self.deleted) = compare_sorted_lists(self.list, old_list)
+
+            if self.deleted:
+                change_warning = (u" {{Moins2}}"
+                                  + u' • '.join(format_titles(self.deleted)))
+            else:
+                change_warning = ''
+
+            if self.new:
+                change_warning += (u" {{Plus4}}"
+                                   + u' • '.join(format_titles(self.new)))
+
+        else:
+            change_warning = u" création."
+        if change_warning:
+            self.list_page.section_update(
+                u'\nMise à jour le ~~~~~ pour un total de {} articles'.format(len(self.list))
+                + '\n' + self.list_string(self.list_of_titles) + '\n',
+                change_warning=(u"{} :{}".format(self.list_name, change_warning))
+            )
+
+            if self.article_number_page:
+                self.article_number_page.section_update(str(len(self.list)))
+            self.list = old_list
+
+    def extract_titles(self, list_string):
+        """ Extracts a list of article title from a wikilist of article links """
+        format_tag = Delimiter('* [[', ']]')
+        titles_list = []
+        for line in list_string.split('\n'):
             try:
-                titlesList.append(formatTag.split(line)[1])
+                titles_list.append(format_tag.split(line)[1])
             except IndexError:
                 pass
-        return unique(titlesList)
+        return unique(titles_list)
 
-    def formatWithoutTalkpages(self, title):
-        return u'* [[{}]]'.format(title)
-
-    def formatWithTalkpages(self, title):
-        return u'* [[{}]] ([[Discussion:{}|d]])'.format(title, title)
-
-    def listString(self, titlesList=[]):
+    def list_string(self, titles_list=None):
         """
         Formats the list's output.
         """
-        if (self.talkpages and self.link):
-            formatting = self.formatWithTalkpages
+
+        if titles_list is None:
+            titles_list = []
+
+        if self.talkpages and self.link:
+            formatting = format_with_talkpages
         else:
-            formatting = self.formatWithoutTalkpages
-        listDict = {}
+            formatting = format_without_talkpages
+
+        list_dict = {}
+
         if self.link:
-            titleTag = Delimiter('', '')
+            title_tag = Delimiter('', '')
         else:
-            listDict[''] = '<no' + 'wiki>\n'
-            titleTag = Delimiter('\n</no' + 'wiki>', '\n<no' + 'wiki>')
-            listDict['~~~'] = '\n</no' + 'wiki>'
+            list_dict[''] = '<no' + 'wiki>\n'
+            title_tag = Delimiter('\n</no' + 'wiki>', '\n<no' + 'wiki>')
+            list_dict['~~~'] = '\n</no' + 'wiki>'
+
         if self.sections:
-            listDict['0'] = titleTag.englobe(u'\n== 0–9 ==')
-            listDict['~'] = titleTag.englobe(u'\n== Autres ==')
-            for ch in string.uppercase:
-                listDict[ch] = titleTag.englobe('\n== {} =='.format(ch))
-        for title in titlesList:
-            key = self.sortTable.translate(title).lstrip().upper()
+            list_dict['0'] = title_tag.englobe(u'\n== 0–9 ==')
+            list_dict['~'] = title_tag.englobe(u'\n== Autres ==')
+
+            for character in string.uppercase:
+                list_dict[character] = title_tag.englobe('\n== {} =='.format(character))
+
+        for title in titles_list:
+            key = self.sort_table.translate(title).lstrip().upper()
             if not key:
                 key = '~~'
-            while key in listDict.keys():
+            while key in list_dict.keys():
                 key += '\t'
-            listDict[key] = formatting(title)
-        keysList = listDict.keys()
-        keysList.sort()
-        # if self.sections and keysList[0].startswith(' '):
-        #    keysList.insert(0,'')
-        #    listDict[''] = '\n== ! =='
-        return "\n".join([listDict[key] for key in keysList])
+            list_dict[key] = formatting(title)
 
-fusionTitleP = re.compile('\n=+\s*(.*?)\s*=+\s*?\n')
-titleP = re.compile('\[\[\s*([^#\|\]]*[^#\|\]\s])[^\]]*?\]\]')
-linkP = re.compile('\[\[(?:[^\|\]]*\|)?([^\]]*)\]\]')
-# linkP = re.compile('(.*?)\[\[(?:[^\|\]]*\|)?([^\]]*)\]\]([^\[]*)')
+        keys_list = list_dict.keys()
+        keys_list.sort()
+
+        return "\n".join([list_dict[key] for key in keys_list])
+
+FUSION_TITLE_PATTERN = re.compile(r'\n=+\s*(.*?)\s*=+\s*?\n')
+TITLE_PATTERN = re.compile(r'\[\[\s*([^#\|\]]*[^#\|\]\s])[^\]]*?\]\]')
+LINK_PATTERN = re.compile(r'\[\[(?:[^\|\]]*\|)?([^\]]*)\]\]')
+
+
+def format_titles(title_list):
+    """ formats a list of titles into a list of wikilinks """
+    return [u'[[{}]]'.format(title)
+            for title in unique(title_list)
+            ]
+
+
+def format_article_list(title_list):
+    """ formats a list of titles into a list of {{m|a}} corresponding template """
+    return [u'* {{a|1={}}}'.format(title)
+            for title in title_list
+            ]
 
 
 class NominationsChecklist(object):
@@ -395,27 +441,33 @@ class NominationsChecklist(object):
 
     Purpose : store nominated articles for deletion, labels and merge.
 
-    the "gatherNominations" method initialize the component with project wide announces
+    the "gather_nominations" method initialize the component with project wide announces
     """
 
     def __init__(self):
-        self.nominTypeDict = {'PAS': u'Page proposée à la suppression',
-                              'PAF': u'Article à fusionner',
-                              'PBA': u'Article potentiellement bon',
-                              'PAdQ': u'Article potentiellement de qualité'}
-        self.listOfFusionTitles = []
+        self.nomination_type_label = {'PAS': u'Page proposée à la suppression',
+                                      'PAF': u'Article à fusionner',
+                                      'PBA': u'Article potentiellement bon',
+                                      'PAdQ': u'Article potentiellement de qualité'}
 
-    def gatherNominations(self):
-        """ initialize"""
-        for key, name in self.nominTypeDict.items():
+        self.list_of_fusion_titles = []
+
+    def gather_nominations(self):
+        """ initialization :
+        * inspects the corresponding categories
+        * extracts fusion nominations in the relevant frwiki page
+        """
+
+        for key, name in self.nomination_type_label.items():
             cat = catlib.Category(wikipedia.getSite(), u'Category:{}'.format(name))
-            self.nominTypeDict[key] = {article.title() for article in cat.articles()}
+            self.nomination_type_label[key] = {article.title() for article in cat.articles()}
 
-        PAFPage = wikipedia.Page(wikipedia.getSite(),
-                                 u'Wikipédia:Pages à fusionner')
+        frwiki_fusion_nomination_page = wikipedia.Page(wikipedia.getSite(),
+                                                       u'Wikipédia:Pages à fusionner')
 
-        self.listOfFusionTitles = fusionTitleP.findall(PAFPage.get())
-        print(self.listOfFusionTitles)
+        self.list_of_fusion_titles = FUSION_TITLE_PATTERN.findall(frwiki_fusion_nomination_page.get())
+
+        # print(self.list_of_fusion_titles)
 
 
 class Portal(wikipedia.Page):
@@ -423,71 +475,88 @@ class Portal(wikipedia.Page):
     Subclass of Page that has some special tricks that only work for
     portal: pages
     """
-    def __init__(self, site, name, logger, insite=None,  # sortTable = None,
+    def __init__(self, site, name, logger,  # sort_table = None,
                  iconMedia=u'Bullet (typography).svg',
-                 edit=True, option=[]):
+                 edit=True, option=None):
         wikipedia.Page.__init__(self, site, 'Portal:' + name,
-                                insite=insite, ns=4)
+                                ns=4)
         # if self.namespace() != 4:
         #   raise ValueError(u'BUG: %s is not in the project namespace!' % name)
+        if option is None:
+            option = []
+
         self.logger = logger
         self.name = uppercase_first(name)
         # linkedCatName = u'Portail:%s/Articles liés' % name
 
-        watchlistPage = BotEditedPage(wikipedia.getSite(),
-                                      u'Portail:{}/Liste de suivi'.format(name),
-                                      botTag=bot_tag, create=True)
-        totalPage = BotEditedPage(wikipedia.getSite(),
-                                  u'Portail:{}/Total'.format(name),
-                                  create=True)
-        self.listUpdateRobot = ListUpdateRobot(
-            watchlistPage,
-            listName=u'* Portail:{}'.format(name),
-            totalPage=totalPage,
-            edit=edit and ('noedit' not in option),
-            talkpages=True, link=('nolink' not in option))
+        watchlist_page = BotEditedPage(wikipedia.getSite(),
+                                       u'Portail:{}/Liste de suivi'.format(name),
+                                       bot_tag=BOT_TAG, create=True, logger=logger)
 
-        self.iconMedia = iconMedia
+        article_number_page = BotEditedPage(wikipedia.getSite(),
+                                            u'Portail:{}/Total'.format(name),
+                                            create=True, logger=logger)
+
+        self.list_updater_bot = ListUpdateRobot(watchlist_page,
+                                                list_name=u'* Portail:{}'.format(name),
+                                                article_number_page=article_number_page,
+                                                edit=edit and ('noedit' not in option),
+                                                talkpages=True,
+                                                link=('nolink' not in option))
+
+        self.icon_media = iconMedia
         self.option = option
         self.site = site
 
-    def iconify(self, iconMedia=None):
-        if iconMedia:
-            self.iconMedia = iconMedia
+    def iconify(self, icon_media=None):
+        """
+        Downloading an illustration icon for the project, if possible
+        """
+
+        if icon_media:
+            self.icon_media = icon_media
         else:
             try:
-                iconPage = wikipedia.Page(wikipedia.getSite(),
-                                          u'Portail:{}/Icône'.format(self.name))
-                self.iconMedia = noinclude_tag.expurge(iconPage.get())
-            except:
-                pass
+                icon_page = wikipedia.Page(wikipedia.getSite(),
+                                           u'Portail:{}/Icône'.format(self.name))
+                self.icon_media = NOINCLUDE_TAG.expurge(icon_page.get())
+
+#             pylint: disable=broad-except
+            except Exception as exc:
+                print("failed to get icon for project {} some reason {}, ignoring"
+                      .format(self.name, exc))
 
     def listify(self):
+        """
+        gets a list of all pages including a {{Modèle:Portal [portal name]}}
+        and updates the list of articles of this portal
+        """
+
         templist = []
-        # wikipedia.output(u"Recherche du bandeau de portail %s" % self.name)
+
         try:
             template = wikipedia.Page(self.site,
                                       u'Modèle:Portail {}'.format(self.name))
             # wikipedia.output(u'OK.')
         except wikipedia.NoPage:
             self.logger.output = u"Bandeau introuvable avec le nom du portail."
-            # return agreement(u"On continue ?", False)
+
             raise wikipedia.NoPage
+
         if template.isRedirectPage():
-            # wikipedia.output(u"Recherche du titre correct du bandeau.")
+
             template = template.getRedirectTarget()
-            # wikipedia.output(u"OK.")
-        for pg in template.getReferences():
-            if pg.namespace() == 0:
-                templist.append(pg.title())
-        # wikipedia.output(u'Liste constituée')
-        self.listUpdateRobot.load(unique(templist))
-        # wikipedia.output(u'Liste chargée')
+
+        for page in template.getReferences():
+            if page.namespace() == 0:
+                templist.append(page.title())
+
+        self.list_updater_bot.list_of_titles = unique(templist)
 
 
 class ProjectPage(wikipedia.Page):
     """
-    Specialisation of class Page for "ProjectPage:" pages
+    Specialization of class Page for "ProjectPage:" pages
     """
     def __init__(self, parameters, logger):
         wikipedia.Page.__init__(self, parameters.site, 'Project:' + parameters.name,
@@ -500,185 +569,187 @@ class ProjectPage(wikipedia.Page):
             print self.namespace()
             raise ValueError(u'BUG: {} is not in the project namespace'.format(self.name))
 
-        self.portalsList = [Portal(name, params) for name, params in parameters.portals]
+        self.portals_list = [Portal(name, params, logger=logger) for name, params in parameters.portals]
 
-        self.titlesList = []
+        self.titles_list = []
 
     @property
     def name(self):
+        """ Accessor for the Portal subjects string"""
         return uppercase_first(self._parameters.name)
 
     def maintenance(self, checklist=None):
+        """Performing maintenance for the portal
+        * update the page listing the articles
+        * gathering nominations
+        """
+
         self.logger.output(u"\n'''[[Projet:{}]]'''".format(self.name))
-        for portal in self.portalsList:
+
+        for portal in self.portals_list:
             portal.iconify()
             portal.listify()
-            self.titlesList += portal.listUpdateRobot.list
-            portal.listUpdateRobot.gatherNominations()
-        self.titlesList = unique(self.titlesList)
-        self.totalUpdate()
-        self.newArticlesUpdate()
+            self.titles_list += portal.list_updater_bot.list
+            portal.list_updater_bot.gather_nominations()
+        self.titles_list = unique(self.titles_list)
+        self.total_update()
+        self.new_articles_update()
         if checklist:
-            self.nominationsListUpdate(checklist)
+            self.nominations_list_update(checklist)
 
-    def totalUpdate(self):
-        totalPage = BotEditedPage(wikipedia.getSite(),
-                                  u'Projet:{}/Total articles'.format(self.name),
-                                  create=True)
+    def total_update(self):
+        """ Put on Wikipedia the full list of articles of the project"""
 
-        totalPage.sectionUpdate(str(len(self.titlesList)))
-        # output(u"Total : %s articles " % len(self.titlesList))
+        total_page = BotEditedPage(wikipedia.getSite(),
+                                   u'Projet:{}/Total articles'.format(self.name),
+                                   create=True, logger=self.logger)
+
+        total_page.section_update(str(len(self.titles_list)))
 
     # list title formatting utility functions
 
-    def formatTitles(self, titleList):
-        """ formats a list of titles into a list of wikilinks """
-        return [u'[[{}]]'.format(title)
-                for title in unique(titleList)
-                ]
+    def new_articles_update(self):
+        """ update the page on which will be seen the new and deleted articles list
+        formated in wikitext with templates"""
+        backup_list = []
+        for portal in self.portals_list:
+            backup_list += portal.list_updater_bot.list
 
-    def formatArticleList(self, titleList):
-        """ formats a list of titles into a list of {{m|a}} corresponding template """
-        return [u'* {{a|1={}}}'.format(title)
-                for title in titleList
-                ]
+        additions_stringlist = []
+        deleted_list = []
 
-    def newArticlesUpdate(self):
-        backupList = []
-        for portal in self.portalsList:
-            backupList += portal.listUpdateRobot.list
-        sList = []
-        deletedList = []
-        for portal in self.portalsList:
-            newList = []
-            for title in portal.listUpdateRobot.new:
-                if title not in backupList:
-                    newList.append(title)
-                    backupList.append(title)
-            if newList:
-                sList.append(':[[Fichier:{}|12x24px|{}|link=Portail:{}]] '
-                             .format(portal.iconMedia, portal.name, portal.name)
-                             + u' • '.join(self.formatTitle(newList)))
+        for portal in self.portals_list:
+            new_list = []
+            for title in portal.list_updater_bot.new:
+                if title not in backup_list:
+                    new_list.append(title)
+                    backup_list.append(title)
+            if new_list:
+                additions_stringlist.append(':[[Fichier:{}|12x24px|{}|link=Portail:{}]] '
+                                            .format(portal.icon_media, portal.name, portal.name)
+                                            + u' • '.join(format_titles(new_list)))
 
-                # backupList += newList
-            for title in portal.listUpdateRobot.deleted:
-                if title not in self.titlesList:
-                    deletedList.append(title)
-        if deletedList:
-            deletedArticleString = u' • '.join(self.formatTitles(deletedList))
+                # backup_list += new_list
+            for title in portal.list_updater_bot.deleted:
+                if title not in self.titles_list:
+                    deleted_list.append(title)
+        if deleted_list:
+            deleted_article_string = u' • '.join(format_titles(deleted_list))
 
-            listString = '\n{{Moins2}} {}'.format(deletedArticleString)
+            list_string = '\n{{Moins2}} {}'.format(deleted_article_string)
         else:
-            listString = ''
+            list_string = ''
 
-        if sList:
-            listString += ('\n;{{subst:CURRENTDAY}}'
-                           + ' {{subst:CURRENTMONTHNAME}}'
-                           + ' {{subst:CURRENTYEAR}}\n'
-                           + '\n'.join(sList))
-        if listString:
-            newArticlesPage = BotEditedPage(wikipedia.getSite(),
-                                            u'Projet:{}/Articles récents'.format(self.name),
-                                            botTag=bot_tag, create=True)
+        if additions_stringlist:
+            list_string += ('\n;{{subst:CURRENTDAY}}'
+                            + ' {{subst:CURRENTMONTHNAME}}'
+                            + ' {{subst:CURRENTYEAR}}\n'
+                            + '\n'.join(additions_stringlist))
+        if list_string:
+            new_articles_page = BotEditedPage(wikipedia.getSite(),
+                                              u'Projet:{}/Articles récents'.format(self.name),
+                                              bot_tag=BOT_TAG, create=True, logger=self.logger)
 
-            oldList = newArticlesPage.editContent().split('\n;')
-            listString += '\n;' + '\n;'.join(oldList[1:10])
+            old_list = new_articles_page.edit_section_content().split('\n;')
+            list_string += '\n;' + '\n;'.join(old_list[1:10])
 
-            newArticlesPage.sectionUpdate(
-                listString,
-                changeWarning=(
+            new_articles_page.section_update(
+                list_string,
+                change_warning=(
                     u"Mise à jour des "
                     + u"[[Projet:{}/Articles récents|articles récents]].".format(self.name)))
 
-    def nominationsListUpdate(self, checklist):
-        projectChecklistDict = {}
-        for key, nominatesList in checklist.nominTypeDict.items():
-            projectChecklistDict[key] = interSortedLists(
-                self.titlesList, nominatesList)
-        projectFusionList = []
-        missingTitlesList = []
-        for fusionTitle in checklist.listOfFusionTitles:
-            fusionList = titleP.findall(fusionTitle)
-            for title in fusionList:
-                if uppercase_first(title) in self.titlesList:
+    def nominations_list_update(self, checklist):
+        """ updates the formated page in wikitext of fusion nominations, adq, and so on
+        """
+        project_checklist_dict = {}
+        for key, nominates_list in checklist.nomination_type_label.items():
+            project_checklist_dict[key] = inter_sorted_lists(
+                self.titles_list, nominates_list)
+        project_fusion_list = []
+        missing_titles_list = []
+        for fusion_title in checklist.list_of_fusion_titles:
+            fusion_list = TITLE_PATTERN.findall(fusion_title)
+            for title in fusion_list:
+                if uppercase_first(title) in self.titles_list:
                     # title = lbranch_tag.expurge(empty_if_tag.expurge(
-                    #   arg_tag.expurge(fusionTitle))).replace('|}}','').strip()
-                    projectFusionList.append(
-                        u'* %s ' % fusionTitle
+                    #   arg_tag.expurge(fusion_title))).replace('|}}','').strip()
+                    project_fusion_list.append(
+                        u'* %s ' % fusion_title
                         + u'<small>([[Wikipédia:Pages à fusionner#'
-                        + u'%s' % re.sub(linkP, r'\1', fusionTitle)
+                        + u'%s' % re.sub(LINK_PATTERN, r'\1', fusion_title)
                         + u'|discussion]])</small>')
-                    for titlebis in fusionList:
+                    for titlebis in fusion_list:
                         titlebis = uppercase_first(titlebis)  # .strip()
                         try:
-                            projectChecklistDict['PAF'].remove(titlebis)
+                            project_checklist_dict['PAF'].remove(titlebis)
                         except ValueError:
                             if u'{' not in titlebis:
-                                missingTitlesList.append(titlebis)
+                                missing_titles_list.append(titlebis)
                     break
-        fusionWarning = ''
-        if missingTitlesList:
+        fusion_warning = ''
+        if missing_titles_list:
 
             msg = u"\nBandeau de fusion à vérifier pour : [[{article_list}]].\n"
-            fusionTitlesStr = "]] • [[".join(missingTitlesList)
+            fusion_titles_str = "]] • [[".join(missing_titles_list)
 
-            fusionWarning = msg.format(article_list=fusionTitlesStr)
+            fusion_warning = msg.format(article_list=fusion_titles_str)
 
-        if projectChecklistDict['PAF']:
+        if project_checklist_dict['PAF']:
                 # fusion list report generation : handling fusions props without comments
 
-            pafList = self.formatTitles(projectChecklistDict['PAF'])
-            fusionWarning += (u"\nProposition de fusion sans discussion initiée pour : {}\n"
-                              .format(u' • '.join(pafList)))
+            paf_list = format_titles(project_checklist_dict['PAF'])
+            fusion_warning += (u"\nProposition de fusion sans discussion initiée pour : {}\n"
+                               .format(u' • '.join(paf_list)))
         text = ''.join([u"[[Image:Icono consulta borrar.png|20px]] ",
                         u"'''Pages à supprimer'''",
                         u' [[Wikipédia:Pages à supprimer#Avertissements',
                         u'|(dernières demandes)]]\n',
-                        '\n'.join(self.formatArticleLinks(projectChecklistDict['PAS'])),
+                        '\n'.join(format_article_list(project_checklist_dict['PAS'])),
                         u"\n[[Image:Merge-arrows.svg|20px]] ",
                         u"'''Pages à fusionner''' ",
                         u'[[Wikipédia:Pages à fusionner#',
                         u'Requêtes à traiter au mois de {{CURRENTMONTHNAME}} ',
                         u'{{CURRENTYEAR}}|(liste du mois)]]\n',
-                        '\n'.join(projectFusionList), fusionWarning,
+                        '\n'.join(project_fusion_list), fusion_warning,
                         '\n[[Image:Fairytale questionmark.png|20px]] ',
                         u"'''Propositions aux labels'''",
                         u' [[WP:AdQ|AdQ]] ou [[WP:BArt|BA]]\n',
                         '\n'.join([u'* {{a|1= %s}}' % t
-                                   for t in (projectChecklistDict['PAdQ']
-                                             + projectChecklistDict['PBA'])])])
-        nominationsPage = BotEditedPage(wikipedia.getSite(),
-                                        u'Projet:{}/Consultations'.format(self.name),
-                                        botTag=bot_tag, create=True)
+                                   for t in (project_checklist_dict['PAdQ']
+                                             + project_checklist_dict['PBA'])])])
+
+        nominations_page = BotEditedPage(wikipedia.getSite(),
+                                         u'Projet:{}/Consultations'.format(self.name),
+                                         bot_tag=BOT_TAG, create=True, logger=self.logger)
 
         # output(u"• [[Projet:%s/Consultations|Consultations]] " % self.name)
 
-        consultationPattern = u"[[Projet:{projet}/Consultations|consultations]]"
-        editMessage = (u"Mise à jour des " + consultationPattern.format(projet=self.name))
+        consultation_pattern = u"[[Projet:{projet}/Consultations|consultations]]"
+        edit_message = (u"Mise à jour des " + consultation_pattern.format(projet=self.name))
 
-        nominationsPage.sectionUpdate('\n' + text + '\n',
-                                      changeWarning=editMessage
-                                      )
+        nominations_page.section_update('\n' + text + '\n',
+                                        change_warning=edit_message
+                                        )
 
-warnings_page = wikipedia.Page(wikipedia.getSite(),
+
+WARNINGS_PAGE = wikipedia.Page(wikipedia.getSite(),
                                u'Utilisateur:HyuBoT/Contrôle')
 
-class HuyBotApp(object):
 
-    @inject(io = IOModule)
-    def __init__(self, io):
-        self.io = io
+class HuyBotApp(object):
+    """ Full robot app for snakejuice"""
+    @inject(iomod=IOModule)
+    def __init__(self, iomod):
+        self.iomod = iomod
 
     def run(self):
+        """ Run the full task list """
         nominations_checklist = NominationsChecklist()
-        nominations_checklist.gatherNominations()
+        nominations_checklist.gather_nominations()
 
 # Bot plumbing part
-from snakeguice.assist import assisted_inject
-from pwbscripts.HyuBot.HyuBotIO import PageFactory, Outputter
 
-
-from projects import Config
 
 class Reporter(object):
     '''class definition for Reporter'''
@@ -690,11 +761,10 @@ class Reporter(object):
         self.output_pagename = config
         self.outputter = output
 
-
     def output(self, text):
         """ method that both output to screen logger and saves the message"""
         self.add_warning(text)
-        self.logger.output(text)
+        self.outputter.output(text)
 
     def add_warning(self, warning):
         """appends a warning report to the message report in prevision of Final report"""
@@ -709,18 +779,18 @@ class Reporter(object):
         #TODO: code
         pass
 
-from snakeguice.modules import Module
-from pwbscripts.HyuBot.HyuBotIO import SimulateIOModule, IOModule
 
 class HyuBotModule(Module):
+    """ real execution """
     def configure(self, binder):
-        self.install(binder, IOModule)
+        self.install(binder, IOModule())
+
 
 class SimuHyuBotModule(Module):
+    """ module instanciation for testing"""
     def configure(self, binder):
         self.install(binder, SimulateIOModule())
 
-from snakeguice import Injector
 
 def main():
     """ main function : defines global logger and so on"""
@@ -744,10 +814,12 @@ def main():
     else:
         inj = Injector(HyuBotModule())
 
-    logger = inj.get_instance(Logger)
-    app = inj.instance("Bot")
+    logger = inj.get_instance(Reporter)
+    app = inj.get_instance(Bot)
 
-    checklist = app.gatherNominations()
+#     pylint: disable=maybe-no-member
+    checklist = app.gather_nominations()
+
     for proj_param in proj_param_list:
         ppage = ProjectPage(proj_param, logger=logger)
         ppage.maintenance(checklist=checklist)
@@ -756,14 +828,14 @@ def main():
 
     wpage_header = u"Opérations du ~~~~~.\n"
 
-    if utf2ascii.unknownCharList:
+    if UTF2ASCII.unknown_char_list:
 
-        # update non transcripted titles characters
+        # page_update non transcripted titles characters
 
         characters_warn_section = u"; Caractères non transcrits : {untranscriptedStr}.\n"
         warn_list = [u"'{char}' dans « [[{title}]] »".format(char=c, title=text)
                      for (c, text)
-                     in utf2ascii.unknownCharList
+                     in UTF2ASCII.unknown_char_list
                      ]
         wpage_header += (characters_warn_section.format(untranscriptedStr=u' – '.join(warn_list)))
 
@@ -772,12 +844,13 @@ def main():
 
         wl_content = u'\n'.join(warnings_list)
         header = wpage_header
-        warnings_page.put(wpage_pattern.format(header=header,
+        WARNINGS_PAGE.put(wpage_pattern.format(header=header,
                                                warn_list=wl_content),
                           comment=u'Contrôle des opérations effectuées.')
 
+# pylint: disable=broad-except
     except Exception as exc:
-        wikipedia.output(u"Erreur lors de l'édition du contrôle.\n {msg}".format(exc.msg))
+        wikipedia.output(u"Erreur lors de l'édition du contrôle.\n {msg}".format(msg=exc))
     finally:
         wikipedia.stopme()
 

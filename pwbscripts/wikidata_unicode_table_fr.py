@@ -11,8 +11,9 @@ TODO: Handle serie season redirects not associated to any particular article
 # import pywikibot
 # create a site object, here for en-wiki
 
-from wd_lib import set_for_lang, make_sequence, item_by_title
+import re
 
+from wd_lib import set_for_lang, make_sequence, item_by_title
 SOURCE = """<strong class="selflink">10000 – 10FFF</strong></li>
 <li><a href="/wiki/Table_des_caract%C3%A8res_Unicode_(11000-11FFF)" title="Table des caractères Unicode (11000-11FFF)">11000 – 11FFF</a></li>
 <li><a href="/wiki/Table_des_caract%C3%A8res_Unicode_(12000-12FFF)" title="">12000 – 12FFF</a></li>
@@ -96,7 +97,6 @@ E000 EFFF
 F000 FFFF"""
 
 
-import re
 
 
 def label(mi_, ma_):

@@ -9,12 +9,11 @@ module that builds wikitext object
 
 from __future__ import unicode_literals
 
-
 from mwparserfromhell.utils import parse_anything
-from wikitext import Text, Link
 
 import mwparserfromhell.nodes as mwnodes
 import mwparserfromhell.wikicode as mwwikicode
+from pwbscripts.wikitext.wikitext import Text, Link
 
 
 def build_wikitext(raw_text):
@@ -22,7 +21,10 @@ def build_wikitext(raw_text):
     return parsed
 
 
-def WikitextFromNode(node):
+def wikitext_from_node(node):
+    """
+    returns a wikitext object from a mwparserfromhell Node
+    """
     if not isinstance(node, mwnodes.text.Text):
         return ValueError("{} object not a mwparserfromhell Text node",
                           node=node)

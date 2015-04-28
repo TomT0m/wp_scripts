@@ -1,17 +1,15 @@
 #! /usr/bin/python
 # encoding:utf-8
 
-from __future__ import unicode_literals
-
 """
 A Project page information state
 """
-import pywikibot
+
+from __future__ import unicode_literals
+
 import mwparserfromhell
-
+import pywikibot
 import re
-
-
 def get_page(name, namespace=None):
     """ get a Page in frwiki """
     site = pywikibot.Site("fr")
