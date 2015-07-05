@@ -10,6 +10,7 @@ import unittest
 
 from pwbscripts.wikitext.wikitext import Text
 import pwbscripts.wikitext.wikitext as Code
+import pwbscripts.wikitext.builder as build
 
 
 class Test(unittest.TestCase):
@@ -72,6 +73,14 @@ class TestTemplate(unittest.TestCase):
         self.assertIn("|wow1=plop", tmpl_str)
 
         self.assertRegexpMatches(tmpl_str, "^{{plop|")
+
+
+class TestMWParserFromHell2WikiText(unittest.TestCase):
+
+    def test1(self):
+        code = u"Le {{Plop|bidou}} petit"
+        wkt = build.build_wikitext(code)
+        self.assertEquals(unicode(wkt), code)
 
 if __name__ == "__main__":
 

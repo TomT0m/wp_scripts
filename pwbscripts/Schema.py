@@ -9,6 +9,8 @@ file fragment purpose
 """
 
 from __future__ import unicode_literals
+
+
 class FormatFragment(object):
 
     "A grammar rule for the yaml config file format"
@@ -19,6 +21,7 @@ class FormatFragment(object):
         self._type = None
 
     def validate(self, param_fragment):
+        """ a method to validate the result of the parsing wrt. the scheme"""
         raise NotImplementedError
 
     def prettyString(self):
@@ -46,13 +49,17 @@ class StringParamUnit(FormatFragment):
     def __str__(self):
         return self.prettyString().format(type="String")
 
+    def validate(self, plop):
+        """ no constraint """
+        return True
+
 
 class StringEnumUnit(StringParamUnit):
 
     "A terminal symbol in the config file parameter"
 
     def __init__(self, name, help_msg):
-        FormatFragment.__init__(self, name, help_msg)
+        StringParamUnit.__init__(self, name, help_msg)
         self._type = "String"
 
     def __str__(self):
@@ -73,6 +80,10 @@ class ObjectFragment(FormatFragment):
 
         return "{header}:\n:{attr_list}".format(header=self.prettyString().format(type="Object"),
                                                 attr_list="".join(attribute_docs))
+
+    def validate(self, doc_fragment):
+        """ no constraint """
+        return set([key for key in doc_fragment]) == set(self._attributes)
 
 
 class ListFragment(FormatFragment):

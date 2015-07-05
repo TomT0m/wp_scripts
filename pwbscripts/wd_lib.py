@@ -127,7 +127,7 @@ def maybe_set_claim(item_data, prop_num, value_item):
         if "ediconflict" in str(err):
 
             output("editconflict ????, retrying")
-            output("=====>".format(err))
+            output("=====> {}".format(err))
             # TODO : FIX reload
             item_data = reloaditempage(item_data),
             maybe_set_claim(item_data, prop_num, value_item)

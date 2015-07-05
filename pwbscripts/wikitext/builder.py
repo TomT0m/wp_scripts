@@ -16,11 +16,6 @@ import mwparserfromhell.wikicode as mwwikicode
 from pwbscripts.wikitext.wikitext import Text, Link
 
 
-def build_wikitext(raw_text):
-    parsed = parse_anything(raw_text)
-    return parsed
-
-
 def wikitext_from_node(node):
     """
     returns a wikitext object from a mwparserfromhell Node
@@ -29,13 +24,20 @@ def wikitext_from_node(node):
         return ValueError("{} object not a mwparserfromhell Text node",
                           node=node)
 
-_buildMap = {mwnodes.Text: Text,
-             mwnodes.Wikilink: Link}
+_buildMap = {mwnodes.Text: wikitext_from_node,
+             mwnodes.wikilink.Wikilink: lambda x: Link(x.title, x.text),
+             mwnodes.text.Text: lambda x: Text(x.value)}
 
 
 def mwp_to_Wikitext(mwparsed):
     if isinstance(mwparsed, mwwikicode.Wikicode):
-        pass
+        return _buildMap[type(mwparsed)](mwparsed)
     else:
-        raise TypeError("{} object is nor Wikicode Object".format(mwparsed),
+        raise TypeError("{} object is not of type Wikicode".format(mwparsed),
                         param=mwparsed)
+
+
+def build_wikitext(raw_text):
+    parsed = parse_anything(raw_text)
+    wk_text = mwp_to_Wikitext(parsed)
+    return wk_text

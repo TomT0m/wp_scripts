@@ -27,6 +27,7 @@ import pywikibot as pwb
 
 # TODO: Fix duplicates announces bug.
 # TODO: Fix fusion status.
+
 # Constants
 ANNOUNCE_DEL_TMPL = "Annonce proposition suppression"
 ANNOUNCE_FUSION_TMPL = "Annonce fusion d'articles"
@@ -221,17 +222,16 @@ def gen_archives_page(old_archive_text, new_archived_announces):
 def projects_maintenance(projects, options):
     """ Function launching maintenance for all projects """
     for project in projects:
-        # TODO: log
 
         pwb.output("Project : " + project.name)
 
         deletion_prop_maintenance(project)
         fusion_prop_maintenance(project)
 
-        print("> Diff des Annonces <\n")
+        pwb.output("> Diff des Annonces <\n")
         project.announce_page.show_diff()
 
-        print("> Diff PDD <\n")
+        pwb.output("> Diff PDD <\n")
         project.discussion_page.show_diff()
 
         pwb.output("Simulate ? {}".format(options.simulate))
@@ -332,8 +332,8 @@ def deletion_prop_maintenance(project):
     ]
     new_announces_text = insert_new_announces(announces_text, dated_new_announces)
 
-    announce_commentP = "proposition(s) de suppression déplacée(s) depuis [[{disc_page}|La page de discussion]]"
-    announce_comment = announce_commentP.format(disc_page=discussion_pagename)
+    announce_comment_pattern = "proposition(s) de suppression déplacée(s) depuis [[{disc_page}|La page de discussion]]"
+    announce_comment = announce_comment_pattern.format(disc_page=discussion_pagename)
 
     project.announce_page.set_content(new_announces_text, announce_comment)
 
@@ -341,8 +341,8 @@ def deletion_prop_maintenance(project):
 
     new_announces_text = deletion_prop_status_update(new_announces_text)
 
-    commentP = "Déplacements vers [[{announce_page}|la page d'annonces]]"
-    comment = commentP.format(announce_page=announces_pagename)
+    comment_pattern = "Déplacements vers [[{announce_page}|la page d'annonces]]"
+    comment = comment_pattern.format(announce_page=announces_pagename)
     announce_comment = "Mise à jour de l'état de propositions de suppression"
 
     project.discussion_page.set_content(new_discussion_text, comment)
@@ -382,14 +382,15 @@ def fusion_prop_maintenance(project):
         dated_new_announces = [(format_fusion_props(*elem), elem[2]) for elem in fusion_prop_list]
         new_a_text = insert_new_announces(project.announce_page.get_content(), dated_new_announces)
 
-        fusion_msg_pattern = "Déplacement d'annonces de proposition de fusion depuis la [[{}|La PDD]]"
-
+        fusion_msg_pattern = WikiPattern("Déplacement d'annonces de proposition de fusion depuis {}")
+        pddlink = WikiLink(project.discussion_pagename, "La PDD")
         project.announce_page.set_content(new_a_text,
-                                          fusion_msg_pattern.format(project.discussion_pagename))
+                                          fusion_msg_pattern.format(pddlink))
 
-        msg_pattern = "Déplacement des annonces de proposition fusion vers [[{}|La page d'annonce]] "
+        announcelink = WikiLink(project.announce_pagename, "La page d'annonce")
+        msg_pattern = "Déplacement des annonces de proposition fusion vers {} "
         project.discussion_page.set_content(new_d_text,
-                                            msg_pattern.format(project.announce_pagename))
+                                            msg_pattern.format(announcelink))
 
 
 # CLI management, UI
@@ -452,8 +453,7 @@ def main():
     opts = opt_parse.parse_args()
 
     if opts.debug:
-#         pwb.logging.basicConfig(level=logging.DEBUG)
-        #TODO: call the relevant Bot class method
+        #         pwb.logging.basicConfig(level=logging.DEBUG)
         pass
     if opts.test:
         test()
