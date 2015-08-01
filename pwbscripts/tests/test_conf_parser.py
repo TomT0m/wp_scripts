@@ -32,19 +32,18 @@ class TestParser(unittest.TestCase):
 
     """ Preliminary & API tests """
 
-    def assertIn(self, elem, tlist):
+    def assertInList(self, elem, tlist):
         """ custom test : elem in list"""
         self.assertTrue(elem in tlist)
 
     def testParse(self):
         """ yaml parser object loading and structure """
         obj = yaml.load(SAMPLEYAML)
-        print(obj)
 
         self.assertEqual(obj["Informatique"]["page"], "Projet:Informatique")
-        self.assertIn("announces", obj["Informatique"]["tasks"])
+        self.assertInList("announces", obj["Informatique"]["tasks"])
 
-        self.assertIn(u"Portail:Algèbre", obj[u"Mathématiques"][u"portals"])
+        self.assertInList(u"Portail:Algèbre", obj[u"Mathématiques"][u"portals"])
 
 
 class TestConfigObj(unittest.TestCase):
@@ -74,12 +73,7 @@ class TestConfigFile(unittest.TestCase):
 
         obj = yaml.load(actual_config)
 
-        #  fakefile = StringIO(actual_config)
-
-        confs = projects.read_conffile(actual_config)
-
         self.assertNotEqual(obj, None)
-        self.assertNotEqual(confs, None)
 
 
 #        loaded OK

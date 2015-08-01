@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#encoding: utf-8
+# encoding: utf-8
 
 """
 #Description: runs a bot to batch add claims, formated "Q...\tP...\tvalue", one per line on stdin
@@ -22,7 +22,9 @@ Example input:
 import csv
 import sys
 
-import wd_lib
+import pwbscripts.wd_lib
+
+
 def main():
     claimreader = csv.reader(sys.stdin, delimiter="\t")
 

@@ -17,6 +17,8 @@ import yaml    # parser for the config file
 
 from Schema import ObjectFragment, StringParamUnit
 from project_parameters import ProjectParameters
+
+
 class ConfigFilePattern(object):
 
     """Class defined to validate config file"""
@@ -58,8 +60,10 @@ class ConfigError(Exception):
         pass
 
 
-
 def get_project_schema():
+    """
+    Ad hoc config file grammar
+    """
     project_conf = ObjectFragment("Project",
                                   "configuration for a WikiProject",
                                   {StringParamUnit("name", "the name of the project (without Projet:)"),

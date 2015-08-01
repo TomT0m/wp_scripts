@@ -6,6 +6,8 @@ Utility module used to the transliteration of articles with non ascii unicode ch
 """
 
 import string
+
+
 class TranslationTable(object):
     """ Class regrouping method to handle unicode caracters in article names"""
     def __init__(self, dicOfRelatives,

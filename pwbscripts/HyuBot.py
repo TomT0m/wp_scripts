@@ -776,7 +776,7 @@ class Reporter(object):
         return self._warnings_list
 
     def final_report(self):
-        #TODO: code
+#       TODO: code @IgnorePep8
         pass
 
 

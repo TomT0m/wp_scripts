@@ -11,6 +11,8 @@ from logging import warn
 
 from page_status import get_page_status
 import pywikibot as pwb
+
+
 class ProjectParameters(object):
 
     """ Project parameters storage class, stores :

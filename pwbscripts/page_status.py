@@ -10,12 +10,14 @@ from __future__ import unicode_literals
 import mwparserfromhell
 import pywikibot
 import re
+
+
 def get_page(name, namespace=None):
     """ get a Page in frwiki """
     site = pywikibot.Site("fr")
 
     if namespace:
-        return pywikibot.Page(site, name, defaultNamespace=namespace)
+        return pywikibot.Page(site, name, ns=namespace)
 
     return pywikibot.Page(site, name)
 
@@ -34,6 +36,7 @@ class PageStatus(object):
 
     @property
     def redirected_to(self):
+        """accessor for the target page"""
         return self._redirected_to
 
     def get_content(self):
@@ -45,6 +48,7 @@ class PageStatus(object):
         return self._cached_content
 
     def is_redirect_page(self):
+        """ True if the page is a redirect """
 
         try:
             self.page.get()
@@ -58,17 +62,20 @@ class PageStatus(object):
         return False
 
     def is_deleted(self):
+        """ True if the page has been deleted """
         try:
             self.page.get()
         except pywikibot.NoPage:
-            return True
+            result = True
         finally:
-            return False
+            result = False
+
+        return result
 
     def set_content(self, new_text, comment):
         """ setter for content, without writing"""
 
-        modif = not(unicode(new_text) == unicode(self._cached_content))
+        modif = not unicode(new_text) == unicode(self._cached_content)
         self.modified = self.modified or modif
 
         if modif:

@@ -14,10 +14,10 @@ TODO: * Handle serie season redirects not associated to any particular article
 
 # NUM_CHANGED = 0
 
-#import wd_lib
+# import wd_lib
 
 from pywikibot import output
-#from pywikibot import NoPage
+# from pywikibot import NoPage
 # from systemd import journal
 ARTICLE = "Gouvernement_de_la_Défense_nationale"
 

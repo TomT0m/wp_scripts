@@ -14,13 +14,14 @@ from pywikibot import output as output
 import pywikibot
 import sys
 
-import bots_commons
-from lang import get_en_ordinal
+import pwbscripts.bots_commons
+
 import wd_lib
+
+
 # create a site object, here for en-wiki
 # import logging
 # NUM_CHANGED = 0
-#from systemd import journal
 ARTICLE = None
 
 
@@ -43,8 +44,11 @@ def set_season_labels(serie_page, season_page, serie_name, season_num):
     datas = serie_page.get()
 
 #     en
-    enlabel = __lang_patterns__[u"en"][u"label"].format(name=serie_name, ordi=get_en_ordinal(season_num))
-    wd_lib.set_for_lang(season_page, serie_name, u'en', enlabel, u"standard label setting")
+    enlabel = __lang_patterns__[u"en"][u"label"]\
+                    .format(name=serie_name,
+                            ordi=wd_lib.get_en_ordinal(season_num))
+    wd_lib.set_for_lang(season_page, serie_name, u'en',
+                        enlabel, u"standard label setting")
 
 #     fr
     if "fr" in datas["labels"]:
@@ -191,7 +195,7 @@ def main():
     try:
         logmain()
     except Exception as err:
-        output("something went wrong for article {} ; error:<{ERROR}>".format(ARTICLE, ERROR=str(err)) )
+        output("something went wrong for article {} ; error:<{ERROR}>".format(ARTICLE, ERROR=str(err)))
         # journal.send("something went wrong for article {}".format(ARTICLE), ERROR=str(err))
 
 main()
