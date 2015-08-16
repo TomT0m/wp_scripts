@@ -34,12 +34,12 @@ from pwbscripts.projects import Config
 from pwbscripts import bots_commons
 
 
-from pwbscripts.hyubot.HyuBotIO import PageFactory, Outputter
-from pwbscripts.hyubot.HyuBotIO import SimulateIOModule, IOModule
-from pwbscripts.hyubot.HyuBotIO import agreement
-from pwbscripts.hyubot.HyuBotParser import Delimiter as Delimiter
-from pwbscripts.hyubot.HyuBotParser import BOT_TAG, NOINCLUDE_TAG, get_reconstruct_errmsg_pattern
-from pwbscripts.hyubot.HyuBotUtils import UTF2ASCII, uppercase_first
+from hyubot.io import PageFactory, Outputter
+from hyubot.io import SimulateIOModule, IOModule
+from hyubot.io import agreement
+from hyubot.parser import Delimiter as Delimiter
+from hyubot.parser import BOT_TAG, NOINCLUDE_TAG, get_reconstruct_errmsg_pattern
+from hyubot.utils import UTF2ASCII, uppercase_first
 
 from pwbscripts.projects import read_conffile
 import pywikibot as wikipedia
@@ -406,7 +406,7 @@ class ListUpdateRobot(object):
             list_dict['0'] = title_tag.englobe('\n== 0–9 ==')
             list_dict['~'] = title_tag.englobe('\n== Autres ==')
 
-            for character in string.uppercase:
+            for character in string.ascii_uppercase:
                 list_dict[character] = title_tag.englobe('\n== {} =='.format(character))
 
         for title in titles_list:

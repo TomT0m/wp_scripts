@@ -14,13 +14,13 @@ import re
 from unittest import TestCase
 import unittest
 
-from pwbscripts.bots_commons import create_options, get_default_configfile
-from pwbscripts.datas import test_data
-from pwbscripts.date import Date, extract_date
-from pwbscripts.page_status import get_page_status
-from pwbscripts.projects import read_conffile
-from pwbscripts.wikitext.wikitext import Pattern as WikiPattern
-from pwbscripts.wikitext.wikitext import Text as WikiText, Link as WikiLink, Template as WikiTmpl
+from bots_commons import create_options, get_default_configfile
+from datas import test_data
+from date import Date, extract_date
+from page_status import get_page_status
+from projects import read_conffile
+from wikitext.wikitext import Pattern as WikiPattern
+from wikitext.wikitext import Text as WikiText, Link as WikiLink, Template as WikiTmpl
 
 import pywikibot as pwb
 

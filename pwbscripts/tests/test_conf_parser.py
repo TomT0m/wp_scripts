@@ -11,8 +11,8 @@ import unittest
 import yaml
 
 
-from pwbscripts.project_parameters import ProjectParameters
-import pwbscripts.projects as projects
+from project_parameters import ProjectParameters
+import projects
 # import pwbscripts.projects
 # import pwbscripts.scripts
 # from StringIO import StringIO
@@ -67,7 +67,7 @@ class TestConfigFile(unittest.TestCase):
     def testConfigLoad(self):
         """ the truth on the conffile loading and parsing """
 
-        actual_config = (pkgutil.get_data("pwbscripts", "projects.yaml")).decode("utf-8")
+        actual_config = (pkgutil.get_data("datas", "projects.yaml")).decode("utf-8")
         #  print(type(actual_config))
 
         self.assertEqual(type(actual_config), type("ààeiu"))

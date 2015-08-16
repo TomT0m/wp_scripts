@@ -1,4 +1,0 @@
-"""
-The script modules
-
-"""
