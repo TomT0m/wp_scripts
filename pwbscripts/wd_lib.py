@@ -19,7 +19,7 @@ def change_made():
     NUM_CHANGED = NUM_CHANGED + 1
 
 
-def set_for_lang_aux(page, label_to_overload, lang, text, summary, kind=u'labels'):
+def set_for_lang_aux(page, label_to_overload, lang, text, summary, kind='labels'):
     """ per language labelling of description
     * kind == 'label' or kind == 'description'
     * """
@@ -30,16 +30,16 @@ def set_for_lang_aux(page, label_to_overload, lang, text, summary, kind=u'labels
     page = reloaditempage(page)
     datas = page.get()
 
-    if kind != u'labels' and kind != u'descriptions':
+    if kind != 'labels' and kind != 'descriptions':
         raise ValueError('Unknow "kind" parameter, is "{}", should be labels or descriptions'.format(kind))
 
     try:
-        to_output = u"> {}: Current item label {} :".format(kind, datas[kind][lang])
+        to_output = "> {}: Current item label {} :".format(kind, datas[kind][lang])
         output(to_output)
     except KeyError:
-        output(u"> Label: Nothing in language {}".format(lang))
+        output("> Label: Nothing in language {}".format(lang))
 
-    pywikibot.output(u"Edit {}: to overload: {}".format(kind, label_to_overload))
+    pywikibot.output("Edit {}: to overload: {}".format(kind, label_to_overload))
 
     if(
         kind not in datas or lang not in datas[kind]
@@ -50,16 +50,16 @@ def set_for_lang_aux(page, label_to_overload, lang, text, summary, kind=u'labels
             page.editLabels({lang: text}, summary=summary)
             change_made()
         else:
-            output(u"|>>>>!Editing descriptions in {} with {}".format(lang, text))
+            output("|>>>>!Editing descriptions in {} with {}".format(lang, text))
             page.editDescriptions({lang: text}, summary=summary)
             change_made()
 
-        pywikibot.output(u"""|>>>! Set label of {} in {} : {}"""
+        pywikibot.output("""|>>>! Set label of {} in {} : {}"""
                          .format(get_q_number(page), lang, text)
                          )
 
     else:
-        pywikibot.output(u"""|>>> Label of {} in {}, nothing done."""
+        pywikibot.output("""|>>> Label of {} in {}, nothing done."""
                          .format(get_q_number(page), lang))
 
     output("===> End of label processing ===")
@@ -72,14 +72,14 @@ def reloaditempage(itempage):
     return itempage
 
 
-def set_for_lang(page, label_to_overload, lang, text, summary, kind=u'labels', depth=0):
+def set_for_lang(page, label_to_overload, lang, text, summary, kind='labels', depth=0):
     """ wrapper """
     try:
         set_for_lang_aux(page, label_to_overload, lang, text, summary, kind=kind)
     except APIError as err:
-        if u"editconf" in str(err):
+        if "editconf" in str(err):
             output("|>>>>!!!!!!!!!!!!!!!!!! Editconflict, retrying ......")
-            print("Nombre d'essais: {}, err : {}".format(depth, err))
+            print(("Nombre d'essais: {}, err : {}".format(depth, err)))
             # reloading page
             page = reloaditempage(page)
             set_for_lang(page, label_to_overload, lang, text, summary, kind=kind, depth=depth + 1)

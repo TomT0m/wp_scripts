@@ -7,15 +7,15 @@
 datas for testcases
 
 """
-from __future__ import unicode_literals
-SAMPLE_TEXT = u"""
+
+SAMPLE_TEXT = """
 ==Plop==
 Bidou
 
 
 == L'article Jean-Daniel Fekete est proposé à la suppression ==
 
-{| align="center" title="{{((}}subst:avertissement suppression page{{!}}page{{))}}" border="0" cellpadding="4" cellspacing="4" style="border-style:none; background-color:#FFFFFF;"
+{| align="center" title="{{((}}subst:avertissement suppression page{{!}}page{{))}}" border="0" cellpadding="4" cellspacing="4" style="border-style:none; background-color:#FFFFFF;"  # @IgnorePep8
 |  | [[Image:Icono consulta borrar.png|64px|Page proposée à la suppression]]
 |  |Bonjour,
 |
@@ -514,7 +514,7 @@ La discussion a lieu sur la page [[Wikipédia:Pages à fusionner#Jasper et Jaspe
 """
 
 
-ANNOUNCES_SAMPLE = u"""<noinclude>[[Catégorie:Projet:Informatique|Annonces]]</noinclude>
+ANNOUNCES_SAMPLE = """<noinclude>[[Catégorie:Projet:Informatique|Annonces]]</noinclude>
 <center>[{{fullurl:Projet:Informatique/Annonces|action=edit}} Annoncer quelque chose] — [{{fullurl:Projet:Informatique/Annonces|action=watch}} Suivre les modifications]</center>
 <center>{{article détaillé|contenu=Archives Annonces: [[Discussion Projet:Informatique/2012/Annonces|2012]] - [[Discussion Projet:Informatique/2013/Annonces|2013]]}}</center>
 <noinclude>== Annonces ==</noinclude>
@@ -633,10 +633,10 @@ ou
 """
 
 
-SAMPLE_FUSION_ANNOUNCE = u"""== Les articles [[Jasper]] et [[Jasper (informatique)]] sont proposés à la fusion ==
+SAMPLE_FUSION_ANNOUNCE = """== Les articles [[Jasper]] et [[Jasper (informatique)]] sont proposés à la fusion ==
 [[Image:Merge-arrows.svg|60px|left|Proposition de fusion en cours.]]
 
 La discussion a lieu sur la page [[Wikipédia:Pages à fusionner#Jasper et Jasper (informatique)]]. [...]
 
 [[Utilisateur:Silex6|Silex6]] ([[Discussion utilisateur:Silex6|d]]) 25 juillet 2013 à 12:23 (CEST)
-"""
+"""  # @IgnorePep8

@@ -9,7 +9,7 @@ Projects configurations object
 
 from logging import warn
 
-from page_status import get_page_status
+from pwbscripts.page_status import get_page_status
 import pywikibot as pwb
 
 
@@ -32,7 +32,7 @@ class ProjectParameters(object):
 
         self._name = name
         self._discussion_pagename = None
-        # hyuBotLib
+        # hyubot
         self._wiki = pwb.Site(site)
 
         # Pages objects attributes
@@ -96,13 +96,13 @@ class ProjectParameters(object):
         test = self.get("tasks", [])
 
         if test == []:
-            warn("/!\ no task for project {}".format(self.name))
+            warn("/!\\ no task for project {}".format(self.name))
 
         return test
 
     @property
     def insite(self):
-        # TODO: document use
+        # TODO: document usage (mysterious)
         return self.get("insite", None)
 
     @property
@@ -123,7 +123,7 @@ class ProjectParameters(object):
                    ]
 
         if portals == []:
-            warn("/!\ no portals for project {}".format(self.name))
+            warn("/!\\ no portals for project {}".format(self.name))
 
         return portals
 

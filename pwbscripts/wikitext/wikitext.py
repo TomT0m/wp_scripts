@@ -5,8 +5,6 @@
 Wikitext generation lib
 """
 
-from __future__ import unicode_literals
-
 
 def wikiconcat(wikitexts):
     """ concatenates fragments of wikitext"""
@@ -38,6 +36,9 @@ class Wikicode(object):
         """ returns invalid chars in page or template name"""
         return cls.reserved_chars
 
+    def __str__(self):
+        pass
+
 
 def isvalidtitle(title):
     """
@@ -68,7 +69,7 @@ class Template(Wikicode):
         return isvalidtitle(name)
 
     def __str__(self):
-        return self.begin_delimiter + self._name + self._format_args() + self.end_delimiter
+        return self.begin_delimiter + str(self._name) + self._format_args() + self.end_delimiter
 
     @staticmethod
     def _fmt_keyval(key, val):
@@ -84,7 +85,7 @@ class Template(Wikicode):
             return "|" + "|".join(
                 [self._fmt_keyval(i + 1, pargs[i]) for i in range(len(pargs))]
                 +
-                [self._fmt_keyval(key, val) for (key, val) in self._kwargs.items()]
+                [self._fmt_keyval(key, val) for (key, val) in list(self._kwargs.items())]
             )
         else:
             return ""
@@ -113,16 +114,13 @@ class Text(Wikicode):
 
         # TODO: more to escape probably (idea : collect them by class attributes and get them from Base class
 
-        return text.replace(u"|", u"{{!}}")
+        return text.replace("|", "{{!}}")
 
     def __str__(self):
-        return str(self._value)
+        return str(self.text)
 
     def __repr__(self):
-        return u"Text({})".format(self.text)
-
-    def __unicode__(self):
-        return unicode(self.text)
+        return "Text({})".format(self.text)
 
     @property
     def text(self):
@@ -153,11 +151,11 @@ class CompositeText(Wikicode):
         return "".join([str(fragment) for fragment in self._fragments])
 
     def __unicode__(self):
-        return "".join([unicode(fragment) for fragment in self._fragments])
+        return "".join([str(fragment) for fragment in self._fragments])
 
     def __repr__(self):
         first = self._fragments[0]
-        return u"TextWithTemplate({first}{next})".format(
+        return "TextWithTemplate({first}{next})".format(
             first=first, next=["," + fragment for fragment in self._fragments[1:]]
         )
 
@@ -177,6 +175,7 @@ class Link(Wikicode):
 
     def __init__(self, pagename, text=None):
         # TODO: validate pagename
+        assert "|" not in pagename
 
         self._pagename = pagename
         self._displayed = text
@@ -185,17 +184,11 @@ class Link(Wikicode):
 
     def __repr__(self):
         if self._displayed:
-            return u"Link({}, {:r})".format(self._pagename, self._displayed)
+            return "Link({}, {:r})".format(self._pagename, self._displayed)
         else:
-            return u"Link({})".format(self._pagename)
+            return "Link({})".format(self._pagename)
 
     def __str__(self):
-        if self._displayed:
-            return "[[{}|{}]]".format(self._pagename, self._displayed)
-        else:
-            return "[[{}]]".format(self._pagename)
-
-    def __unicode__(self):
         if self._displayed:
             return "[[{}|{}]]".format(self._pagename, self._displayed)
         else:

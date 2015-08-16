@@ -29,7 +29,7 @@ def main():
     claimreader = csv.reader(sys.stdin, delimiter="\t")
 
     for line in claimreader:
-        print "Item: <{}> Property: <{}> value:'{}'".format(line[0], line[1], line[2])
+        print("Item: <{}> Property: <{}> value:'{}'".format(line[0], line[1], line[2]))
 
 if __name__ == "main":
     main()

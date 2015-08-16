@@ -5,7 +5,6 @@
 A Project page information state
 """
 
-from __future__ import unicode_literals
 
 import mwparserfromhell
 import pywikibot
@@ -29,7 +28,7 @@ class PageStatus(object):
     def __init__(self, page):
         self.page = page
         self._cached_content = None
-        self.edit_comment = u""
+        self.edit_comment = ""
         self._original_content = None
         self.modified = False
         self._redirected_to = None
@@ -53,7 +52,7 @@ class PageStatus(object):
         try:
             self.page.get()
         except pywikibot.IsRedirectPage:
-            print("!!!!!!!!! {}".format(self.page.getRedirectTarget().title()))
+            print(("!!!!!!!!! {}".format(self.page.getRedirectTarget().title())))
             self._redirected_to = self.page.getRedirectTarget().title()
             return True
 
@@ -75,12 +74,12 @@ class PageStatus(object):
     def set_content(self, new_text, comment):
         """ setter for content, without writing"""
 
-        modif = not unicode(new_text) == unicode(self._cached_content)
+        modif = not str(new_text) == str(self._cached_content)
         self.modified = self.modified or modif
 
         if modif:
             if len(self.edit_comment) > 0:
-                self.edit_comment += u"; " + comment
+                self.edit_comment += "; " + comment
             else:
                 self.edit_comment = comment
 
@@ -93,8 +92,8 @@ class PageStatus(object):
     def is_proposed_to_deletion(self):
         """ try to guess if there is a deletion proposition related to this page"""
 
-        re_bandeau = re.compile(u"{{(suppression|à supprimer)}}", re.IGNORECASE)
-        re_pas_closed = re.compile(u"{{Article (supprimé|conservé)", re.IGNORECASE)
+        re_bandeau = re.compile("{{(suppression|à supprimer)}}", re.IGNORECASE)
+        re_pas_closed = re.compile("{{Article (supprimé|conservé)", re.IGNORECASE)
 
         if self.page.exists():
 
@@ -123,13 +122,13 @@ class PageStatus(object):
     def is_proposed_to_fusion(self):
         """ try to guess if there is a deletion proposition related to this page"""
 
-        return u'{{à fusionner|' in self.get_content()
+        return '{{à fusionner|' in self.get_content()
 
     def fusion_with(self):
         """get the list of article titles which are supposed to be fusioned with this one"""
         parsed = mwparserfromhell.parse(self.get_content())
         for tmpl in parsed.filter_template():
-            if tmpl.name == u"à fusionner":
+            if tmpl.name == "à fusionner":
                 print(tmpl)
 
     def show_diff(self):
@@ -141,7 +140,7 @@ class PageStatus(object):
         return "Status object of page {}. Modified : {}".format(self.page, self.modified)
 
     def __unicode__(self):
-        return u"Status object of page {}. Modified : {}".format(self.page, self.modified)
+        return "Status object of page {}. Modified : {}".format(self.page, self.modified)
 
 
 def get_page_status(pagename):

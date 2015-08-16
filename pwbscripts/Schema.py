@@ -8,7 +8,7 @@ The grammar is self documented : each fragment is attached to an help string who
 file fragment purpose
 """
 
-from __future__ import unicode_literals
+
 
 
 class FormatFragment(object):

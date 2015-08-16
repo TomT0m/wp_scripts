@@ -8,9 +8,8 @@
 """
 
 
-from __future__ import unicode_literals
-
 import mwparserfromhell
+
 import re
 from unittest import TestCase
 import unittest
@@ -38,21 +37,22 @@ ANNOUNCE_FUSION_TMPL = "Annonce fusion d'articles"
 def msg_line_eating():
     """
     generates a pattern matching a complete line not beginning with '=='
+    >>> import os
     >>> opts = re.MULTILINE # | re.DEBUG
     >>> re.match(msg_line_eating(), "plop").group(0)
-    u'plop'
+    'plop'
     >>> re.match(msg_line_eating(), "p").group(0)
-    u'p'
+    'p'
     >>> re.match(msg_line_eating(), "== plop ==")
 
     >>> re.match("([^=]|=?!=).*$", "aa").group(0)
-    u'aa'
+    'aa'
     >>> msg = "ab" + os.linesep + "b" + os.linesep + "==plop=="
     >>> re.match('(' +msg_line_eating() + ')*', msg, opts).group(0).split(os.linesep)
-    [u'ab', u'b', u'']
+    ['ab', 'b', '']
     >>> msg = msg + os.linesep + os.linesep + "==plop==" + os.linesep
     >>> re.match('(' +msg_line_eating() + ')*', msg, opts).group(0).split(os.linesep)
-    [u'ab', u'b', u'']
+    ['ab', 'b', '']
     """
     # newline_pattern = "(?:$\n)?^"
     not_eq_eq = "^(?:[^=]|=?!=)"
@@ -70,7 +70,7 @@ def extract_full_del_props(text):
     articles = []
     del_sum = 0
 
-    for article in re.finditer(pattern.format(u'(.*)'), text, re.MULTILINE):
+    for article in re.finditer(pattern.format('(.*)'), text, re.MULTILINE):
         date = extract_date(article.group(2))
         articles.append((article.group(1), date))
         del_sum += len(article.group(0))
@@ -78,7 +78,7 @@ def extract_full_del_props(text):
         pwb.output(" Article : {} (annoncé le {})".format(article.group(1), date))
         pwb.output(" Annonce : \n'''{}'''".format(len(article.group(2))))
 
-    del_pattern = pattern.format(u'.*')
+    del_pattern = pattern.format('.*')
     newpage = re.sub(del_pattern, '', text, flags=re.MULTILINE)
 
     pwb.debug("(taille en octets) : Supprimé {} - nouvelle : {}, ancienne {}, différence {}: "
@@ -97,14 +97,14 @@ def format_del_announce(date, article_name):
     announce = WikiTmpl(ANNOUNCE_DEL_TMPL,
                         posargs=[date], kwargs={"nom": article_name})
 
-    return unicode(announce)
+    return str(announce)
 
 
 def extract_fusion_articles(title):
     """ Extracts article titles from section title
     >>> title = '== Les articles [[Jasper]] et [[Jasper (informatique)]] sont proposés à la fusion =='
     >>> extract_fusion_articles(title)
-    [u'Jasper', u'Jasper (informatique)']
+    ['Jasper', 'Jasper (informatique)']
 
     """
     lbegin = re.escape("[[")
@@ -120,7 +120,7 @@ def extract_link_to_fusionprops(section):
     """ Extracts the section in fusion prop global page from a (parsed) fusion prop section in Project Chat
     >>> parsed = mwparserfromhell.parse(SAMPLE_FUSION_ANNOUNCE)
     >>> extract_link_to_fusionprops(parsed)
-    u'Wikipédia:Pages à fusionner#Jasper et Jasper (informatique)'
+    'Wikipédia:Pages à fusionner#Jasper et Jasper (informatique)'
     """
     expected = section.filter_wikilinks(matches="Wikipédia:Pages à fusionner#")[0]
     return expected[2:-2]
@@ -150,7 +150,7 @@ def extract_fusion_props(text):
         link_to_discussion = extract_link_to_fusionprops(sect)
 
         fusions.append((articles, link_to_discussion, date))
-        text = text.replace(unicode(sect), "")
+        text = text.replace(str(sect), "")
 
     return (fusions, text)
 
@@ -177,7 +177,7 @@ def insert_new_announces(old_text, dated_new_announces):
 
     # tri par date
     sorted_announces = sorted(dated_old_announces + dated_new_announces,
-                              key=lambda (_, date): date, reverse=True)
+                              key=lambda __date: __date[1], reverse=True)
 
     # création de la section finale
 
@@ -201,7 +201,7 @@ def gen_archives_page(old_archive_text, new_archived_announces):
                            for text in announces_lines if text != "" and text.strip()[:2] == "{{"]
 
     sorted_announces = sorted(dated_old_announces + new_archived_announces,
-                              key=lambda (_, date): date, reverse=False)
+                              key=lambda __date1: __date1[1], reverse=False)
 
     by_month = {month: [value for (date, value) in sorted_announces + dated_old_announces
                         if date.mois == month] for month in Date.MOIS
@@ -252,15 +252,13 @@ ANNOUNCES_SAMPLE = test_data.ANNOUNCES_SAMPLE
 
 def del_prop_iteration(page):
     """ iterator on deletion proposition announces in announce page
-
-    >>>
-    >>> liste = list(del_prop_iteration(mwparserfromhell.parse(tdata.ANNOUNCES_SAMPLE)))
-    >>> liste[0].get("nom").value
-    u'PagePlus'
-    >>> len(liste)
-    13
+    >>> liste = list(del_prop_iteration(mwparserfromhell.parse(test_data.ANNOUNCES_SAMPLE)))
     >>> liste[0].name == ANNOUNCE_DEL_TMPL
     True
+    >>> liste[0].get("nom").value
+    'PagePlus'
+    >>> len(liste)
+    13
     """
 
     for tmpl in page.filter_templates():
@@ -280,7 +278,7 @@ def deletion_prop_status_update(announce_page):
         article_title = announce.get("nom").value
         pwb.output("-> {}".format(article_title))
         try:
-            status = get_page_status(unicode(article_title))
+            status = get_page_status(str(article_title))
             if status.is_deleted():
                 announce.add(2, "supprimé")
             elif status.is_proposed_to_deletion():
@@ -294,7 +292,7 @@ def deletion_prop_status_update(announce_page):
         except pwb.exceptions.InvalidTitle:
             pwb.log("Annonce malformée !! {}".format(article_title))
 
-    return unicode(parsed)
+    return str(parsed)
 
 
 def deletion_prop_maintenance(project):
@@ -327,7 +325,7 @@ def deletion_prop_maintenance(project):
     # insertions des annonces extraites dans la page d'annonce
 
     dated_new_announces = [
-        (format_del_announce(WikiText(unicode(date)), name), date)
+        (format_del_announce(WikiText(str(date)), name), date)
         for name, date in articles
     ]
     new_announces_text = insert_new_announces(announces_text, dated_new_announces)
@@ -352,7 +350,7 @@ def deletion_prop_maintenance(project):
 def format_fusion_props(articles, section, date):
     """ format a fusion proposition announce name
 
-    >>> format_fusion_props(["a", "b"], "wow", Date(1, 1, 2001)
+)
 
     """
 

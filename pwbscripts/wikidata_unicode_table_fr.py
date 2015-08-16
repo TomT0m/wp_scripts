@@ -13,7 +13,7 @@ TODO: Handle serie season redirects not associated to any particular article
 
 import re
 
-from wd_lib import set_for_lang, make_sequence, item_by_title
+from pwbscripts.wd_lib import set_for_lang, make_sequence, item_by_title
 SOURCE = """<strong class="selflink">10000 – 10FFF</strong></li>
 <li><a href="/wiki/Table_des_caract%C3%A8res_Unicode_(11000-11FFF)" title="Table des caractères Unicode (11000-11FFF)">11000 – 11FFF</a></li>
 <li><a href="/wiki/Table_des_caract%C3%A8res_Unicode_(12000-12FFF)" title="">12000 – 12FFF</a></li>
@@ -70,13 +70,13 @@ SOURCE = """<strong class="selflink">10000 – 10FFF</strong></li>
 """
 
 MAINS = [
-    u"Table des caractères Unicode (0000-FFFF)",
-    u"Table des caractères Unicode (10000-1FFFF)",
-    u"Table des caractères Unicode (20000-2FFFF)",
-    u"Table des caractères Unicode (30000-DFFFF)",
-    u"Table des caractères Unicode (E0000-EFFFF)",
-    u"Table des caractères Unicode (F0000-FFFFF)",
-    u"Table des caractères Unicode (100000-10FFFF)"
+    "Table des caractères Unicode (0000-FFFF)",
+    "Table des caractères Unicode (10000-1FFFF)",
+    "Table des caractères Unicode (20000-2FFFF)",
+    "Table des caractères Unicode (30000-DFFFF)",
+    "Table des caractères Unicode (E0000-EFFFF)",
+    "Table des caractères Unicode (F0000-FFFFF)",
+    "Table des caractères Unicode (100000-10FFFF)"
 ]
 
 LESSER = """0000 0FFF
@@ -97,8 +97,6 @@ E000 EFFF
 F000 FFFF"""
 
 
-
-
 def label(mi_, ma_):
     """ returns a calculated label from a range """
     return "caractères Unicode des points de code {} à {}".format(mi_, ma_)
@@ -111,14 +109,14 @@ def enlabel(mi_, ma_):
 
 def frtitle(mi_, ma_):
     """returns formated title """
-    return u"Table des caractères Unicode ({}-{})".format(mi_, ma_)
+    return "Table des caractères Unicode ({}-{})".format(mi_, ma_)
 
 
 def main():
     """ main script function """
     def extr_mini_maxi(titl):
         """ extract bounds from title"""
-        res = re.split(u"[()-]", titl)
+        res = re.split("[()-]", titl)
         return res[1], res[2]
 
     items = [item_by_title("fr", title)
@@ -136,7 +134,7 @@ def main():
     for (item, rang_) in zip(items, ranges):
         (min_, max_) = rang_
         prefix = min_[0:-4]
-        print ("====================='{}'========================".format(prefix))
+        print(("====================='{}'========================".format(prefix)))
 
         def gen_title(lrange):
             """ title gen"""
@@ -155,11 +153,11 @@ def main():
         all_ranges = all_ranges + ranges
 
     for (item, (min_, max_)) in zip(all_items, all_ranges):
-        set_for_lang(item, u"Table des caractères Unicode", "fr", label(min_, max_), "ambiguity and label correction")
-        set_for_lang(item, u"", "en", enlabel(min_, max_), "ambiguity and label correction")
+        set_for_lang(item, "Table des caractères Unicode", "fr", label(min_, max_), "ambiguity and label correction")
+        set_for_lang(item, "", "en", enlabel(min_, max_), "ambiguity and label correction")
 
         # correction of previous bug as it seems
-        set_for_lang(item, u"Unicode characters from 100000 to 10FFFF codepoints",
+        set_for_lang(item, "Unicode characters from 100000 to 10FFFF codepoints",
                      "en", enlabel(min_, max_), "ambiguity and label correction")
 
 if __name__ == "__main__":

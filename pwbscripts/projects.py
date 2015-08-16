@@ -4,19 +4,18 @@
 """
 Project parameters handling : read & load configuration
 """
+from pwbscripts.Schema import ObjectFragment, StringParamUnit  # @NoMove
+from pwbscripts.project_parameters import ProjectParameters
 
 """
 tasks :
-    * hyuBotLib : maintain of a list of pages in a project (pages in one of its subportal)
+    * hyubot : maintain of a list of pages in a project (pages in one of its subportal)
     * announces : maintains a list of project announces with
                   the properties for deletion and fusion of this project talk page.
 """
 # Configuration file structure validation
 
 import yaml    # parser for the config file
-
-from Schema import ObjectFragment, StringParamUnit
-from project_parameters import ProjectParameters
 
 
 class ConfigFilePattern(object):
@@ -77,4 +76,4 @@ class Config(object):
     '''config object, used to store configuration'''
 
     def __init__(self, filepath):
-        self.projects = read_conffile
+        self.projects = read_conffile(filepath)

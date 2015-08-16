@@ -25,7 +25,7 @@ class TestNetProjets(Testn):
         # net_projets.Test.runTest(self)
 
 
-def load_tests(loader, tests):
+def load_tests(loader, tests, other=None):
     """
     #  (avoided) patch trial to make this work
     """

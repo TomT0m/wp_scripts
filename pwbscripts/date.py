@@ -4,6 +4,8 @@
 
 from functools import total_ordering
 import re
+
+
 @total_ordering
 class Date(object):
     """ A french (very) simple date object, comparable and that's it,
@@ -14,7 +16,7 @@ class Date(object):
     >>> a < b
     True
     """
-    MOIS = u" janvier février mars avril mai juin juillet août septembre octobre novembre décembre".split(u" ")
+    MOIS = " janvier février mars avril mai juin juillet août septembre octobre novembre décembre".split(" ")
     REV_MOIS = None
 
     def __init__(self, jour, mois, annee):
@@ -34,7 +36,7 @@ class Date(object):
                 self.mois == other.mois and self.jour < other.jour))
 
     def __str__(self):
-        res = u"{:2d} {} {:4d}".format(self.jour, self.MOIS[self.mois], self.annee)
+        res = "{:2d} {} {:4d}".format(self.jour, self.MOIS[self.mois], self.annee)
         return res
 
     def __repr__(self):
@@ -58,7 +60,7 @@ class Date(object):
 
 
 def extract_date(text):
-    u""" Returns a date object if text seems to countain a date textual description,
+    """ Returns a date object if text seems to countain a date textual description,
     None otherwide
 
 
@@ -70,12 +72,12 @@ def extract_date(text):
 """
     for line in text.split("\n"):
         mois = Date.MOIS
-        re_mois = u"{}".format(u"|".join(mois))
-        match = re.search(u"({jour}) ({mois}) ({annee})"
+        re_mois = "{}".format("|".join(mois))
+        match = re.search("({jour}) ({mois}) ({annee})"
                           .format(
                               mois=re_mois,
-                              jour=u"[0-9]{1,2}",
-                              annee=u"[0-9]{4}"
+                              jour="[0-9]{1,2}",
+                              annee="[0-9]{4}"
                           ),
                           line)
         if match:

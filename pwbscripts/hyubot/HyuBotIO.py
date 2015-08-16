@@ -72,10 +72,10 @@ def agreement(question, default):
     """
     huybot function that asks for the user agreement to proceed
     """
-    print(u"{} (y/n), default : {}".format(question, default))
+    print(("{} (y/n), default : {}".format(question, default)))
     invalid_input = True
     while invalid_input:
-        rep = raw_input()
+        rep = input()
         if rep in ['y', 'n', '']:
             invalid_input = False
 

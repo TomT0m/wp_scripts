@@ -13,37 +13,35 @@ from argparse import ArgumentParser
 import pywikibot
 import sys
 
-from lang import get_en_ordinal
-import wd_lib
+from pwbscripts.lang import get_en_ordinal
+import pwbscripts.wd_lib as wd_lib
 # create a site object, here for en-wiki
 # import logging
 NUM_CHANGED = 0
 
 
-
-
 def set_season_labels(page, serie_name, season_num, year):
     """ setting labels """
-    enlabel = u'{name} in {year}'.format(name=serie_name, year=year)
+    enlabel = '{name} in {year}'.format(name=serie_name, year=year)
 
     wd_lib.set_for_lang(page, serie_name, 'en', enlabel, "standard label setting")
-    frlabel = u'{name} saison {num}'.format(name=serie_name, num=year)
+    frlabel = '{name} saison {num}'.format(name=serie_name, num=year)
 
     wd_lib.set_for_lang(page, serie_name, 'fr', frlabel, "standard label setting")
 
-    fr_descriptionP = u'saison n°{num} de la série télévisée « {name} » en {year}'
+    fr_descriptionP = 'saison n°{num} de la série télévisée « {name} » en {year}'
 
     fr_description = fr_descriptionP.format(name=serie_name,
                                             num=season_num,
                                             year=year)
 
-    wd_lib.set_for_lang(page, serie_name, 'fr', fr_description, u"standard fr label setting",
+    wd_lib.set_for_lang(page, serie_name, 'fr', fr_description, "standard fr label setting",
                         kind='description')
 
-    en_description = u'{ordi} season of the {name} TV show'.format(name=serie_name,
-                                                                   ordi=get_en_ordinal(season_num))
+    en_description = '{ordi} season of the {name} TV show'.format(name=serie_name,
+                                                                  ordi=get_en_ordinal(season_num))
     wd_lib.set_for_lang(page, serie_name, 'en', en_description,
-                        u"standard fr label setting", kind='description')
+                        "standard fr label setting", kind='description')
 
 
 def treat_serie(serie_name, site_name='en',
@@ -56,7 +54,7 @@ def treat_serie(serie_name, site_name='en',
 
     site = pywikibot.getSite(site_name)
 
-    print("Serie : {}, Page: {}".format(serie_name, main_page_name))
+    print(("Serie : {}, Page: {}".format(serie_name, main_page_name)))
     serie_item = wd_lib.item_by_title(site, main_page_name)
 
     # Patterns of the titles of the series
@@ -92,11 +90,11 @@ def treat_serie(serie_name, site_name='en',
 
     num_season = current - 1
 
-    print("Number of seasons : {}".format(num_season))
+    print(("Number of seasons : {}".format(num_season)))
 
     year = start_year
     for i in range(1, len(items) + 1):
-        print("season {}, item: {}". format(i, items[i]))
+        print(("season {}, item: {}". format(i, items[i])))
         set_season_labels(items[i], serie_name, i, year)
 
         year = year + 1
@@ -106,10 +104,9 @@ def treat_serie(serie_name, site_name='en',
         items[i] = wd_lib.reloaditempage(items[i])
         wd_lib.maybe_set_claim(items[i], 361, serie_item)
         # wd_lib.instance_of(items[i], wd_lib.item_by_title("fr", u"Saison (télévision)"))
-    type_item = wd_lib.item_by_title("fr", u"Saison (télévision)")
+    type_item = wd_lib.item_by_title("fr", "Saison (télévision)")
     print(type_item)
-    wd_lib.make_sequence(items.itervalues(), type_item)
-
+    wd_lib.make_sequence(iter(items.values()), type_item)
 
 
 def create_options():
@@ -147,7 +144,6 @@ def create_options():
     return options
 
 
-
 def main():
     """ main script function """
     opt_parse = create_options()
@@ -158,7 +154,7 @@ def main():
         exit(0)
     serie_name = " ".join(opt.serie_name)
 
-    print(sys.argv)
+    print((sys.argv))
 
     num = None
     if opt.max_num:
@@ -171,7 +167,7 @@ def main():
     else:
         treat_serie(serie_name, "en", num=num, TITLE_PATTERN=opt.title_pattern)
 
-    print ("Nombre de changements : {}".format(NUM_CHANGED))
+    print(("Nombre de changements : {}".format(NUM_CHANGED)))
     return True
 
 if __name__ == "__main__":

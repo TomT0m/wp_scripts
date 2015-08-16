@@ -118,12 +118,12 @@ class HtmlTag(Delimiter):
         self.start = '<{}>'.format(tagname)
         self.end = '</{}>'.format(tagname)
 
-BOT_TAG = Delimiter(u'', u'<!-- FIN BOT -->')
-LINK_TAG = Delimiter(u'[[', u']]')
+BOT_TAG = Delimiter('', '<!-- FIN BOT -->')
+LINK_TAG = Delimiter('[[', ']]')
 
-ARG_TAG = Delimiter(u'{{{', u'}}}')
+ARG_TAG = Delimiter('{{{', '}}}')
 
-COMMENT_TAG = Delimiter(u'<!--', u'-->')
+COMMENT_TAG = Delimiter('<!--', '-->')
 INCLUDEONLY_TAG = HtmlTag('includeonly')
 NOINCLUDE_TAG = HtmlTag('noinclude')
 NOWIKI_TAG = HtmlTag('nowiki')
@@ -131,5 +131,5 @@ NOWIKI_TAG = HtmlTag('nowiki')
 
 def get_reconstruct_errmsg_pattern():
     """ returns an error message pattern """
-    err_msg_pattern = u"Balise de début {} manquante; ou numéro de section {} trop élevé dans la page {}."
+    err_msg_pattern = "Balise de début {} manquante; ou numéro de section {} trop élevé dans la page {}."
     return err_msg_pattern

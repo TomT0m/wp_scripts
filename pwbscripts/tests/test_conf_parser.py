@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 
-u"""
+"""
 Yaml parser & ProjectParameters objects test
 """
 
@@ -10,12 +10,13 @@ import pkgutil
 import unittest
 import yaml
 
+
 from pwbscripts.project_parameters import ProjectParameters
 import pwbscripts.projects as projects
 # import pwbscripts.projects
 # import pwbscripts.scripts
 # from StringIO import StringIO
-SAMPLEYAML = u"""
+SAMPLEYAML = """
 Informatique:
         page:  Projet:Informatique
         tasks: [announces]
@@ -24,7 +25,7 @@ Mathématiques:
     page: Projet:Mathématiques
     tasks: [Hyubot]
     portals: ["Portail:Algèbre"]
-    tasks: [announces, hyuBotLib]
+    tasks: [announces, hyubot]
 """
 
 
@@ -43,7 +44,7 @@ class TestParser(unittest.TestCase):
         self.assertEqual(obj["Informatique"]["page"], "Projet:Informatique")
         self.assertInList("announces", obj["Informatique"]["tasks"])
 
-        self.assertInList(u"Portail:Algèbre", obj[u"Mathématiques"][u"portals"])
+        self.assertInList("Portail:Algèbre", obj["Mathématiques"]["portals"])
 
 
 class TestConfigObj(unittest.TestCase):
@@ -56,7 +57,7 @@ class TestConfigObj(unittest.TestCase):
         obj = yaml.load(SAMPLEYAML)
         proj = ProjectParameters("Informatique", obj["Informatique"])
 
-        self.assertTrue(proj.has_task(u"announces"))
+        self.assertTrue(proj.has_task("announces"))
 
 
 class TestConfigFile(unittest.TestCase):
@@ -69,7 +70,7 @@ class TestConfigFile(unittest.TestCase):
         actual_config = (pkgutil.get_data("pwbscripts", "projects.yaml")).decode("utf-8")
         #  print(type(actual_config))
 
-        self.assertEqual(type(actual_config), type(u"ààeiu"))
+        self.assertEqual(type(actual_config), type("ààeiu"))
 
         obj = yaml.load(actual_config)
 

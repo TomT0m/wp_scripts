@@ -14,9 +14,11 @@ from pywikibot import output as output
 import pywikibot
 import sys
 
-import pwbscripts.bots_commons
 
-import wd_lib
+from pwbscripts import wd_lib
+from pwbscripts import lang
+
+from pwbscripts import bots_commons as bots_commons
 
 
 # create a site object, here for en-wiki
@@ -26,14 +28,14 @@ ARTICLE = None
 
 
 __lang_patterns__ = {
-    u"fr": {
-        u"label": u'{name} saison {num}',
-        u"description": u'saison {num} de la série télévisée « {name} »'
+    "fr": {
+        "label": '{name} saison {num}',
+        "description": 'saison {num} de la série télévisée « {name} »'
 
     },
-    u"en": {
-        u"label": u'{ordi} season of {name}',
-        u"description": None
+    "en": {
+        "label": '{ordi} season of {name}',
+        "description": None
     }
 }
 
@@ -44,11 +46,11 @@ def set_season_labels(serie_page, season_page, serie_name, season_num):
     datas = serie_page.get()
 
 #     en
-    enlabel = __lang_patterns__[u"en"][u"label"]\
-                    .format(name=serie_name,
-                            ordi=wd_lib.get_en_ordinal(season_num))
-    wd_lib.set_for_lang(season_page, serie_name, u'en',
-                        enlabel, u"standard label setting")
+    enlabel = __lang_patterns__["en"]["label"]\
+        .format(name=serie_name,
+                ordi=lang.get_en_ordinal(season_num))
+    wd_lib.set_for_lang(season_page, serie_name, 'en',
+                        enlabel, "standard label setting")
 
 #     fr
     if "fr" in datas["labels"]:
@@ -56,21 +58,21 @@ def set_season_labels(serie_page, season_page, serie_name, season_num):
     else:
         frseriename = serie_name
 
-    frlabel = u'{name} saison {num}'.format(name=frseriename, num=season_num)
-    wd_lib.set_for_lang(season_page, serie_name, u'fr', frlabel, u"standard label setting")
+    frlabel = '{name} saison {num}'.format(name=frseriename, num=season_num)
+    wd_lib.set_for_lang(season_page, serie_name, 'fr', frlabel, "standard label setting")
 
-    frdescription = u'saison {num} de la série télévisée « {name} »'.format(name=frseriename, num=season_num)
+    frdescription = 'saison {num} de la série télévisée « {name} »'.format(name=frseriename, num=season_num)
     if frseriename != serie_name:
         # correct a label set in english name when we got a french one
-        wrongdescription = u'saison {num} de la série télévisée « {name} »'.format(name=serie_name, num=season_num)
+        wrongdescription = 'saison {num} de la série télévisée « {name} »'.format(name=serie_name, num=season_num)
 
         wd_lib.set_for_lang(season_page, wrongdescription,
-                            'fr', frdescription, u"standard fr label setting",
+                            'fr', frdescription, "standard fr label setting",
                             kind='descriptions')
         # end correction block
 
     wd_lib.set_for_lang(season_page, serie_name,
-                        'fr', frdescription, u"standard fr label setting",
+                        'fr', frdescription, "standard fr label setting",
                         kind='descriptions')
 
 
@@ -81,10 +83,10 @@ def treat_serie(serie_name, site_name='en', main_page_name=None, num=None):
         main_page_name = serie_name
 
     site = pywikibot.Site(site_name, "wikipedia")
-    output(u"======> Serie : {}, Page: {}".format(serie_name, main_page_name))
+    output("======> Serie : {}, Page: {}".format(serie_name, main_page_name))
     serie_item = wd_lib.item_by_title(site, main_page_name)
 
-    TITLE_PATTERN = u"{}_(season_{})"
+    TITLE_PATTERN = "{}_(season_{})"
 
     has_previous = True
     current = 1
@@ -114,12 +116,12 @@ def treat_serie(serie_name, site_name='en', main_page_name=None, num=None):
 
     num_season = current - 1
 
-    output(u"=>Number of seasons : {}".format(num_season))
+    output("=>Number of seasons : {}".format(num_season))
 
     for i in range(1, len(items) + 1):
         output("===> Saison {}\n".format(i))
 
-        output(u"season {}, item: {}". format(i, items[i]))
+        output("season {}, item: {}". format(i, items[i]))
         set_season_labels(serie_item, items[i], serie_name, i)
         if i > 1:
             wd_lib.set_previous(items[i], items[i - 1])
@@ -127,13 +129,11 @@ def treat_serie(serie_name, site_name='en', main_page_name=None, num=None):
             wd_lib.set_next(items[i], items[i + 1])
 #          part of (P361): this item is a part of that item
         wd_lib.maybe_set_claim(items[i], 361, serie_item)
-        wd_lib.instance_of(items[i], wd_lib.item_by_title("fr", u"Saison (télévision)"))
+        wd_lib.instance_of(items[i], wd_lib.item_by_title("fr", "Saison (télévision)"))
 
         output("===> End of aison {} processing\n".format(i))
 
     output("======> End of serie (maybe) processing\n")
-
-
 
 
 def create_options():
@@ -153,7 +153,6 @@ def create_options():
     return options
 
 
-
 def logmain():
     """ main script function """
 
@@ -171,8 +170,8 @@ def logmain():
         opt_parse.print_help()
         exit(0)
 
-    serie_name = u" ".join([name.decode('utf-8')
-                            for name in opt.serie_name])
+    serie_name = " ".join([name.decode('utf-8')
+                           for name in opt.serie_name])
     global ARTICLE
     ARTICLE = serie_name  # remember for logging all errors
 
@@ -185,7 +184,7 @@ def logmain():
     else:
         treat_serie(serie_name, "en", num=num)
 
-    output(u"Nombre de changements : {}".format(wd_lib.NUM_CHANGED))
+    output("Nombre de changements : {}".format(wd_lib.NUM_CHANGED))
     return True
 
 

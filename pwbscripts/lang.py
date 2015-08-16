@@ -24,7 +24,7 @@ def get_en_ordinal(number):
         else:
             suffix = "th"
 
-        return u"{}{}".format(number, suffix)
+        return "{}{}".format(number, suffix)
 
     else:
         raise ValueError("Must be > 0")
