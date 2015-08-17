@@ -220,7 +220,7 @@ class _Formated(Wikicode):
     def __init__(self, text):
         self._text = text
 
-    def __unicode__(self):
+    def __str__(self):
         return self._text
 
 

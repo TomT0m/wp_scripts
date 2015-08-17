@@ -22,6 +22,7 @@ from wikitext.wikitext import Pattern as WikiPattern
 from wikitext.wikitext import Text as WikiText, Link as WikiLink, Template as WikiTmpl
 
 import pywikibot as pwb
+from wikitext.builder import build_wikitext
 
 # TODO: Fix duplicates announces bug.
 # TODO: Fix fusion status.
@@ -37,7 +38,6 @@ def extract_title(titre):
     """
     Retourne un titre d'article à partir d'un titre de section d'annonce de suppression
     """
-    print(titre)
     match = re.match(r" ?L'article (.*) est proposé à la suppression ?",
                      titre)
     return match.group(1)
@@ -57,7 +57,6 @@ def extract_full_del_props(text):
     sections = parsed.get_sections([2],
                                    matches="L'article .*? est proposé à la suppression")
 
-    print(sections)
     for sect in sections:
 
         article = extract_title(sect.split("==")[1])
@@ -75,7 +74,7 @@ def format_del_announce(date, article_name):
     announce = WikiTmpl(ANNOUNCE_DEL_TMPL,
                         posargs=[date], kwargs={"nom": article_name})
 
-    return str(announce)
+    return announce
 
 
 def extract_fusion_articles(title):
@@ -148,7 +147,7 @@ def insert_new_announces(old_text, dated_new_announces):
     announces_lines = section_annonces.split("\n")
 
     dated_old_announces = [
-        (text, extract_date(text))
+        (build_wikitext(text), extract_date(text))
         for text in announces_lines
         if text != ""
     ]
@@ -161,7 +160,7 @@ def insert_new_announces(old_text, dated_new_announces):
 
     new_section = WikiText("\n").join([text for text, _ in sorted_announces])
 
-    return preamble + sep_preamble + "\n" + new_section + "\n" + sep_end + rest
+    return preamble + sep_preamble + "\n" + str(new_section) + "\n" + sep_end + rest
 
 
 def gen_month_announces(month):
@@ -196,6 +195,8 @@ def gen_archives_page(old_archive_text, new_archived_announces):
 
 # writing functions
 
+import traceback
+
 
 def projects_maintenance(projects, options):
     """ Function launching maintenance for all projects """
@@ -203,27 +204,32 @@ def projects_maintenance(projects, options):
 
         pwb.output("Project : " + project.name)
 
-        deletion_prop_maintenance(project)
-        fusion_prop_maintenance(project)
+        try:
+            deletion_prop_maintenance(project)
+            fusion_prop_maintenance(project)
 
-        pwb.output("> Diff des Annonces <\n")
-        project.announce_page.show_diff()
+            pwb.output("> Diff des Annonces <\n")
+            project.announce_page.show_diff()
 
-        pwb.output("> Diff PDD <\n")
-        project.discussion_page.show_diff()
+            pwb.output("> Diff PDD <\n")
+            project.discussion_page.show_diff()
 
-        pwb.output("Simulate ? {}".format(options.simulate))
+            pwb.output("Simulate ? {}".format(options.simulate))
 
-        pwb.output("> touched files : {} ; {}".format(project.discussion_page, project.announce_page))
+            pwb.output("> touched files : {} ; {}".format(project.discussion_page, project.announce_page))
 
-        # Sauvegarde éventuelle #
-        if not options.simulate:
-            if project.discussion_page.modified:
-                project.discussion_page.save()
+            # Sauvegarde éventuelle #
+            if not options.simulate:
+                if project.discussion_page.modified:
+                    project.discussion_page.save()
 
-            if project.announce_page.modified:
-                project.announce_page.save()
+                if project.announce_page.modified:
+                    project.announce_page.save()
+        except Exception as e:
+            print(traceback.format_exc())
 
+            pwb.output("Quelque chose s'est mal passé pour le projet {} : <{}> {}"
+                       .format(project.name, type(e),str(e)))
 
 ANNOUNCES_SAMPLE = test_data.ANNOUNCES_SAMPLE
 
@@ -246,29 +252,37 @@ def del_prop_iteration(page):
 
 def deletion_prop_status_update(announce_page):
     """ returns an updated announce page
-    where deletion proposition annouce have been
+    where deletion proposition annonuce have been
     modified to reflect their real status (closed ?)
     """
 
     parsed = mwparserfromhell.parse(announce_page)
 
+    already_treated = set()
+
     for announce in del_prop_iteration(parsed):
-        article_title = announce.get("nom").value
+        article_title = str(announce.get("nom").value)
         pwb.output("-> {}".format(article_title))
-        try:
-            status = get_page_status(str(article_title))
-            if status.is_deleted():
-                announce.add(2, "supprimé")
-            elif status.is_proposed_to_deletion():
-                pwb.output("* still opened")
-            elif status.is_redirect_page():
-                announce.add(2, "fusionné")
-                announce.add("fusionné_avec", status.redirected_to)
-            else:
-                if "fait" not in announce:
-                    announce.add(2, "fait")
-        except pwb.exceptions.InvalidTitle:
-            pwb.log("Annonce malformée !! {}".format(article_title))
+        if article_title in already_treated:
+            parsed.remove(announce)
+        else:
+            try:
+                status = get_page_status(str(article_title))
+                if status.is_deleted():
+                    announce.add(2, "supprimé")
+                elif status.is_proposed_to_deletion():
+                    pwb.output("* till opened")
+                elif status.is_redirect_page():
+                    announce.add(2, "fusionné")
+                    announce.add("fusionné_avec", status.redirected_to)
+                else:
+                    if "fait" not in announce:
+                        announce.add(2, "fait")
+                already_treated.add(article_title)
+            except pwb.exceptions.InvalidTitle:
+                pwb.log("Annonce malformée !! {}".format(article_title))
+            except ValueError:
+                pwb.log("Pas de paramètre nom pour le modèle !! {}".format(parsed))
 
     return str(parsed)
 
@@ -291,6 +305,7 @@ def deletion_prop_maintenance(project):
     (articles, new_discussion_text) = extract_full_del_props(discussion_text)
 
     pwb.output("Articles extraits")
+
     for elem in articles:
         (nom, date) = elem
         pwb.output("Date d'annonce : {} ; Article à supprimer : {}".format(date, nom))
@@ -354,14 +369,14 @@ def fusion_prop_maintenance(project):
         new_a_text = insert_new_announces(project.announce_page.get_content(), dated_new_announces)
 
         fusion_msg_pattern = WikiPattern("Déplacement d'annonces de proposition de fusion depuis {}")
-        pddlink = WikiLink(project.discussion_pagename, "La PDD")
+        pddlink = WikiLink(project.discussion_pagename, WikiText("La PDD"))
         project.announce_page.set_content(new_a_text,
-                                          fusion_msg_pattern.format(pddlink))
+                                          str(fusion_msg_pattern.format(pddlink)))
 
-        announcelink = WikiLink(project.announce_pagename, "La page d'annonce")
+        announcelink = WikiLink(project.announce_pagename, WikiText("La page d'annonce"))
         msg_pattern = "Déplacement des annonces de proposition fusion vers {} "
         project.discussion_page.set_content(new_d_text,
-                                            msg_pattern.format(announcelink))
+                                            str(msg_pattern.format(announcelink)))
 
 
 # CLI management, UI

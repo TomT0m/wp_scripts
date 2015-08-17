@@ -25,7 +25,8 @@ _buildMap = {
     mwnodes.wikilink.Wikilink: lambda x: Link(x.title,
                                               mwp_to_wikitext(x.text)),
     mwnodes.template.Template: lambda x: Template(x.name,
-                                                  posargs=x.params),
+                                                  posargs=x.params,
+                                                  kwargs={str(p.name): p.value for p in x.params}),
 
     mwnodes.text.Text: lambda x: Text(x)
 }

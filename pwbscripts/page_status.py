@@ -51,7 +51,7 @@ class PageStatus(object):
 
         try:
             self.page.get()
-        except pywikibot.IsRedirectPage:
+        except pywikibot.exceptions.IsRedirectPage:
             print(("!!!!!!!!! {}".format(self.page.getRedirectTarget().title())))
             self._redirected_to = self.page.getRedirectTarget().title()
             return True
@@ -64,8 +64,10 @@ class PageStatus(object):
         """ True if the page has been deleted """
         try:
             self.page.get()
-        except pywikibot.NoPage:
+        except pywikibot.exceptions.NoPage:
             result = True
+        except pywikibot.exceptions.IsRedirectPage:
+            result = False
         finally:
             result = False
 
