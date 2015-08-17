@@ -9,7 +9,7 @@ Projects configurations object
 
 from logging import warn
 
-from pwbscripts.page_status import get_page_status
+from page_status import get_page_status
 import pywikibot as pwb
 
 

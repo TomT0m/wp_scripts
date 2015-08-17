@@ -13,7 +13,7 @@ from snakeguice import inject
 from snakeguice.modules import Module
 
 
-from pwbscripts.projects import Config
+from projects import Config
 
 
 class IOModule(Module):

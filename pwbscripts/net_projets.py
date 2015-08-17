@@ -1,5 +1,4 @@
-#! /usr/bin/python
-# -*- coding: utf-8 -*-
+#! /usr/bin/python3
 
 """
 #Description: Déplace les annonces de proposition de suppression de la page
@@ -34,30 +33,14 @@ ANNOUNCE_FUSION_TMPL = "Annonce fusion d'articles"
 # Parsing functions
 
 
-def msg_line_eating():
+def extract_title(titre):
     """
-    generates a pattern matching a complete line not beginning with '=='
-    >>> import os
-    >>> opts = re.MULTILINE # | re.DEBUG
-    >>> re.match(msg_line_eating(), "plop").group(0)
-    'plop'
-    >>> re.match(msg_line_eating(), "p").group(0)
-    'p'
-    >>> re.match(msg_line_eating(), "== plop ==")
-
-    >>> re.match("([^=]|=?!=).*$", "aa").group(0)
-    'aa'
-    >>> msg = "ab" + os.linesep + "b" + os.linesep + "==plop=="
-    >>> re.match('(' +msg_line_eating() + ')*', msg, opts).group(0).split(os.linesep)
-    ['ab', 'b', '']
-    >>> msg = msg + os.linesep + os.linesep + "==plop==" + os.linesep
-    >>> re.match('(' +msg_line_eating() + ')*', msg, opts).group(0).split(os.linesep)
-    ['ab', 'b', '']
+    Retourne un titre d'article à partir d'un titre de section d'annonce de suppression
     """
-    # newline_pattern = "(?:$\n)?^"
-    not_eq_eq = "^(?:[^=]|=?!=)"
-
-    return '(?:' + '^$\n?' + '|' + not_eq_eq + ".*$\n?" + ')'
+    print(titre)
+    match = re.match(r" ?L'article (.*) est proposé à la suppression ?",
+                     titre)
+    return match.group(1)
 
 
 def extract_full_del_props(text):
@@ -66,29 +49,24 @@ def extract_full_del_props(text):
 
     Searches deletion proposition generated with the standard ''full template'' form
     """
-    pattern = """== L'article {} est proposé à la suppression ==$\n""" + '((?:' + msg_line_eating() + ')*' + ')'
+
     articles = []
-    del_sum = 0
 
-    for article in re.finditer(pattern.format('(.*)'), text, re.MULTILINE):
-        date = extract_date(article.group(2))
-        articles.append((article.group(1), date))
-        del_sum += len(article.group(0))
+    parsed = mwparserfromhell.parse(text)
 
-        pwb.output(" Article : {} (annoncé le {})".format(article.group(1), date))
-        pwb.output(" Annonce : \n'''{}'''".format(len(article.group(2))))
+    sections = parsed.get_sections([2],
+                                   matches="L'article .*? est proposé à la suppression")
 
-    del_pattern = pattern.format('.*')
-    newpage = re.sub(del_pattern, '', text, flags=re.MULTILINE)
+    print(sections)
+    for sect in sections:
 
-    pwb.debug("(taille en octets) : Supprimé {} - nouvelle : {}, ancienne {}, différence {}: "
-              .format(del_sum,
-                      len(newpage),
-                      len(text),
-                      del_sum - (len(text) - len(newpage))),
-              "bot")
+        article = extract_title(sect.split("==")[1])
+        date = extract_date(sect)
 
-    return (articles, newpage)
+        articles.append((article, date))
+        text = text.replace(str(sect), "")
+
+    return (articles, text)
 
 
 def format_del_announce(date, article_name):
@@ -312,11 +290,6 @@ def deletion_prop_maintenance(project):
     #
     (articles, new_discussion_text) = extract_full_del_props(discussion_text)
 
-    # stats sur le diff entre page générée et page originale
-    pwb.output("Before : {} ; After {} ; expected around {}"
-               .format(len(discussion_text), len(new_discussion_text),
-                       len(discussion_text) - len(articles) * 1200))
-
     pwb.output("Articles extraits")
     for elem in articles:
         (nom, date) = elem
@@ -396,6 +369,28 @@ def fusion_prop_maintenance(project):
 
 #############################################################
 # testing
+TESTNEW = """
+== L'article Taskii est proposé à la suppression ==
+[[Image:Questionmark.png|70px|link=|Page proposée à la suppression|gauche]]
+Bonjour,
+
+L’article « '''{{Lien à supprimer|1=Taskii}}''' » est proposé à la suppression ({{cf.}} [[Wikipédia:Pages à supprimer]]). Après avoir pris connaissance des [[Wikipédia:Critères d'admissibilité des articles|critères généraux d’admissibilité des articles]] et des [[:Catégorie:Wikipédia:Admissibilité des articles|critères spécifiques]], vous pourrez [[Aide:Arguments à éviter lors d'une procédure de suppression|donner votre avis]] sur la page de discussion '''[[{{TALKPAGENAME:Taskii}}/Suppression]]'''.
+
+Le meilleur moyen d’obtenir un consensus pour la conservation de l’article est de fournir des [[Wikipédia:Citez vos sources|sources secondaires fiables et indépendantes]]. Si vous ne pouvez trouver de telles sources, c’est que l’article n’est probablement pas admissible. N’oubliez pas que les [[Wikipédia:Principes fondateurs|principes fondateurs]] de Wikipédia ne garantissent aucun droit à avoir un article sur Wikipédia.
+
+<nowiki />[[Utilisateur:Chris a liege|Chris a liege]] ([[Discussion utilisateur:Chris a liege|discuter]]) 20 mars 2015 à 00:54 (CET)
+
+== L'article Webisation est proposé à la suppression ==
+[[Image:Questionmark.png|70px|link=|Page proposée à la suppression|gauche]]
+Bonjour,
+
+L’article « '''{{Lien à supprimer|1=Webisation}}''' » est proposé à la suppression ({{cf.}} [[Wikipédia:Pages à supprimer]]). Après avoir pris connaissance des [[Wikipédia:Critères d'admissibilité des articles|critères généraux d’admissibilité des articles]] et des [[:Catégorie:Wikipédia:Admissibilité des articles|critères spécifiques]], vous pourrez [[Aide:Arguments à éviter lors d'une procédure de suppression|donner votre avis]] sur la page de discussion '''[[{{TALKPAGENAME:Webisation}}/Suppression]]'''.
+
+Le meilleur moyen d’obtenir un consensus pour la conservation de l’article est de fournir des [[Wikipédia:Citez vos sources|sources secondaires fiables et indépendantes]]. Si vous ne pouvez trouver de telles sources, c’est que l’article n’est probablement pas admissible. N’oubliez pas que les [[Wikipédia:Principes fondateurs|principes fondateurs]] de Wikipédia ne garantissent aucun droit à avoir un article sur Wikipédia.
+
+<nowiki />[[Utilisateur:Chris a liege|Chris a liege]] ([[Discussion utilisateur:Chris a liege|discuter]]) 23 mars 2015 à 01:19 (CET)
+
+"""
 
 
 class Test(TestCase):

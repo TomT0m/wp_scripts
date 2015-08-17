@@ -1,7 +1,4 @@
 
-# encoding:utf-8
-
-
 from argparse import ArgumentParser
 import dirspec.basedir  # multiformat config file getter
 import os
@@ -30,8 +27,8 @@ def get_default_configfile():
     """ returns the file path for the default configuration file """
 
     config_path = dirspec.basedir.get_xdg_config_home()
-    basepath = os.path.join(config_path, 'pwb')
+    basepath = os.path.join(config_path, b'pwb')
 
-    conffile = os.path.join(basepath, 'projects.yaml')
+    conffile = os.path.join(basepath, b'projects.yaml')
 
     return conffile

@@ -10,7 +10,7 @@ from mwparserfromhell.utils import parse_anything
 
 import mwparserfromhell.nodes as mwnodes
 import mwparserfromhell.wikicode as mwwikicode
-from pwbscripts.wikitext.wikitext import Text, Link, Template, wikiconcat
+from .wikitext import Text, Link, Template, wikiconcat
 
 
 def wikitext_from_node(node):

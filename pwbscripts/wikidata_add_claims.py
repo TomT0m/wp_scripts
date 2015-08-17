@@ -21,8 +21,7 @@ Example input:
 
 import csv
 import sys
-
-import pwbscripts.wd_lib
+import wd_lib
 
 
 def main():

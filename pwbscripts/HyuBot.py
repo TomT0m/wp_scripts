@@ -30,8 +30,8 @@ from snakeguice.modules import Module
 
 import string
 
-from pwbscripts.projects import Config
-from pwbscripts import bots_commons
+from projects import Config
+import bots_commons
 
 
 from hyubot.io import PageFactory, Outputter
@@ -41,7 +41,7 @@ from hyubot.parser import Delimiter as Delimiter
 from hyubot.parser import BOT_TAG, NOINCLUDE_TAG, get_reconstruct_errmsg_pattern
 from hyubot.utils import UTF2ASCII, uppercase_first
 
-from pwbscripts.projects import read_conffile
+from projects import read_conffile
 import pywikibot as wikipedia
 
 

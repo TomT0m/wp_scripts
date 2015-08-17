@@ -12,7 +12,7 @@ import yaml
 
 
 from project_parameters import ProjectParameters
-import projects
+
 # import pwbscripts.projects
 # import pwbscripts.scripts
 # from StringIO import StringIO

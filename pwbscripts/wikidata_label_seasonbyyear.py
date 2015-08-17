@@ -13,8 +13,8 @@ from argparse import ArgumentParser
 import pywikibot
 import sys
 
-from pwbscripts.lang import get_en_ordinal
-import pwbscripts.wd_lib as wd_lib
+from lang import get_en_ordinal
+import wd_lib
 # create a site object, here for en-wiki
 # import logging
 NUM_CHANGED = 0

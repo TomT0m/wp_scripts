@@ -13,7 +13,8 @@ TODO: Handle serie season redirects not associated to any particular article
 
 import re
 
-from pwbscripts.wd_lib import set_for_lang, make_sequence, item_by_title
+from wd_lib import set_for_lang, make_sequence, item_by_title
+
 SOURCE = """<strong class="selflink">10000 – 10FFF</strong></li>
 <li><a href="/wiki/Table_des_caract%C3%A8res_Unicode_(11000-11FFF)" title="Table des caractères Unicode (11000-11FFF)">11000 – 11FFF</a></li>
 <li><a href="/wiki/Table_des_caract%C3%A8res_Unicode_(12000-12FFF)" title="">12000 – 12FFF</a></li>

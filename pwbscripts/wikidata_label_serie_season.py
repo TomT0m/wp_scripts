@@ -15,10 +15,10 @@ import pywikibot
 import sys
 
 
-from pwbscripts import wd_lib
-from pwbscripts import lang
+import wd_lib
+import lang
 
-from pwbscripts import bots_commons as bots_commons
+import bots_commons
 
 
 # create a site object, here for en-wiki

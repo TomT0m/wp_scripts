@@ -6,9 +6,9 @@ Created on 15 juil. 2014
 
 import unittest
 
-from pwbscripts.wikitext.wikitext import Text
-import pwbscripts.wikitext.wikitext as Code
-import pwbscripts.wikitext.builder as build
+from wikitext.wikitext import Text
+import wikitext.wikitext as Code
+import wikitext.builder as build
 
 
 class Test(unittest.TestCase):
@@ -69,8 +69,6 @@ class TestTemplate(unittest.TestCase):
         self.assertNotIn("|3=", tmpl_str)
 
         self.assertIn("|wow1=plop", tmpl_str)
-
-        #self.assertRegex(tmpl_str, "^{{plop|")
 
 
 class TestMWParserFromHell2WikiText(unittest.TestCase):

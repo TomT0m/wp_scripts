@@ -4,8 +4,8 @@
 """
 Project parameters handling : read & load configuration
 """
-from pwbscripts.Schema import ObjectFragment, StringParamUnit  # @NoMove
-from pwbscripts.project_parameters import ProjectParameters
+from Schema import ObjectFragment, StringParamUnit  # @NoMove
+from project_parameters import ProjectParameters
 
 """
 tasks :
