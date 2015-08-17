@@ -25,8 +25,12 @@ _buildMap = {
     mwnodes.wikilink.Wikilink: lambda x: Link(x.title,
                                               mwp_to_wikitext(x.text)),
     mwnodes.template.Template: lambda x: Template(x.name,
-                                                  posargs=x.params,
-                                                  kwargs={str(p.name): p.value for p in x.params}),
+                                                  posargs=[str(p.value)
+                                                           for p in x.params if str(p.name).isdigit()],
+                                                  kwargs={
+                                                      str(p.name): p.value
+                                                      for p in x.params if not str(p.name).isdigit()}
+                                                  ),
 
     mwnodes.text.Text: lambda x: Text(x)
 }
