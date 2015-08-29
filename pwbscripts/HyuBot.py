@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 # Description : updates stats and announces and global project watchlist using Portals
@@ -23,17 +23,14 @@ Features :
 
 from pywikibot.compat import catlib
 import re
-from snakeguice import Injector
-from snakeguice import inject
-from snakeguice.assist import assisted_inject
-from snakeguice.modules import Module
-
+import pywikibot as pwb
 import string
 
 from projects import Config
 import bots_commons
 
 
+from hyubot.lists import compare_sorted_lists, inter_sorted_lists
 from hyubot.io import PageFactory, Outputter
 from hyubot.io import SimulateIOModule, IOModule
 from hyubot.io import agreement
@@ -59,56 +56,6 @@ Toolkit
 
 # store for the warnings to report on some user page
 warnings_list = []
-
-
-#
-# functions on the List (of Pages) article
-#
-
-
-def compare_sorted_lists(new_list, old_list):
-    """ calculates the differences between a list and a newer one
-
-    returns a couple of lists (insertions, deletions)
-    """
-    gain = []
-    loss = []
-    index = 0
-    for elem in old_list:
-        try:
-            while new_list[index] < elem:
-                gain.append(new_list[index])
-                index += 1
-            if elem == new_list[index]:
-                index += 1
-            else:
-                loss.append(elem)
-        except IndexError:
-            loss.append(elem)
-    return (gain + new_list[index:], loss)
-
-
-def inter_sorted_lists(list1, list2):
-    """ computes the commons elements of two sorted list """
-    index = 0
-    intersection = []
-    for elem in list2:
-        try:
-            while list1[index] < elem:
-                index += 1
-            if list1[index] == elem:
-                intersection.append(elem)
-                index += 1
-            # else:
-            #    print [elem, list1[index]]
-        except IndexError:
-            break
-    return intersection
-
-
-def odd_index_list(long_list):
-    """ Returns a list of indexes """
-    return [long_list[i] for i in range(1, len(long_list), 2)]
 
 
 """
@@ -304,7 +251,6 @@ class ListUpdateRobot(object):
                  sections=True, sort_table=UTF2ASCII):
 
         self.list_page = list_page
-        self.list = list_of_titles
         self.article_number_page = article_number_page
         self.edit = edit
         self.link = link
@@ -315,8 +261,8 @@ class ListUpdateRobot(object):
         self.deleted = []
         self._list_of_titles = list_of_titles
 
-        if self.list_of_titles is None:
-            self.list_of_titles = []
+        if self._list_of_titles is None:
+            self._list_of_titles = []
         if list_name:
             self.list_name = list_name
         else:
@@ -328,9 +274,9 @@ class ListUpdateRobot(object):
         return self._list_of_titles
 
     @list_of_titles.setter
-    def set_list(self, val):
-        """ Accessor for the Portal subjects string"""
-        self._list_of_titles = val
+    def list_of_titles(self, liste):
+        """ Setter for the Portal subjects string"""
+        self._list_of_titles = liste
 
     def gather_nominations(self):
         """
@@ -344,7 +290,7 @@ class ListUpdateRobot(object):
         old_list = self.extract_titles(self.list_page.section_string())
 
         if old_list:
-            (self.new, self.deleted) = compare_sorted_lists(self.list, old_list)
+            (self.new, self.deleted) = compare_sorted_lists(self.list_of_titles, old_list)
 
             if self.deleted:
                 change_warning = (" {{Moins2}}"
@@ -360,24 +306,24 @@ class ListUpdateRobot(object):
             change_warning = " création."
         if change_warning:
             self.list_page.section_update(
-                '\nMise à jour le ~~~~~ pour un total de {} articles'.format(len(self.list))
+                '\nMise à jour le ~~~~~ pour un total de {} articles'.format(len(self.list_of_titles))
                 + '\n' + self.list_string(self.list_of_titles) + '\n',
                 change_warning=("{} :{}".format(self.list_name, change_warning))
             )
 
             if self.article_number_page:
-                self.article_number_page.section_update(str(len(self.list)))
+                self.article_number_page.section_update(str(len(self.list_of_titles)))
             self.list = old_list
 
     def extract_titles(self, list_string):
         """ Extracts a list of article title from a wikilist of article links """
-        format_tag = Delimiter('* [[', ']]')
         titles_list = []
         for line in list_string.split('\n'):
-            try:
-                titles_list.append(format_tag.split(line)[1])
-            except IndexError:
-                pass
+            res = re.match('\* [[(.*)]]', line)
+            if res:
+                article = res.group(1)
+                titles_list.append(article)
+
         return unique(titles_list)
 
     def list_string(self, titles_list=None):
@@ -487,6 +433,7 @@ class Portal(wikipedia.Page):
     def __init__(self, site, name, logger,  # sort_table = None,
                  iconMedia='Bullet (typography).svg',
                  edit=True, option=None):
+        logger.output(name)
         wikipedia.Page.__init__(self, site, 'Portal:' + name,
                                 ns=4)
         # if self.namespace() != 4:
@@ -515,7 +462,7 @@ class Portal(wikipedia.Page):
 
         self.icon_media = iconMedia
         self.option = option
-        self.site = site
+        self._site = site
 
     def iconify(self, icon_media=None):
         """
@@ -580,7 +527,10 @@ class ProjectPage(wikipedia.Page):
             print(self.namespace())
             raise ValueError('BUG: {} is not in the project namespace'.format(self.name))
 
-        self.portals_list = [Portal(name, params, logger=logger) for name, params in parameters.portals]
+        logger.output(parameters.portals)
+
+        self.portals_list = [Portal(wikipedia.getSite(), name, logger)
+                             for (name, params) in parameters.portals]
 
         self.titles_list = []
 
@@ -600,7 +550,7 @@ class ProjectPage(wikipedia.Page):
         for portal in self.portals_list:
             portal.iconify()
             portal.listify()
-            self.titles_list += portal.list_updater_bot.list
+            self.titles_list += portal.list_updater_bot.list_of_titles
             portal.list_updater_bot.gather_nominations()
         self.titles_list = unique(self.titles_list)
         self.total_update()
@@ -751,7 +701,7 @@ WARNINGS_PAGE = wikipedia.Page(wikipedia.getSite(),
 class HuyBotApp(object):
 
     """ Full robot app for snakejuice"""
-    @inject(iomod=IOModule)
+
     def __init__(self, iomod):
         self.iomod = iomod
 
@@ -767,7 +717,6 @@ class Reporter(object):
 
     '''class definition for Reporter'''
 
-    @assisted_inject(page_factory=PageFactory, output=Outputter, config=Config)
     def __init__(self, page_factory, output, config):
         self._warnings_list = []
         self.page_factory = page_factory
@@ -793,22 +742,6 @@ class Reporter(object):
         pass
 
 
-class HyuBotModule(Module):
-
-    """ real execution """
-
-    def configure(self, binder):
-        self.install(binder, IOModule())
-
-
-class SimuHyuBotModule(Module):
-
-    """ module instanciation for testing"""
-
-    def configure(self, binder):
-        self.install(binder, SimulateIOModule())
-
-
 def main():
     """ main function : defines global logger and so on"""
 
@@ -827,18 +760,17 @@ def main():
                        ]
 
     if options.simulate:
-        inj = Injector(SimuHyuBotModule())
+        pass
     else:
-        inj = Injector(HyuBotModule())
+        pass
 
-    logger = inj.get_instance(Reporter)
-    app = inj.get_instance(Bot)
+    app = Bot()
 
 #     pylint: disable=maybe-no-member
     checklist = app.gather_nominations()
 
     for proj_param in proj_param_list:
-        ppage = ProjectPage(proj_param, logger=logger)
+        ppage = ProjectPage(proj_param, logger=wikipedia)
         ppage.maintenance(checklist=checklist)
 
     # reports the runs warnings on logging page

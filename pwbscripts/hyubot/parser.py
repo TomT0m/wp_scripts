@@ -8,6 +8,8 @@ Huybot wikitext parsing and deconstructing module
 
 """
 
+import re
+
 
 class Delimiter(object):
 
@@ -26,23 +28,10 @@ class Delimiter(object):
         self.end = endTag
         self._errors = None
 
-    def indices(self, txt, text_from=0):
-        """ computes the indexes of the substring delimited by the start and end delimiters
-
-        (or (StartIndex, None) if there is no end delimiters
-        """
-        start_index = txt.index(self.start, text_from)
-        if self.end:
-            try:
-                end_index = txt.index(self.end, start_index + len(self.start))
-            except ValueError:
-                end_index = None
-        else:
-            end_index = None
-        return (start_index, end_index)
-
     class EndTagMissing(Exception):
+
         """Exception launched when the page misses an end tag on parsing"""
+
         def __init__(self, message, Errors):
             Exception.__init__(self, message)
 
@@ -56,19 +45,21 @@ class Delimiter(object):
 
         """
         result = []
-        index = 0
-        try:
-            while 1:
-                (start_index, end_index) = self.indices(text, index)
-                result.append(text[index:start_index])
-                result.append(text[start_index + len(self.start):end_index])
-                index = end_index + len(self.end)
-        except ValueError:
-            result.append(text[index:])
-        except TypeError:
-            if self.end:
-                raise self.EndTagMissing("End tag '{}'".format(self.end), {"text": text})
 
+        if self.end is not None:
+
+            result = re.split("({}|{})".format(self.start,
+                                               self.end), text)
+            if len(result) % 2 != 1:
+                raise self.EndTagMissing("End tag '{}'".format(self.end), {"text": text})
+        else:
+            if self.start != "":
+                result = text.split(self.start)
+            else:
+                result = [text]
+
+        if self.start == "":
+            return [""] + result
         return result
 
     def rebuild(self, string_list):

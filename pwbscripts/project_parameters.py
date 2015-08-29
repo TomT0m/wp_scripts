@@ -115,11 +115,11 @@ class ProjectParameters(object):
             array_opt = self.get("option", [])
 
             if portal in array_opt:
-                return array_opt(portal)
+                return array_opt[portal]
             return []
 
         portals = [(portal, options(self, portal))
-                   for portal in self.get("portals", [])
+                   for portal in self.get("portal_names", [])
                    ]
 
         if portals == []:
