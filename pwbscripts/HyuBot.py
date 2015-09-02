@@ -122,7 +122,7 @@ class BotEditedPage(object):
 
     def section_string(self, section_number=0):
         """ returns the section content given a number
-        (the table countains also section names at odd indexes)"""
+        (the table contains also section names at odd indexes)"""
 
         return self.splitting[2 * section_number + 1]
 
