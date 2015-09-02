@@ -9,34 +9,9 @@
 """
 
 import pywikibot
-from snakeguice import inject
-from snakeguice.modules import Module
 
 
 from projects import Config
-
-
-class IOModule(Module):
-
-    """IOModule interface
-
-    IOModule binds WikiPages objects for actual runs to the Logger and Pages classes
-    of the Wikibots
-
-    Useful for tests and for simulation runs
-
-    """
-
-    def configure(self, linker):
-        pass
-
-
-class SimulateIOModule(IOModule):
-
-    """ IO not saving on Wikipedia pages, but rather putting pages elsewhere"""
-
-    def configure(self, linker):
-        pass
 
 
 class Outputter(object):
@@ -59,7 +34,7 @@ class PageFactory(object):
 
     """ How to get a WikiPage
     """
-    @inject(config=Config)
+
     def __init__(self, config):
         self._config = config
 
