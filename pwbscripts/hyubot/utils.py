@@ -68,6 +68,12 @@ UTF2ASCII = TranslationTable(
 def uppercase_first(text):
     """ returns a similar string with the first characters uppercased"""
     if text:
-        return text[0].upper() + text[1:]
+        return text.capitalize()
     else:
         return ''
+
+def unique(l):
+    """Given a list of hashable object, return an alphabetized unique list."""
+    l = list(dict.fromkeys(l).keys())
+    l.sort()
+    return l

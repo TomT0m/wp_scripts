@@ -8,38 +8,40 @@
 
 """
 
-import pywikibot
+
+class Reporter(object):
+    '''class definition for Reporter'''
+
+    def __init__(self, iomod):
+        self._warnings_list = []
+        self.iomod = iomod
+
+    def output(self, text):
+        """ method that both output to screen logger and saves the message"""
+        self.add_warning(text)
+        self.iomod.output(text)
+
+    def add_warning(self, warning):
+        """appends a warning report to the message report in prevision of Final report"""
+        self._warnings_list.append(warning)
+
+    @property
+    def warning_list(self):
+        """ getter for warning list messages"""
+        return self._warnings_list
 
 
-from projects import Config
-
-
-class Outputter(object):
-
-    """base class to output message on screen or console"""
-
-    def __init__(self):
-        self.outputted = 0
-
-    def output(self, message):
-        """outputs a message to console """
-        self.outputted += 1
-        pywikibot.output(message)
-
-    # def output_usage(self):
-    #    pywikibot.output("wow : {}".format(self.outputted))
-
-
-class PageFactory(object):
-
-    """ How to get a WikiPage
+class IOMod(object):
+    """ Standard module for logging, wikipage creation, ...
+    includes a page factory
     """
 
-    def __init__(self, config):
-        self._config = config
+    def __init__(self, *args, **kwargs):
 
-    def create_page(self, pagename):
-        """ main page creation function """
+        self.args = args
+        self.kwargs = kwargs
+
+    def createPage(self, *args, **kwargs):
         pass
 
 

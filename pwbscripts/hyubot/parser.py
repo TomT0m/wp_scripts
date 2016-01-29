@@ -1,7 +1,5 @@
 
 # encoding:utf-8
-
-
 """
 
 Huybot wikitext parsing and deconstructing module
@@ -10,9 +8,7 @@ Huybot wikitext parsing and deconstructing module
 
 import re
 
-
 class Delimiter(object):
-
     """
     Specifies start tag and end tag.
 

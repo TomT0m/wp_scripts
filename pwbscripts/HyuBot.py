@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+import hyubot
 
 # Description : updates stats and announces and global project watchlist using Portals
 
@@ -20,42 +21,23 @@ Features :
     * page_update article stats for portals
 """
 
-
-from pywikibot.compat import catlib
 import re
-import pywikibot as pwb
-import string
-
-from projects import Config
-import bots_commons
-
-
-from hyubot.lists import compare_sorted_lists, inter_sorted_lists
-from hyubot.io import PageFactory, Outputter
-from hyubot.io import SimulateIOModule, IOModule
-from hyubot.io import agreement
-from hyubot.parser import Delimiter as Delimiter
-from hyubot.parser import BOT_TAG, NOINCLUDE_TAG, get_reconstruct_errmsg_pattern
-from hyubot.utils import UTF2ASCII, uppercase_first
-
-from projects import read_conffile
+from pywikibot.compat import catlib
 import pywikibot as wikipedia
 
-
-# TODO: check the API to know if it is still needed (quick and dirty fix)
-def unique(l):
-    """Given a list of hashable object, return an alphabetized unique list."""
-    l = list(dict.fromkeys(l).keys())
-    l.sort()
-    return l
+import bots_commons
+from hyubot.io import agreement
+import hyubot.io as io
+from hyubot.lists import compare_sorted_lists, inter_sorted_lists
+from hyubot.parser import BOT_TAG, NOINCLUDE_TAG, get_reconstruct_errmsg_pattern
+from hyubot.parser import Delimiter as Delimiter
+from hyubot.utils import UTF2ASCII, uppercase_first, unique
+from projects import read_conffile
 
 
 """
 Toolkit
 """
-
-# store for the warnings to report on some user page
-warnings_list = []
 
 
 """
@@ -79,11 +61,12 @@ class BotEditedPage(object):
     Subclass of Page aimed to be edited by a bot.
     """
 
-    def __init__(self, site, title, logger, bot_tag=None,
-                 create=False
+    def __init__(self, site, title, iomod, bot_tag=None,
+                 create=False,
                  # sectionLevel=None, edit=True
                  ):
-        self.wikipage = wikipedia.Page(site, title)
+
+        self.wikipage = iomod.createPage(site, title)
 
         if bot_tag:
             self.bot_tag = bot_tag
@@ -93,7 +76,7 @@ class BotEditedPage(object):
         self.edit_summary = 'Robot : mise à jour'
         self.recovered = False
         self.create = create
-        self.logger = logger
+        self.iomod = iomod
         self._title = title
 
         self.edit = True
@@ -111,7 +94,7 @@ class BotEditedPage(object):
             try:
                 self.splitting = self.bot_tag.split(self.wikipage.get())
             except wikipedia.NoPage:
-                self.logger.output("\nLa page {} n'existe pas.".format(self.title))
+                self.iomod.output("\nLa page {} n'existe pas.".format(self.title))
 
                 if self.create:
                     self.splitting = ['', '']
@@ -141,17 +124,17 @@ class BotEditedPage(object):
             old_section = self.splitting[index]
         except IndexError:
             errmsg_pattern = get_reconstruct_errmsg_pattern()
-            self.logger.output(errmsg_pattern.format(self.bot_tag.start, str(section_number), self.title))
+            self.iomod.output(errmsg_pattern.format(self.bot_tag.start, str(section_number), self.title))
 
             if self.create:
-                self.logger.output("Création de la section à la suite du texte.")
+                self.iomod.output("Création de la section à la suite du texte.")
                 old_section = ''
             else:
-                self.logger.output("Abandon des modifications.")
+                self.iomod.output("Abandon des modifications.")
                 return
         if old_section == new_section:
             if no_change_warning:
-                self.logger.output("Pas de changement sur la page {}.".format(self.title))
+                self.iomod.output("Pas de changement sur la page {}.".format(self.title))
             return
         if not comment:
             comment = self.edit_summary
@@ -164,11 +147,12 @@ class BotEditedPage(object):
             self.wikipage.put(self.bot_tag.rebuild([head, new_section, tail]),
                               comment=comment)
 
+# pylint: disable=broad-except
         except Exception as exc:
-            self.logger.output("Erreur pendant l'édition de la page [[{}]]: {}.".format(self.title, exc))
+            self.iomod.output("Erreur pendant l'édition de la page [[{}]]: {}.".format(self.title, exc))
         else:
             if change_warning:
-                self.logger.output(change_warning)
+                self.iomod.output(change_warning)
 
     def edit_section_content(self, section_number=0):
         """ modifies the content of a section (no upload)"""
@@ -180,7 +164,7 @@ class BotEditedPage(object):
         except IndexError as exc:
 
             err_msg_pattern = "Balise de début {} manquante; ou numéro de section {} trop élevé dans la page {}."
-            self.logger.output(err_msg_pattern.format(self.bot_tag.start, str(section_number), self.title))
+            self.iomod.output(err_msg_pattern.format(self.bot_tag.start, str(section_number), self.title))
 
             raise exc
 
@@ -207,7 +191,7 @@ class BotEditedPage(object):
             if not comment:
                 comment = self.edit_summary
             if warning:
-                self.logger.output("(mise à jour) ")
+                self.iomod.output("(mise à jour) ")
 
             index = 2 * section_number + 1
             head = self.bot_tag.rebuild(self.splitting[:index])
@@ -218,10 +202,12 @@ class BotEditedPage(object):
             try:
                 self.wikipage.put(self.bot_tag.rebuild([head, new_string, tail]),
                                   comment=comment)
+
+# pylint: disable=broad-except
             except Exception as exc:
-                self.logger.output("Erreur pendant l'édition de la page [[{}]]: {}".format(self.title, exc))
+                self.iomod.output("Erreur pendant l'édition de la page [[{}]]: {}".format(self.title, exc))
         else:
-            self.logger.output("Pas de modification de la page [[{}]].".format(self.title))
+            self.iomod.output("Pas de modification de la page [[{}]].".format(self.title))
 
 
 class Bot(object):
@@ -267,6 +253,7 @@ class ListUpdateRobot(object):
             self.list_name = list_name
         else:
             self.list_name = list_page.title()
+        self.old_list = None
 
     @property
     def list_of_titles(self):
@@ -313,13 +300,14 @@ class ListUpdateRobot(object):
 
             if self.article_number_page:
                 self.article_number_page.section_update(str(len(self.list_of_titles)))
-            self.list = old_list
+            self.old_list = old_list
+        return self.old_list
 
     def extract_titles(self, list_string):
         """ Extracts a list of article title from a wikilist of article links """
         titles_list = []
         for line in list_string.split('\n'):
-            res = re.match('\* [[(.*)]]', line)
+            res = re.match(r'\* [[(.*)]]', line)
             if res:
                 article = res.group(1)
                 titles_list.append(article)
@@ -352,7 +340,7 @@ class ListUpdateRobot(object):
             list_dict['0'] = title_tag.englobe('\n== 0–9 ==')
             list_dict['~'] = title_tag.englobe('\n== Autres ==')
 
-            for character in string.ascii_uppercase:
+            for character in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
                 list_dict[character] = title_tag.englobe('\n== {} =='.format(character))
 
         for title in titles_list:
@@ -411,7 +399,7 @@ class NominationsChecklist(object):
         * extracts fusion nominations in the relevant frwiki page
         """
 
-        for key, name in list(self.nomination_type_label.items()):
+        for key, name in self.nomination_type_label.items():
             cat = catlib.Category(wikipedia.getSite(), 'Category:{}'.format(name))
             self.nomination_type_label[key] = {article.title() for article in cat.articles()}
 
@@ -430,10 +418,10 @@ class Portal(wikipedia.Page):
     portal: pages
     """
 
-    def __init__(self, site, name, logger,  # sort_table = None,
+    def __init__(self, site, name, iomod,  # sort_table = None,
                  iconMedia='Bullet (typography).svg',
                  edit=True, option=None):
-        logger.output(name)
+        iomod.output(name)
         wikipedia.Page.__init__(self, site, 'Portal:' + name,
                                 ns=4)
         # if self.namespace() != 4:
@@ -441,17 +429,18 @@ class Portal(wikipedia.Page):
         if option is None:
             option = []
 
-        self.logger = logger
         self.name = uppercase_first(name)
         # linkedCatName = u'Portail:%s/Articles liés' % name
 
         watchlist_page = BotEditedPage(wikipedia.getSite(),
                                        'Portail:{}/Liste de suivi'.format(name),
-                                       bot_tag=BOT_TAG, create=True, logger=logger)
+                                       iomod,
+                                       bot_tag=BOT_TAG, create=True)
 
         article_number_page = BotEditedPage(wikipedia.getSite(),
                                             'Portail:{}/Total'.format(name),
-                                            create=True, logger=logger)
+                                            iomod,
+                                            create=True)
 
         self.list_updater_bot = ListUpdateRobot(watchlist_page,
                                                 list_name='* Portail:{}'.format(name),
@@ -463,6 +452,7 @@ class Portal(wikipedia.Page):
         self.icon_media = iconMedia
         self.option = option
         self._site = site
+        self.iomod = iomod
 
     def iconify(self, icon_media=None):
         """
@@ -479,8 +469,8 @@ class Portal(wikipedia.Page):
 
 #             pylint: disable=broad-except
             except Exception as exc:
-                print(("failed to get icon for project {} some reason {}, ignoring"
-                       .format(self.name, exc)))
+                print("failed to get icon for project {} some reason {}, ignoring"
+                      .format(self.name, exc))
 
     def listify(self):
         """
@@ -493,9 +483,8 @@ class Portal(wikipedia.Page):
         try:
             template = wikipedia.Page(self.site,
                                       'Modèle:Portail {}'.format(self.name))
-            # wikipedia.output(u'OK.')
         except wikipedia.NoPage:
-            self.logger.output = "Bandeau introuvable avec le nom du portail."
+            self.iomod.output = "Bandeau introuvable avec le nom du portail."
 
             raise wikipedia.NoPage
 
@@ -510,27 +499,28 @@ class Portal(wikipedia.Page):
         self.list_updater_bot.list_of_titles = unique(templist)
 
 
-class ProjectPage(wikipedia.Page):
+class ProjectPage(BotEditedPage):
 
     """
     Specialization of class Page for "ProjectPage:" pages
     """
 
-    def __init__(self, parameters, logger):
-        wikipedia.Page.__init__(self, parameters.site, 'Project:' + parameters.name,
-                                insite=parameters.insite)  # , defaultNamespace = 4)
+    def __init__(self, parameters, iomod):
+        BotEditedPage.__init__(self, parameters, iomod)
+
+        self._page = iomod.createPage(self, parameters.site, 'Project:' + parameters.name,
+                                      insite=parameters.insite)  # , defaultNamespace = 4)
 
         self._parameters = parameters
-        self.logger = logger
+        self.iomod = iomod
 
-        if self.namespace() != 4:
-            print(self.namespace())
-            raise ValueError('BUG: {} is not in the project namespace'.format(self.name))
+        if self._page.namespace() != 4:
+            raise ValueError('BUG: {} is not in the project namespace'.format(self._page.name))
 
-        logger.output(parameters.portals)
+        iomod.output(parameters.portals)
 
-        self.portals_list = [Portal(wikipedia.getSite(), name, logger)
-                             for (name, params) in parameters.portals]
+        self.portals_list = [Portal(wikipedia.getSite(), name, iomod)
+                             for name in parameters.portals.keys()]
 
         self.titles_list = []
 
@@ -545,7 +535,7 @@ class ProjectPage(wikipedia.Page):
         * gathering nominations
         """
 
-        self.logger.output("\n'''[[Projet:{}]]'''".format(self.name))
+        self.iomod.output("\n'''[[Projet:{}]]'''".format(self._page.name))
 
         for portal in self.portals_list:
             portal.iconify()
@@ -563,7 +553,8 @@ class ProjectPage(wikipedia.Page):
 
         total_page = BotEditedPage(wikipedia.getSite(),
                                    'Projet:{}/Total articles'.format(self.name),
-                                   create=True, logger=self.logger)
+                                   self.iomod,
+                                   create=True)
 
         total_page.section_update(str(len(self.titles_list)))
 
@@ -609,7 +600,8 @@ class ProjectPage(wikipedia.Page):
         if list_string:
             new_articles_page = BotEditedPage(wikipedia.getSite(),
                                               'Projet:{}/Articles récents'.format(self.name),
-                                              bot_tag=BOT_TAG, create=True, logger=self.logger)
+                                              self.iomod,
+                                              bot_tag=BOT_TAG, create=True)
 
             old_list = new_articles_page.edit_section_content().split('\n;')
             list_string += '\n;' + '\n;'.join(old_list[1:10])
@@ -621,7 +613,8 @@ class ProjectPage(wikipedia.Page):
                     + "[[Projet:{}/Articles récents|articles récents]].".format(self.name)))
 
     def nominations_list_update(self, checklist):
-        """ updates the formated page in wikitext of fusion nominations, adq, and so on
+        """
+        updates the formated page in wikitext of fusion nominations, adq, and so on
         """
         project_checklist_dict = {}
         for key, nominates_list in list(checklist.nomination_type_label.items()):
@@ -636,9 +629,9 @@ class ProjectPage(wikipedia.Page):
                     # title = lbranch_tag.expurge(empty_if_tag.expurge(
                     #   arg_tag.expurge(fusion_title))).replace('|}}','').strip()
                     project_fusion_list.append(
-                        '* %s ' % fusion_title
+                        '* {} '.format(fusion_title)
                         + '<small>([[Wikipédia:Pages à fusionner#'
-                        + '%s' % re.sub(LINK_PATTERN, r'\1', fusion_title)
+                        + '{}'.format(re.sub(LINK_PATTERN, r'\1', fusion_title))
                         + '|discussion]])</small>')
                     for titlebis in fusion_list:
                         titlebis = uppercase_first(titlebis)  # .strip()
@@ -681,8 +674,9 @@ class ProjectPage(wikipedia.Page):
                                              + project_checklist_dict['PBA'])])])
 
         nominations_page = BotEditedPage(wikipedia.getSite(),
+                                         self.iomod,
                                          'Projet:{}/Consultations'.format(self.name),
-                                         bot_tag=BOT_TAG, create=True, logger=self.logger)
+                                         bot_tag=BOT_TAG, create=True)
 
         # output(u"• [[Projet:%s/Consultations|Consultations]] " % self.name)
 
@@ -702,18 +696,23 @@ class HuyBotApp(object):
 
     """ Full robot app for snakejuice"""
 
-    def __init__(self, iomod):
+    def __init__(self, params, iomod):
         self.iomod = iomod
+        self.params = params
 
     def run(self):
         """ Run the full task list """
         nominations_checklist = NominationsChecklist()
         nominations_checklist.gather_nominations()
 
+        for proj_param in self.params:
+            ppage = ProjectPage(proj_param, self.iomod)
+            ppage.maintenance(checklist=nominations_checklist)
+
 # Bot plumbing part
 
 
-class Reporter(object):
+class Reporter(io.Reporter):
 
     '''class definition for Reporter'''
 
@@ -738,8 +737,22 @@ class Reporter(object):
         return self._warnings_list
 
     def final_report(self):
-        #       TODO: code @IgnorePep8
+        #       TODO: code
         pass
+
+
+class IOMod(object):
+    """ Standard module for logging, wikipage creation, ...
+    includes a page factory
+    """
+
+    def __init__(self, *args, **kwargs):
+
+        self.args = args
+        self.kwargs = kwargs
+
+    def createPage(self, *args, **kwargs):
+        return wikipedia.Page(*args, **kwargs)
 
 
 def main():
@@ -760,18 +773,15 @@ def main():
                        ]
 
     if options.simulate:
-        pass
+        iomod = hyubot.testIO.TestIOMod()
+        reporter = hyubot.testIO.TestReporter(iomod)
     else:
-        pass
+        iomod = IOMod()
+        reporter = io.Reporter(iomod)
 
-    app = Bot()
+    app = HuyBotApp(None, proj_param_list, iomod, reporter)
 
-#     pylint: disable=maybe-no-member
-    checklist = app.gather_nominations()
-
-    for proj_param in proj_param_list:
-        ppage = ProjectPage(proj_param, logger=wikipedia)
-        ppage.maintenance(checklist=checklist)
+    app.run()
 
     # reports the runs warnings on logging page
 
@@ -791,7 +801,7 @@ def main():
     try:
         wpage_pattern = "{header}\n{warn_list}"
 
-        wl_content = '\n'.join(warnings_list)
+        wl_content = '\n'.join(reporter.warnings_list)
         header = wpage_header
         WARNINGS_PAGE.put(wpage_pattern.format(header=header,
                                                warn_list=wl_content),

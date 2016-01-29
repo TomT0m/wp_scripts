@@ -4,7 +4,6 @@ Created on 25 août 2015
 @author: tom
 '''
 
-
 #
 # functions on the List (of Pages) article
 #
